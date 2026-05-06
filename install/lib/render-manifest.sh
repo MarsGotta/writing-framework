@@ -175,11 +175,13 @@ validate_with_ajv() {
     # caller pueda caer al fallback de python+jsonschema.
     local out rc
     set +e
-    out="$(npx --no-install ajv-cli validate -s "$schema_path" -d "$manifest_path" 2>&1)"
+    out="$(npx --no-install ajv-cli validate --spec=draft2020 -s "$schema_path" -d "$manifest_path" 2>&1)"
     rc=$?
     set -e
     if [[ $rc -ne 0 ]]; then
-        if echo "$out" | grep -q -E "missing packages|could not determine executable to run|command not found"; then
+        # ajv ausente, schema no soportado o ref interna no resoluble: tratar como
+        # "ajv no disponible" (rc=2) para que el caller caiga al fallback python.
+        if echo "$out" | grep -q -E "missing packages|could not determine executable to run|command not found|no schema with key or ref|schema .* is invalid|unknown keyword"; then
             return 2
         fi
         echo "$out" >&2

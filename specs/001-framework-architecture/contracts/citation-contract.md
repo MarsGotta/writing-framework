@@ -147,7 +147,7 @@ Un schema completo vive en `contracts/citation-record.schema.json` (futuro). Esq
     "confianza": {"enum": ["oficial", "comunidad_alta", "comunidad_baja", "personal"]},
     "notas": {"type": "string"}
   },
-  "if": {"properties": {"versionado_aplicable": {"const": true}}},
+  "if": {"properties": {"versionado_aplicable": {"const": true}}, "required": ["versionado_aplicable"]},
   "then": {"required": ["version_aplicable"]}
 }
 ```

@@ -70,7 +70,10 @@
       "versionado_aplicable": {
         "const": true
       }
-    }
+    },
+    "required": [
+      "versionado_aplicable"
+    ]
   },
   "then": {
     "required": [
