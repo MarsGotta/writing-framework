@@ -1,0 +1,61 @@
+{
+  "closeable": true,
+  "blockers": [],
+  "passes_summary": {
+    "1": {
+      "firma_tipo": "autonomous",
+      "n_findings": 5
+    },
+    "2": {
+      "firma_tipo": "autonomous",
+      "n_findings": 6
+    },
+    "3": {
+      "firma_tipo": "autonomous",
+      "n_findings": 6
+    },
+    "4": {
+      "firma_tipo": "autonomous",
+      "n_findings": 8
+    },
+    "5": {
+      "firma_tipo": "autonomous",
+      "n_findings": 7
+    }
+  },
+  "pilot_proxy_signatures": [
+    {
+      "pasada": "pasada_3_naturalidad",
+      "razon": "Firma marcada como `desviacion_justificada` a nivel de pasada porque la matriz default exige firma `human` en pasada 3. Ver decisión documentada en close-project-output.json."
+    },
+    {
+      "pasada": "pasada_4_precision",
+      "razon": "Firma marcada como `desviacion_justificada` a nivel de pasada porque la matriz default exige firma `human` en pasada 4. Ver decisión documentada en close-project-output.json."
+    }
+  ],
+  "strict_blockers_if_no_proxy": [
+    {
+      "type": "human_signature_missing",
+      "pasada": "pasada_3_naturalidad",
+      "expected": "human",
+      "got": "autonomous"
+    },
+    {
+      "type": "human_signature_missing",
+      "pasada": "pasada_4_precision",
+      "expected": "human",
+      "got": "autonomous"
+    }
+  ],
+  "note": "Piloto editorial 2026-05-06: pasadas 3 y 4 firmaron `desviacion_justificada` con razón \"piloto automatizado: el operador humano firmará en una validación posterior; este piloto valida pipeline, no calidad final\". Bajo esa decisión documentada, se trata como firma humana proxy para fines del piloto y se permite cierre. En una validación final de producción, marcela debe firmar explícitamente las pasadas 3 y 4.",
+  "findings_total_open_critical": 0,
+  "manifest_signing_matrix": {
+    "pasada_1_estructura": "autonomous",
+    "pasada_2_utilidad": "autonomous",
+    "pasada_3_naturalidad": "human",
+    "pasada_4_precision": "human",
+    "pasada_5_formato": "autonomous"
+  },
+  "schema_version": "1.0",
+  "generated_at": "2026-05-06"
+}

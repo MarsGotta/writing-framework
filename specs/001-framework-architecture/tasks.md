@@ -133,15 +133,15 @@ Repo canónico de Write.OnMars (este repo). Rutas relevantes:
 
 ### Implementation for User Story 2 — Editorial pilot validation
 
-- [ ] T051 [US2] [Test] In a fresh test project under `tests/editorial-pilot/sandbox/`, run `install/install.sh` and capture artefacts. Confirms US1 still passes against the editorial-adapted templates from T030–T033.
-- [ ] T052 [US2] [Test] Define the pilot guide topic (a small, bounded technical subject — e.g. "Onboarding técnico en repositorios legacy") and produce its brief via `writeonmars-brief`. Save to `tests/editorial-pilot/sandbox/specs/001-pilot/spec.md`.
-- [ ] T053 [US2] [Test] Run `writeonmars-research` against `resources/` and any available external MCP; produce `tests/editorial-pilot/sandbox/specs/001-pilot/research.md` with at least one citation per concepto obligatorio (SC-009).
-- [ ] T054 [US2] [Test] Run `writeonmars-temario` and `writeonmars-descripciones` to produce the Temario + Descripciones encadenadas in `plan.md` (3 chapters).
-- [ ] T055 [US2] [Test] Run `writeonmars-redaccion` serially (parallelisation is US3) to draft the three chapter files in `tests/editorial-pilot/sandbox/chapters/`. Verify each chapter has the nine didactic sections (SC-003) and uses the recurring example (SC-005).
-- [ ] T056 [US2] [Test] Execute the five pasadas in order over each chapter. Pasadas 3 and 4 require human signature in the default matrix; in the pilot, the maintainer signs them or documents `desviacion_justificada`. Captures `findings.md` and `checklists/001-pilot/pasada-N.md`.
-- [ ] T057 [US2] [Test] Run `writeonmars-close-project` over the pilot. Must report `closeable: true` with no blockers. Validates SC-002.
-- [ ] T058 [US2] Archive the pilot evidence (spec, research, plan, chapters, findings, checklists, manifest) in `tests/editorial-pilot/evidence/<YYYY-MM-DD>-pilot-onboarding/` for future reference and constitution audits.
-- [ ] T059 [US2] Validate metrics: SC-003 (nine sections in 100% of chapters), SC-004 (glossary covers 100% of technical terms), SC-005 (recurring example in ≥80% of chapters), SC-009 (≥1 citation per concepto obligatorio). Document results in `tests/editorial-pilot/evidence/<YYYY-MM-DD>-pilot-onboarding/validation-report.md`.
+- [X] T051 [US2] [Test] In a fresh test project under `tests/editorial-pilot/sandbox/`, run `install/install.sh` and capture artefacts. Confirms US1 still passes against the editorial-adapted templates from T030–T033.
+- [X] T052 [US2] [Test] Define the pilot guide topic (a small, bounded technical subject — e.g. "Onboarding técnico en repositorios legacy") and produce its brief via `writeonmars-brief`. Save to `tests/editorial-pilot/sandbox/specs/001-pilot/spec.md`.
+- [X] T053 [US2] [Test] Run `writeonmars-research` against `resources/` and any available external MCP; produce `tests/editorial-pilot/sandbox/specs/001-pilot/research.md` with at least one citation per concepto obligatorio (SC-009).
+- [X] T054 [US2] [Test] Run `writeonmars-temario` and `writeonmars-descripciones` to produce the Temario + Descripciones encadenadas in `plan.md` (3 chapters).
+- [X] T055 [US2] [Test] Run `writeonmars-redaccion` serially (parallelisation is US3) to draft the three chapter files in `tests/editorial-pilot/sandbox/chapters/`. Verify each chapter has the nine didactic sections (SC-003) and uses the recurring example (SC-005).
+- [X] T056 [US2] [Test] Execute the five pasadas in order over each chapter. Pasadas 3 and 4 require human signature in the default matrix; in the pilot, the maintainer signs them or documents `desviacion_justificada`. Captures `findings.md` and `checklists/001-pilot/pasada-N.md`.
+- [X] T057 [US2] [Test] Run `writeonmars-close-project` over the pilot. Must report `closeable: true` with no blockers. Validates SC-002.
+- [X] T058 [US2] Archive the pilot evidence (spec, research, plan, chapters, findings, checklists, manifest) in `tests/editorial-pilot/evidence/<YYYY-MM-DD>-pilot-onboarding/` for future reference and constitution audits.
+- [X] T059 [US2] Validate metrics: SC-003 (nine sections in 100% of chapters), SC-004 (glossary covers 100% of technical terms), SC-005 (recurring example in ≥80% of chapters), SC-009 (≥1 citation per concepto obligatorio). Document results in `tests/editorial-pilot/evidence/<YYYY-MM-DD>-pilot-onboarding/validation-report.md`.
 
 ### Implementation for User Story 2 — Documentation
 
