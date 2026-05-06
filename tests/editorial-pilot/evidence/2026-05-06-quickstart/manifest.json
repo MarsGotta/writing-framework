@@ -1,0 +1,110 @@
+{
+  "framework_version": "0.1.0",
+  "constitution_version": "1.1.0",
+  "agent_target": "claude-code",
+  "language_primary": "es",
+  "skills": [
+    {
+      "name": "marcela-prose",
+      "version": "0.1.0",
+      "source": "bundled"
+    },
+    {
+      "name": "technical-guide-design",
+      "version": "0.1.0",
+      "source": "bundled"
+    },
+    {
+      "name": "writeonmars-brief",
+      "version": "0.1.0",
+      "source": "bundled"
+    },
+    {
+      "name": "writeonmars-close-project",
+      "version": "0.1.0",
+      "source": "bundled"
+    },
+    {
+      "name": "writeonmars-contraste",
+      "version": "0.2.0",
+      "source": "bundled"
+    },
+    {
+      "name": "writeonmars-descripciones",
+      "version": "0.1.0",
+      "source": "bundled"
+    },
+    {
+      "name": "writeonmars-glossary",
+      "version": "0.2.0",
+      "source": "bundled"
+    },
+    {
+      "name": "writeonmars-install",
+      "version": "0.1.0",
+      "source": "bundled"
+    },
+    {
+      "name": "writeonmars-pasada-1",
+      "version": "0.1.0",
+      "source": "bundled"
+    },
+    {
+      "name": "writeonmars-pasada-2",
+      "version": "0.1.0",
+      "source": "bundled"
+    },
+    {
+      "name": "writeonmars-pasada-3",
+      "version": "0.1.0",
+      "source": "bundled"
+    },
+    {
+      "name": "writeonmars-pasada-4",
+      "version": "0.1.0",
+      "source": "bundled"
+    },
+    {
+      "name": "writeonmars-pasada-5",
+      "version": "0.1.0",
+      "source": "bundled"
+    },
+    {
+      "name": "writeonmars-redaccion",
+      "version": "0.2.0",
+      "source": "bundled"
+    },
+    {
+      "name": "writeonmars-research",
+      "version": "0.1.0",
+      "source": "bundled"
+    },
+    {
+      "name": "writeonmars-temario",
+      "version": "0.1.0",
+      "source": "bundled"
+    },
+    {
+      "name": "writeonmars-update",
+      "version": "0.1.0",
+      "source": "bundled"
+    }
+  ],
+  "research_mode": "byom",
+  "signing_matrix": {
+    "pasada_1_estructura": "autonomous",
+    "pasada_2_utilidad": "autonomous",
+    "pasada_3_naturalidad": "human",
+    "pasada_4_precision": "human",
+    "pasada_5_formato": "autonomous"
+  },
+  "human_operators": [
+    {
+      "id": "marcela.gotta",
+      "email": "marcela@example.com",
+      "role": "editor"
+    }
+  ],
+  "citation_contract_version": "1.0",
+  "project_type": "editorial"
+}
