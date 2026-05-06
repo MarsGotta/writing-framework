@@ -53,16 +53,16 @@ Repo canónico de Write.OnMars (este repo). Rutas relevantes:
 
 **⚠️ CRITICAL**: ninguna user story puede arrancar hasta completar esta fase.
 
-- [ ] T006 Copy `/marcela-prose` from the Obsidian vault canonical source into `.claude/skills/marcela-prose/` and freeze a `VERSION` file declaring the imported version (FR-028). Document the import procedure (date, source, hash) in `docs/maintenance/sync-from-vault.md`.
-- [ ] T007 Copy `/technical-guide-design` from the Obsidian vault canonical source into `.claude/skills/technical-guide-design/` and freeze a `VERSION` file (FR-028). Append to `docs/maintenance/sync-from-vault.md`.
-- [ ] T008 [P] Mirror `specs/001-framework-architecture/contracts/citation-contract.md` to `contracts/citation-contract.md` (canonical published location).
-- [ ] T009 [P] Extract the JSON Schema from `contracts/citation-contract.md` § "JSON Schema (referencia mínima)" into `contracts/citation-record.schema.json` so it can be validated independently with `ajv`.
-- [ ] T010 [P] Mirror `specs/001-framework-architecture/contracts/manifest-schema.json` to `contracts/manifest-schema.json` (canonical published location).
-- [ ] T011 [P] Mirror `specs/001-framework-architecture/contracts/pass-output-schema.md` to `contracts/pass-output-schema.md` (canonical published location).
-- [ ] T012 [P] Create `docs/citation-contract.md` as a human-friendly walkthrough of the citation contract (audience: maintainers and MCP authors), linking to `contracts/citation-contract.md` for the formal spec.
-- [ ] T013 [P] Create `docs/manifest-schema.md` documenting each manifest field with examples, defaults and migration notes.
-- [ ] T014 [P] Create `docs/compatibility-matrix.md` scaffold with sections: "MCPs investigación compatibles" (initial entries: `context7`, `web-search:tavily`, `fetch`, `local:resources`), "Agentes soportados" (claude-code marked v1, codex/cursor marked planned).
-- [ ] T015 [P] Document the canonical maintenance procedure in `docs/maintenance/sync-from-vault.md`: when, why and how to refresh the bundled `/marcela-prose` and `/technical-guide-design` from the vault, including version bump rules.
+- [X] T006 Copy `/marcela-prose` from the Obsidian vault canonical source into `.claude/skills/marcela-prose/` and freeze a `VERSION` file declaring the imported version (FR-028). Document the import procedure (date, source, hash) in `docs/maintenance/sync-from-vault.md`.
+- [X] T007 Copy `/technical-guide-design` from the Obsidian vault canonical source into `.claude/skills/technical-guide-design/` and freeze a `VERSION` file (FR-028). Append to `docs/maintenance/sync-from-vault.md`.
+- [X] T008 [P] Mirror `specs/001-framework-architecture/contracts/citation-contract.md` to `contracts/citation-contract.md` (canonical published location).
+- [X] T009 [P] Extract the JSON Schema from `contracts/citation-contract.md` § "JSON Schema (referencia mínima)" into `contracts/citation-record.schema.json` so it can be validated independently with `ajv`.
+- [X] T010 [P] Mirror `specs/001-framework-architecture/contracts/manifest-schema.json` to `contracts/manifest-schema.json` (canonical published location).
+- [X] T011 [P] Mirror `specs/001-framework-architecture/contracts/pass-output-schema.md` to `contracts/pass-output-schema.md` (canonical published location).
+- [X] T012 [P] Create `docs/citation-contract.md` as a human-friendly walkthrough of the citation contract (audience: maintainers and MCP authors), linking to `contracts/citation-contract.md` for the formal spec.
+- [X] T013 [P] Create `docs/manifest-schema.md` documenting each manifest field with examples, defaults and migration notes.
+- [X] T014 [P] Create `docs/compatibility-matrix.md` scaffold with sections: "MCPs investigación compatibles" (initial entries: `context7`, `web-search:tavily`, `fetch`, `local:resources`), "Agentes soportados" (claude-code marked v1, codex/cursor marked planned).
+- [X] T015 [P] Document the canonical maintenance procedure in `docs/maintenance/sync-from-vault.md`: when, why and how to refresh the bundled `/marcela-prose` and `/technical-guide-design` from the vault, including version bump rules.
 
 **Checkpoint**: contratos publicados, skills externas bundled y documentación de mantenimiento listas. Las user stories pueden arrancar.
 
