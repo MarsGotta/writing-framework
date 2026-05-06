@@ -1,6 +1,6 @@
 ---
-
-description: "Task list template for feature implementation"
+description: "Task list template for feature implementation. Coexistente: modo software (default Spec Kit) y modo editorial (Write.OnMars)."
+project_type: software
 ---
 
 # Tasks: [FEATURE NAME]
@@ -8,45 +8,61 @@ description: "Task list template for feature implementation"
 **Input**: Design documents from `/specs/[###-feature-name]/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
+**Modos disponibles**: este template coexiste en dos modos seleccionados por el
+front-matter `project_type`:
 
-**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
+- `project_type: software` (default Spec Kit): expone fases Setup / Foundational
+  / User Stories / Polish.
+- `project_type: editorial`: expone fases editoriales (Brief / Investigación /
+  Plan / Redacción / Pasada 1–5 / Cierre) que reflejan los Principios II y V de
+  la constitución y FR-005..FR-029. La detección la realiza `/speckit-tasks`
+  leyendo `.writeonmars-manifest.json` (campo `project_type`).
+- `project_type: mixed`: rellena ambas zonas; útil cuando una feature mezcla
+  trabajo de framework con trabajo editorial.
 
-## Format: `[ID] [P?] [Story] Description`
+**Tests**: incluidos solo si los pide la spec. En modo editorial, las pasadas
+del Principio V actúan como tests obligatorios.
 
-- **[P]**: Can run in parallel (different files, no dependencies)
-- **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
-- Include exact file paths in descriptions
+**Organization**: tareas agrupadas por fase. En modo software, además se
+agrupan por user story; en modo editorial, por etapa del flujo editorial.
+
+## Format: `[ID] [P?] [Story?] Description`
+
+- **[P]**: puede ejecutarse en paralelo (archivos distintos, sin dependencias).
+- **[Story]**: solo en modo software; mapea a US1, US2, US3...
+- Cada tarea incluye ruta de archivo exacta.
 
 ## Path Conventions
 
-- **Single project**: `src/`, `tests/` at repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
-- Paths shown below assume single project - adjust based on plan.md structure
+- **Modo software / Single project**: `src/`, `tests/` en raíz del repo.
+- **Modo software / Web app**: `backend/src/`, `frontend/src/`.
+- **Modo software / Mobile**: `api/src/`, `ios/src/` o `android/src/`.
+- **Modo editorial**: `chapters/`, `glossary.md`, `index.md`, `common-errors.md`,
+  `templates/`, `checklists/[###-feature]/`, `specs/[###-feature]/findings.md`.
 
-<!-- 
+<!--
   ============================================================================
-  IMPORTANT: The tasks below are SAMPLE TASKS for illustration purposes only.
-  
-  The /speckit-tasks command MUST replace these with actual tasks based on:
-  - User stories from spec.md (with their priorities P1, P2, P3...)
-  - Feature requirements from plan.md
-  - Entities from data-model.md
-  - Endpoints from contracts/
-  
-  Tasks MUST be organized by user story so each story can be:
-  - Implemented independently
-  - Tested independently
-  - Delivered as an MVP increment
-  
-  DO NOT keep these sample tasks in the generated tasks.md file.
+  IMPORTANT: las tareas siguientes son MUESTRAS ilustrativas. El comando
+  /speckit-tasks (modo software) o la skill writeonmars-tasks (modo editorial,
+  cuando exista) DEBE reemplazarlas por tareas reales basadas en:
+
+  - User stories / Trayectos de lector de spec.md (con sus prioridades).
+  - Requisitos de plan.md (incluido el temario en modo editorial).
+  - Entidades del data-model.md / glosario inicial en modo editorial.
+  - Endpoints de contracts/ / contrato de citación en modo editorial.
+
+  Las tareas DEBEN organizarse por fase + (story | etapa editorial) para que
+  cada bloque sea independientemente entregable.
+
+  NO conserves estas tareas de muestra en el tasks.md generado.
   ============================================================================
 -->
 
+# Modo software (default Spec Kit)
+
 ## Phase 1: Setup (Shared Infrastructure)
 
-**Purpose**: Project initialization and basic structure
+**Purpose**: inicialización del proyecto y estructura básica.
 
 - [ ] T001 Create project structure per implementation plan
 - [ ] T002 Initialize [language] project with [framework] dependencies
@@ -56,11 +72,9 @@ description: "Task list template for feature implementation"
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
-**Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented
+**Purpose**: infraestructura nuclear que todas las user stories consumen.
 
-**⚠️ CRITICAL**: No user story work can begin until this phase is complete
-
-Examples of foundational tasks (adjust based on your project):
+**⚠️ CRITICAL**: ninguna user story puede arrancar hasta completar esta fase.
 
 - [ ] T004 Setup database schema and migrations framework
 - [ ] T005 [P] Implement authentication/authorization framework
@@ -69,19 +83,19 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T008 Configure error handling and logging infrastructure
 - [ ] T009 Setup environment configuration management
 
-**Checkpoint**: Foundation ready - user story implementation can now begin in parallel
+**Checkpoint**: Foundation lista — las user stories pueden arrancar en paralelo.
 
 ---
 
 ## Phase 3: User Story 1 - [Title] (Priority: P1) 🎯 MVP
 
-**Goal**: [Brief description of what this story delivers]
+**Goal**: [Qué entrega esta historia.]
 
-**Independent Test**: [How to verify this story works on its own]
+**Independent Test**: [Cómo verificarla en aislamiento.]
 
-### Tests for User Story 1 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 1 (OPTIONAL — solo si la spec pide tests) ⚠️
 
-> **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
+> **NOTA: Escribe estos tests PRIMERO; deben FALLAR antes de implementar.**
 
 - [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
 - [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
@@ -95,17 +109,17 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T016 [US1] Add validation and error handling
 - [ ] T017 [US1] Add logging for user story 1 operations
 
-**Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
+**Checkpoint**: User Story 1 totalmente funcional y testable de forma independiente.
 
 ---
 
 ## Phase 4: User Story 2 - [Title] (Priority: P2)
 
-**Goal**: [Brief description of what this story delivers]
+**Goal**: [Qué entrega.]
 
-**Independent Test**: [How to verify this story works on its own]
+**Independent Test**: [Cómo verificarla.]
 
-### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 2 (OPTIONAL) ⚠️
 
 - [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
 - [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
@@ -117,17 +131,17 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T022 [US2] Implement [endpoint/feature] in src/[location]/[file].py
 - [ ] T023 [US2] Integrate with User Story 1 components (if needed)
 
-**Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
+**Checkpoint**: User Stories 1 + 2 funcionan independientemente.
 
 ---
 
 ## Phase 5: User Story 3 - [Title] (Priority: P3)
 
-**Goal**: [Brief description of what this story delivers]
+**Goal**: [Qué entrega.]
 
-**Independent Test**: [How to verify this story works on its own]
+**Independent Test**: [Cómo verificarla.]
 
-### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
+### Tests for User Story 3 (OPTIONAL) ⚠️
 
 - [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
 - [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
@@ -138,17 +152,17 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T027 [US3] Implement [Service] in src/services/[service].py
 - [ ] T028 [US3] Implement [endpoint/feature] in src/[location]/[file].py
 
-**Checkpoint**: All user stories should now be independently functional
+**Checkpoint**: las tres user stories funcionan independientemente.
 
 ---
 
-[Add more user story phases as needed, following the same pattern]
+[Añade más fases de user story según sea necesario.]
 
 ---
 
 ## Phase N: Polish & Cross-Cutting Concerns
 
-**Purpose**: Improvements that affect multiple user stories
+**Purpose**: mejoras que afectan a varias user stories.
 
 - [ ] TXXX [P] Documentation updates in docs/
 - [ ] TXXX Code cleanup and refactoring
@@ -159,93 +173,280 @@ Examples of foundational tasks (adjust based on your project):
 
 ---
 
-## Dependencies & Execution Order
+# Modo editorial (Write.OnMars — activado por `project_type: editorial`)
 
-### Phase Dependencies
+<!--
+  Estas fases sólo se materializan cuando el manifiesto declara
+  `project_type: editorial` o `mixed`. La numeración E001..E0NN identifica
+  tareas editoriales y NO debe colisionar con T### del modo software.
+-->
 
-- **Setup (Phase 1)**: No dependencies - can start immediately
-- **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
-- **User Stories (Phase 3+)**: All depend on Foundational phase completion
-  - User stories can then proceed in parallel (if staffed)
-  - Or sequentially in priority order (P1 → P2 → P3)
-- **Polish (Final Phase)**: Depends on all desired user stories being complete
+## Phase E1: Brief (FR-005..FR-007)
 
-### User Story Dependencies
+**Purpose**: aterrizar el brief obligatorio del Principio III antes de
+investigar o redactar.
 
-- **User Story 1 (P1)**: Can start after Foundational (Phase 2) - No dependencies on other stories
-- **User Story 2 (P2)**: Can start after Foundational (Phase 2) - May integrate with US1 but should be independently testable
-- **User Story 3 (P3)**: Can start after Foundational (Phase 2) - May integrate with US1/US2 but should be independently testable
+- [ ] E001 Run `writeonmars-brief` (vía `/speckit-specify`) para producir el
+  brief de nueve campos en `specs/[###-feature]/spec.md`.
+- [ ] E002 Resolver cualquier `[NEEDS CLARIFICATION]` en campos críticos
+  (audiencia, ejemplo recurrente, resultado esperado) antes de avanzar a
+  Investigación. Bloqueante por FR-006.
+- [ ] E003 Generar / actualizar el contexto del proyecto (`CLAUDE.md` /
+  `AGENTS.md`) entre marcadores `<!-- WRITEONMARS START -->` /
+  `<!-- WRITEONMARS END -->`.
 
-### Within Each User Story
-
-- Tests (if included) MUST be written and FAIL before implementation
-- Models before services
-- Services before endpoints
-- Core implementation before integration
-- Story complete before moving to next priority
-
-### Parallel Opportunities
-
-- All Setup tasks marked [P] can run in parallel
-- All Foundational tasks marked [P] can run in parallel (within Phase 2)
-- Once Foundational phase completes, all user stories can start in parallel (if team capacity allows)
-- All tests for a user story marked [P] can run in parallel
-- Models within a story marked [P] can run in parallel
-- Different user stories can be worked on in parallel by different team members
+**Checkpoint**: brief firmado por la persona operadora; spec lista para
+investigar.
 
 ---
 
-## Parallel Example: User Story 1
+## Phase E2: Investigación (FR-008..FR-009b)
+
+**Purpose**: producir `research.md` con fuentes verificables conformes al
+contrato de citación v1.0.
+
+- [ ] E010 Ejecutar `writeonmars-research` sobre `resources/` (fuente local
+  obligatoria) + MCPs externos compatibles (BYOM por defecto).
+- [ ] E011 [P] Validar cada CitationRecord contra
+  `contracts/citation-record.schema.json` con `tests/lib/validate-citation.sh`.
+- [ ] E012 Asegurar ≥ 1 cita por concepto obligatorio del brief (SC-009).
+- [ ] E013 Marcar datos volátiles (versiones, precios, comandos) con
+  `[VERIFICAR]`.
+
+**Checkpoint**: `specs/[###-feature]/research.md` cierra cobertura de
+conceptos obligatorios.
+
+---
+
+## Phase E3: Plan editorial (FR-010, FR-011)
+
+**Purpose**: temario + descripciones encadenadas + Constitution Check editorial.
+
+- [ ] E020 [P] Ejecutar `writeonmars-temario` (envuelve `/technical-guide-design`)
+  y rellenar la sección "Temario" de `plan.md`.
+- [ ] E021 [P] Ejecutar `writeonmars-descripciones` y rellenar
+  "Descripciones encadenadas" en `plan.md`. Validar que `conexion_anterior` /
+  `conexion_siguiente` `null` solo aparece en frontera.
+- [ ] E022 Constitution Check editorial: verificar Principios I–V; registrar
+  desviaciones en `Complexity Tracking`.
+
+**Checkpoint**: `plan.md` aprobado; cualquier desviación justificada.
+
+---
+
+## Phase E4: Redacción (FR-014, FR-015)
+
+**Purpose**: producir cada capítulo bajo la estructura didáctica del Principio
+II y consolidar el glosario sin colisiones.
+
+- [ ] E030 [P] Despachar sub-agente de redacción por capítulo (o `--parallel N`
+  cuando US3 esté activo) con el prompt canónico
+  `agents/claude/prompts/redaccion.md`.
+- [ ] E031 Cada sub-agente devuelve `chapters/[###]-titulo.md` con front-matter
+  YAML (data-model § 7) y las nueve secciones obligatorias.
+- [ ] E032 Ejecutar `writeonmars-glossary` para consolidar
+  `terminos_introducidos`; bloquear ante colisiones de definición (FR-015).
+
+**Checkpoint**: capítulos redactados, glosario consolidado, ejemplo recurrente
+aplicado en ≥ 80 % de capítulos (SC-005).
+
+---
+
+## Phase E5: Pasada 1 — Estructura (FR-018, Constitución § V.1)
+
+**Purpose**: detectar promesa difusa, capítulos sin función, progresión rota.
+
+- [ ] E040 Ejecutar `writeonmars-pasada-1` (envuelve `/technical-guide-design`).
+- [ ] E041 Anexar bloque a `findings.md` conforme a `pass-output-schema` v1.0.
+- [ ] E042 Firmar `checklists/[###-feature]/pasada-1.md` (default: autonomous).
+
+**Checkpoint**: pasada 1 verde o hallazgos críticos resueltos.
+
+---
+
+## Phase E6: Pasada 2 — Utilidad (FR-018, Constitución § V.2)
+
+**Purpose**: ejemplos por concepto, acción práctica por capítulo, checklists,
+errores comunes, criterios de éxito.
+
+- [ ] E050 Ejecutar `writeonmars-pasada-2` (envuelve `/technical-guide-design`).
+- [ ] E051 Anexar bloque a `findings.md`.
+- [ ] E052 Firmar `checklists/[###-feature]/pasada-2.md` (default: autonomous).
+
+**Checkpoint**: pasada 2 verde o hallazgos críticos resueltos.
+
+---
+
+## Phase E7: Pasada 3 — Naturalidad (FR-018, Constitución § V.3)
+
+**Purpose**: detectar frases comprimidas, "No es X: es Y", pronombres vagos,
+transiciones secas, entusiasmo artificial, metáforas mezcladas.
+
+- [ ] E060 Ejecutar `writeonmars-pasada-3` (envuelve `/marcela-prose`).
+- [ ] E061 Anexar bloque a `findings.md`.
+- [ ] E062 Firmar `checklists/[###-feature]/pasada-3.md`. **Firma humana
+  requerida** por defecto (FR-020a). Cualquier desviación se justifica en
+  `Complexity Tracking`.
+
+**Checkpoint**: pasada 3 firmada por operador humano; hallazgos críticos
+resueltos.
+
+---
+
+## Phase E8: Pasada 4 — Precisión (FR-016, FR-018, Constitución § V.4)
+
+**Purpose**: contrastar cada afirmación verificable contra ≥ 1 CitationRecord.
+
+- [ ] E070 Ejecutar `writeonmars-pasada-4` (envuelve `writeonmars-contraste`).
+- [ ] E071 Anexar bloque a `findings.md` con `referencias_cita` por hallazgo.
+- [ ] E072 Firmar `checklists/[###-feature]/pasada-4.md`. **Firma humana
+  requerida** por defecto.
+
+**Checkpoint**: cero hallazgos críticos abiertos en pasada 4 al cierre (SC-002).
+
+---
+
+## Phase E9: Pasada 5 — Formato (FR-018, FR-029, Constitución § V.5)
+
+**Purpose**: cajas visuales útiles, ejemplos diferenciados, títulos claros,
+índice navegable, glosario completo, plantillas extraídas.
+
+- [ ] E080 Ejecutar `writeonmars-pasada-5`. Agrega `common-errors.md`,
+  construye / valida `index.md`, valida `glossary.md` y `templates/`.
+- [ ] E081 Anexar bloque a `findings.md`.
+- [ ] E082 Firmar `checklists/[###-feature]/pasada-5.md` (default: autonomous).
+
+**Checkpoint**: pasada 5 verde; estructura de guía completa lista.
+
+---
+
+## Phase E10: Cierre (FR-020, FR-020a)
+
+**Purpose**: gate final de cierre del proyecto editorial.
+
+- [ ] E090 Ejecutar `writeonmars-close-project`. Devuelve
+  `{closeable: bool, blockers: [...]}`.
+- [ ] E091 Resolver blockers (críticos abiertos, firmas humanas faltantes) o
+  archivar `desviacion_justificada`.
+- [ ] E092 Archivar evidencia del ciclo (spec, research, plan, chapters,
+  findings, checklists, manifest) en
+  `tests/editorial-pilot/evidence/<YYYY-MM-DD>-<topic>/` cuando aplique.
+
+**Checkpoint**: cierre del proyecto editorial; guía publicable.
+
+---
+
+## Dependencies & Execution Order
+
+### Phase Dependencies (modo software)
+
+- **Setup (Phase 1)**: sin dependencias.
+- **Foundational (Phase 2)**: depende de Setup. **BLOQUEA** todas las stories.
+- **User Stories (Phase 3+)**: dependen de Foundational.
+  - Pueden avanzar en paralelo si hay equipo.
+  - O secuencialmente por prioridad (P1 → P2 → P3).
+- **Polish (Final Phase)**: depende de las stories deseadas completas.
+
+### Phase Dependencies (modo editorial)
+
+- **E1 Brief**: sin dependencias.
+- **E2 Investigación**: depende de E1.
+- **E3 Plan editorial**: depende de E2.
+- **E4 Redacción**: depende de E3.
+- **E5..E9 Pasadas 1–5**: secuenciales en este orden (constitución § V).
+- **E10 Cierre**: depende de E5..E9 verdes.
+
+### Within Each User Story (modo software)
+
+- Tests (si se incluyen) DEBEN escribirse y FALLAR antes de implementar.
+- Modelos antes de servicios.
+- Servicios antes de endpoints.
+- Implementación nuclear antes de integración.
+
+### Within Each Editorial Phase
+
+- Cada pasada bloquea la siguiente: defectos detectados se resuelven antes de
+  avanzar (constitución § V).
+- Las pasadas con firma humana requieren al operador declarado en
+  `human_operators[]` del manifiesto.
+
+### Parallel Opportunities
+
+- Tareas marcadas `[P]` dentro de una fase pueden ejecutarse en paralelo.
+- Modo software: una vez Foundational verde, todas las stories pueden empezar
+  en paralelo si la capacidad lo permite.
+- Modo editorial: la redacción (E030) puede paralelizarse capítulo a capítulo
+  cuando US3 esté activo (US3 entrega `--parallel N`).
+
+---
+
+## Parallel Example: User Story 1 (modo software)
 
 ```bash
-# Launch all tests for User Story 1 together (if tests requested):
+# Lanzar todos los tests de la US1 a la vez (si la spec los pide):
 Task: "Contract test for [endpoint] in tests/contract/test_[name].py"
 Task: "Integration test for [user journey] in tests/integration/test_[name].py"
 
-# Launch all models for User Story 1 together:
+# Lanzar todos los modelos de la US1 a la vez:
 Task: "Create [Entity1] model in src/models/[entity1].py"
 Task: "Create [Entity2] model in src/models/[entity2].py"
+```
+
+## Parallel Example: Redacción editorial (modo editorial, US3)
+
+```bash
+# Después de E20–E22 (plan editorial cerrado), lanzar redacción paralela
+# de capítulos independientes:
+Task: "Redactar chapters/001-titulo.md siguiendo agents/claude/prompts/redaccion.md"
+Task: "Redactar chapters/002-titulo.md siguiendo agents/claude/prompts/redaccion.md"
+Task: "Redactar chapters/003-titulo.md siguiendo agents/claude/prompts/redaccion.md"
 ```
 
 ---
 
 ## Implementation Strategy
 
-### MVP First (User Story 1 Only)
+### MVP First (User Story 1 / Brief + Pasada 5)
 
-1. Complete Phase 1: Setup
-2. Complete Phase 2: Foundational (CRITICAL - blocks all stories)
-3. Complete Phase 3: User Story 1
-4. **STOP and VALIDATE**: Test User Story 1 independently
-5. Deploy/demo if ready
+1. Modo software: Phase 1 → Phase 2 → Phase 3.
+2. Modo editorial: E1 → E2 → E3 → un solo capítulo en E4 → E5..E9 sobre ese
+   capítulo → E10.
+3. **STOP and VALIDATE** antes de extender.
 
 ### Incremental Delivery
 
-1. Complete Setup + Foundational → Foundation ready
-2. Add User Story 1 → Test independently → Deploy/Demo (MVP!)
-3. Add User Story 2 → Test independently → Deploy/Demo
-4. Add User Story 3 → Test independently → Deploy/Demo
-5. Each story adds value without breaking previous stories
+- Modo software: Setup + Foundational → US1 → US2 → US3 → Polish.
+- Modo editorial: brief → investigación → plan → un capítulo redactado y
+  pasado por las cinco pasadas → ampliar al resto del temario.
 
 ### Parallel Team Strategy
 
-With multiple developers:
+Modo software (con varios developers):
 
-1. Team completes Setup + Foundational together
-2. Once Foundational is done:
-   - Developer A: User Story 1
-   - Developer B: User Story 2
-   - Developer C: User Story 3
-3. Stories complete and integrate independently
+1. Equipo completa Setup + Foundational.
+2. Una vez Foundational verde:
+   - Persona A: User Story 1.
+   - Persona B: User Story 2.
+   - Persona C: User Story 3.
+3. Las stories integran independientemente.
+
+Modo editorial (con un agente y un humano):
+
+1. Operador humano firma brief y pasadas 3 + 4.
+2. Agente redacta y ejecuta pasadas 1, 2, 5 en autónomo.
+3. La paralelización de redacción (`--parallel N`) acelera guías de ≥ 4
+   capítulos.
 
 ---
 
 ## Notes
 
-- [P] tasks = different files, no dependencies
-- [Story] label maps task to specific user story for traceability
-- Each user story should be independently completable and testable
-- Verify tests fail before implementing
-- Commit after each task or logical group
-- Stop at any checkpoint to validate story independently
-- Avoid: vague tasks, same file conflicts, cross-story dependencies that break independence
+- `[P]` = archivos distintos, sin dependencias incompletas.
+- `[Story]` mapea la tarea a una user story (solo modo software).
+- Verifica que los tests fallan antes de implementar.
+- Commit después de cada tarea o grupo lógico; el hook `auto_commit.after_implement`
+  de Spec Kit aplica igual a artefactos editoriales que a código.
+- Modo editorial: nunca borres pasadas históricas en `findings.md`; cada pasada
+  añade su bloque al final.
+- Evita: tareas vagas, conflictos de archivo, dependencias cruzadas que rompan
+  la independencia de stories o de pasadas.

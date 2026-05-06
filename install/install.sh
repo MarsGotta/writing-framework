@@ -271,17 +271,19 @@ context_json="$(bash "$SCRIPT_DIR/lib/render-context.sh" "${render_context_args[
     exit 40
 }
 
-# Parsear operator_id / operator_email del JSON devuelto.
+# Parsear operator_id / operator_email / project_type del JSON devuelto.
 if command -v jq >/dev/null 2>&1; then
     OPERATOR_ID="$(echo "$context_json" | jq -r '.operator_id')"
     OPERATOR_EMAIL="$(echo "$context_json" | jq -r '.operator_email')"
     EFFECTIVE_AGENT="$(echo "$context_json" | jq -r '.agent_target')"
     EFFECTIVE_LANGUAGE="$(echo "$context_json" | jq -r '.language_primary')"
+    PROJECT_TYPE="$(echo "$context_json" | jq -r '.project_type')"
 else
     OPERATOR_ID="$(echo "$context_json" | grep -Eo '"operator_id"[[:space:]]*:[[:space:]]*"[^"]+"' | head -n1 | sed 's/.*"\([^"]*\)"$/\1/')"
     OPERATOR_EMAIL="$(echo "$context_json" | grep -Eo '"operator_email"[[:space:]]*:[[:space:]]*"[^"]+"' | head -n1 | sed 's/.*"\([^"]*\)"$/\1/')"
     EFFECTIVE_AGENT="$AGENT"
     EFFECTIVE_LANGUAGE="$LANGUAGE"
+    PROJECT_TYPE="$(echo "$context_json" | grep -Eo '"project_type"[[:space:]]*:[[:space:]]*"[^"]+"' | head -n1 | sed 's/.*"\([^"]*\)"$/\1/')"
 fi
 
 if [[ -z "$OPERATOR_ID" || -z "$OPERATOR_EMAIL" ]]; then
@@ -296,7 +298,7 @@ fi
 common::info "[6/6] Generando .writeonmars-manifest.json..."
 if ! bash "$SCRIPT_DIR/lib/render-manifest.sh" \
         "$TARGET_DIR" "$EFFECTIVE_AGENT" "$EFFECTIVE_LANGUAGE" \
-        "$OPERATOR_ID" "$OPERATOR_EMAIL"; then
+        "$OPERATOR_ID" "$OPERATOR_EMAIL" "${PROJECT_TYPE:-}"; then
     common::err "render-manifest.sh falló."
     exit 50
 fi

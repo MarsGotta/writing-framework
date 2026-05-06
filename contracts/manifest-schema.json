@@ -98,6 +98,11 @@
       "pattern": "^\\d+\\.\\d+$",
       "description": "Citation contract version this project supports. Records emitted by MCPs are validated against this version."
     },
+    "project_type": {
+      "type": "string",
+      "enum": ["editorial", "software", "mixed"],
+      "description": "Optional. Selects the mode of `.specify/templates/*` consumed by Spec Kit. `editorial` activates the brief of nine fields, the temario / descripciones encadenadas, the five-pasada checklist materialisation and the editorial Constitution Check. `software` keeps the classic Spec Kit behaviour. `mixed` renders both. Default behaviour when absent: software."
+    },
     "memory_external": {
       "type": "object",
       "additionalProperties": false,

@@ -103,10 +103,10 @@ Repo canónico de Write.OnMars (este repo). Rutas relevantes:
 
 ### Implementation for User Story 2 — Spec Kit template adaptation
 
-- [ ] T030 [P] [US2] Adapt `.specify/templates/spec-template.md` to incorporate the nine-field editorial brief (audiencia, problema, resultado_esperado, nivel, tono, conceptos_obligatorios, ejemplo_recurrente, riesgos, acciones_practicas) as mandatory sections (FR-005). Preserve the "User Stories → Trayectos de lector" mental model documented in the constitution sync impact report.
-- [ ] T031 [P] [US2] Adapt `.specify/templates/plan-template.md` to include explicit "Temario" and "Descripciones encadenadas" sections plus the editorial-oriented Constitution Check (FR-010, FR-011).
-- [ ] T032 [P] [US2] Adapt `.specify/templates/tasks-template.md` to support an **editorial mode** activado por front-matter (`project_type: editorial`) que expone fases editoriales (Brief / Investigación / Plan / Redacción / Pasada 1–5 / Cierre) **adicionalmente** al modo software por defecto (Setup / Foundational / Stories / Polish). El modo software permanece intacto para features de framework como esta. La detección del modo se basa en `project_type` que `writeonmars-install` registra en el manifiesto del proyecto editorial durante la instalación inicial (FR-004).
-- [ ] T033 [P] [US2] Adapt `.specify/templates/checklist-template.md` to materialise the five pasadas as separate templated sections (`pasada-1.md` … `pasada-5.md`), each with its checklist items derived from the constitution § V.
+- [X] T030 [P] [US2] Adapt `.specify/templates/spec-template.md` to incorporate the nine-field editorial brief (audiencia, problema, resultado_esperado, nivel, tono, conceptos_obligatorios, ejemplo_recurrente, riesgos, acciones_practicas) as mandatory sections (FR-005). Preserve the "User Stories → Trayectos de lector" mental model documented in the constitution sync impact report.
+- [X] T031 [P] [US2] Adapt `.specify/templates/plan-template.md` to include explicit "Temario" and "Descripciones encadenadas" sections plus the editorial-oriented Constitution Check (FR-010, FR-011).
+- [X] T032 [P] [US2] Adapt `.specify/templates/tasks-template.md` to support an **editorial mode** activado por front-matter (`project_type: editorial`) que expone fases editoriales (Brief / Investigación / Plan / Redacción / Pasada 1–5 / Cierre) **adicionalmente** al modo software por defecto (Setup / Foundational / Stories / Polish). El modo software permanece intacto para features de framework como esta. La detección del modo se basa en `project_type` que `writeonmars-install` registra en el manifiesto del proyecto editorial durante la instalación inicial (FR-004).
+- [X] T033 [P] [US2] Adapt `.specify/templates/checklist-template.md` to materialise the five pasadas as separate templated sections (`pasada-1.md` … `pasada-5.md`), each with its checklist items derived from the constitution § V.
 
 ### Implementation for User Story 2 — Editorial skills (writeonmars-*)
 
@@ -126,8 +126,8 @@ Repo canónico de Write.OnMars (este repo). Rutas relevantes:
 
 ### Implementation for User Story 2 — Sub-agent prompts and citation orchestration
 
-- [ ] T047 [P] [US2] Create `agents/claude/prompts/redaccion.md`: canonical prompt for the redaction sub-agent. Includes role, files to read, allowed skills, output format and acceptance criteria. Versioned (filename includes version or has front-matter version).
-- [ ] T048 [P] [US2] Create `agents/claude/prompts/pasada-1.md` … `agents/claude/prompts/pasada-5.md`: one canonical prompt per pasada with the specific lens of each. Wired by the corresponding skill via T041–T045.
+- [X] T047 [P] [US2] Create `agents/claude/prompts/redaccion.md`: canonical prompt for the redaction sub-agent. Includes role, files to read, allowed skills, output format and acceptance criteria. Versioned (filename includes version or has front-matter version).
+- [X] T048 [P] [US2] Create `agents/claude/prompts/pasada-1.md` … `agents/claude/prompts/pasada-5.md`: one canonical prompt per pasada with the specific lens of each. Wired by the corresponding skill via T041–T045.
 - [ ] T049 [US2] Create `tests/lib/validate-citation.sh`: shell helper that runs `ajv` against `contracts/citation-record.schema.json` for a given JSON file or stream. Used by `writeonmars-research` and CI.
 - [ ] T050 [US2] Implement BYOM dispatch logic inside `writeonmars-research` SKILL: documents how the skill normalises outputs from `context7`, web search and `fetch` into citation records. Add a fallback that surfaces a clear error when no compatible MCP is available (edge case from spec).
 
@@ -145,8 +145,8 @@ Repo canónico de Write.OnMars (este repo). Rutas relevantes:
 
 ### Implementation for User Story 2 — Documentation
 
-- [ ] T060 [P] [US2] Create `docs/editorial-cycle.md`: the canonical eight-step flow (install → brief → context → research → temario → descripciones → redacción → contraste → 5 pasadas) with cross-references to skills, contracts and the constitution.
-- [ ] T061 [P] [US2] Create `docs/skill-catalog.md`: enumerates each `writeonmars-*` skill, what it wraps (if any), inputs, outputs and FR coverage. Useful for maintainers and for new agent ports.
+- [X] T060 [P] [US2] Create `docs/editorial-cycle.md`: the canonical eight-step flow (install → brief → context → research → temario → descripciones → redacción → contraste → 5 pasadas) with cross-references to skills, contracts and the constitution.
+- [X] T061 [P] [US2] Create `docs/skill-catalog.md`: enumerates each `writeonmars-*` skill, what it wraps (if any), inputs, outputs and FR coverage. Useful for maintainers and for new agent ports.
 
 **Checkpoint**: US2 cierra. El framework produce guías que pasan las cinco pasadas con métricas auditables. Hay evidencia archivada que demuestra el ciclo completo end-to-end.
 

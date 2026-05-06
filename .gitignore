@@ -1,12 +1,14 @@
 # === Editorial outputs (project-level, no canonical) ===
 # El repo canónico no debe arrastrar artefactos editoriales generados
-# por instalaciones de proyectos editoriales destino.
-chapters/
-glossary.md
-index.md
-common-errors.md
-templates/
-.writeonmars-manifest.json
+# por instalaciones de proyectos editoriales destino. Patrones
+# anclados a raíz (con /) para no afectar a `.specify/templates/`,
+# `tests/editorial-pilot/sandbox/templates/`, etc.
+/chapters/
+/glossary.md
+/index.md
+/common-errors.md
+/templates/
+/.writeonmars-manifest.json
 
 # === Sandbox del piloto editorial ===
 # Los pilotos generan repos editoriales completos; solo se conserva

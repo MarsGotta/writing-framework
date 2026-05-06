@@ -5,7 +5,12 @@
 # por defecto: pasadas 1, 2, 5 = autonomous; pasadas 3, 4 = human).
 #
 # Uso:
-#   render-manifest.sh <target_dir> <agent_target> <language_primary> <operator_id> <operator_email>
+#   render-manifest.sh <target_dir> <agent_target> <language_primary> <operator_id> <operator_email> [project_type]
+#
+# `project_type` es opcional. Cuando se pasa, se registra en el manifiesto como
+# campo opcional (enum: editorial|software|mixed) que selecciona el modo de las
+# plantillas Spec Kit consumidas. Si se omite, el manifiesto no incluye el
+# campo (comportamiento por defecto = software para Spec Kit).
 #
 # Salida: <target_dir>/.writeonmars-manifest.json validado contra
 # contracts/manifest-schema.json del repo canónico.
@@ -25,7 +30,7 @@ WOM_LOG_PREFIX="render-manifest"
 
 usage() {
     cat <<EOF
-Uso: render-manifest.sh <target_dir> <agent_target> <language_primary> <operator_id> <operator_email>
+Uso: render-manifest.sh <target_dir> <agent_target> <language_primary> <operator_id> <operator_email> [project_type]
 EOF
 }
 
@@ -39,6 +44,20 @@ AGENT_TARGET="$2"
 LANGUAGE_PRIMARY="$3"
 OPERATOR_ID="$4"
 OPERATOR_EMAIL="$5"
+PROJECT_TYPE_RAW="${6:-}"
+
+# Mapear el tipo de proyecto editorial recolectado por render-context.sh al
+# enum del manifiesto. Cualquier tipo editorial canónico (guía, manual, libro,
+# artículo, tutorial) se registra como `editorial`. Si llega ya un valor
+# canónico (editorial|software|mixed) se respeta tal cual. Si llega vacío, el
+# campo no se emite.
+PROJECT_TYPE_MANIFEST=""
+case "$PROJECT_TYPE_RAW" in
+    "") PROJECT_TYPE_MANIFEST="" ;;
+    editorial|software|mixed) PROJECT_TYPE_MANIFEST="$PROJECT_TYPE_RAW" ;;
+    guia|manual|libro|articulo|tutorial) PROJECT_TYPE_MANIFEST="editorial" ;;
+    *) common::warn "project_type='$PROJECT_TYPE_RAW' desconocido; se omite del manifiesto." ;;
+esac
 
 if [[ -z "${WRITING_FRAMEWORK_HOME:-}" ]]; then
     WRITING_FRAMEWORK_HOME="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -94,6 +113,12 @@ skills_json+="]"
 
 manifest_path="$TARGET_DIR/.writeonmars-manifest.json"
 
+# Construir línea opcional `"project_type": "..."` con coma final correcta.
+project_type_line=""
+if [[ -n "$PROJECT_TYPE_MANIFEST" ]]; then
+    project_type_line=$',\n  "project_type": "'"$PROJECT_TYPE_MANIFEST"'"'
+fi
+
 cat >"$manifest_path" <<EOF
 {
   "framework_version": "$framework_version",
@@ -116,7 +141,7 @@ cat >"$manifest_path" <<EOF
       "role": "editor"
     }
   ],
-  "citation_contract_version": "1.0"
+  "citation_contract_version": "1.0"${project_type_line}
 }
 EOF
 
