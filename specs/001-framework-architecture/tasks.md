@@ -37,11 +37,11 @@ Repo canónico de Write.OnMars (este repo). Rutas relevantes:
 
 **Purpose**: scaffolding del repositorio canónico + tooling de desarrollo.
 
-- [ ] T001 Create framework directory structure per plan.md: `install/lib/`, `mcp/`, `contracts/`, `docs/maintenance/`, `tools/`, `tests/smoke/`, `tests/lib/`, `tests/editorial-pilot/evidence/`, `tests/editorial-pilot/sandbox/`, `agents/claude/prompts/`, `releases/`, `.claude/skills/` (already exists from Spec Kit hooks but ensure is present).
-- [ ] T002 Add `.gitignore` entries for editorial outputs that should not be committed in canonical repo: `chapters/`, `glossary.md` (project-level), `index.md` (project-level), `common-errors.md`, `templates/`, `.writeonmars-manifest.json`. The canonical repo should not carry editorial artefacts.
-- [ ] T003 [P] Create `tools/dev-bootstrap.sh` that documents and verifies dev prerequisites: Bash 5+, Git ≥2.30, `jq`, `ajv` (via npm/npx) and `shellcheck`. Exit non-zero if any missing.
-- [ ] T004 [P] Create `tests/editorial-pilot/README.md` describing the 3-chapter pilot scope, topic, and links to evidence directory; mirror SC validations table from `quickstart.md`.
-- [ ] T005 [P] Create `README.md` skeleton at repo root with: short pitch, links to `.specify/memory/constitution.md`, `specs/001-framework-architecture/`, and `docs/`.
+- [X] T001 Create framework directory structure per plan.md: `install/lib/`, `mcp/`, `contracts/`, `docs/maintenance/`, `tools/`, `tests/smoke/`, `tests/lib/`, `tests/editorial-pilot/evidence/`, `tests/editorial-pilot/sandbox/`, `agents/claude/prompts/`, `releases/`, `.claude/skills/` (already exists from Spec Kit hooks but ensure is present).
+- [X] T002 Add `.gitignore` entries for editorial outputs that should not be committed in canonical repo: `chapters/`, `glossary.md` (project-level), `index.md` (project-level), `common-errors.md`, `templates/`, `.writeonmars-manifest.json`. The canonical repo should not carry editorial artefacts.
+- [X] T003 [P] Create `tools/dev-bootstrap.sh` that documents and verifies dev prerequisites: Bash 5+, Git ≥2.30, `jq`, `ajv` (via npm/npx) and `shellcheck`. Exit non-zero if any missing.
+- [X] T004 [P] Create `tests/editorial-pilot/README.md` describing the 3-chapter pilot scope, topic, and links to evidence directory; mirror SC validations table from `quickstart.md`.
+- [X] T005 [P] Create `README.md` skeleton at repo root with: short pitch, links to `.specify/memory/constitution.md`, `specs/001-framework-architecture/`, and `docs/`.
 
 **Checkpoint**: estructura del repo lista; tooling de desarrollo verificable.
 

@@ -1,0 +1,27 @@
+# === Editorial outputs (project-level, no canonical) ===
+# El repo canónico no debe arrastrar artefactos editoriales generados
+# por instalaciones de proyectos editoriales destino.
+chapters/
+glossary.md
+index.md
+common-errors.md
+templates/
+.writeonmars-manifest.json
+
+# === Sandbox del piloto editorial ===
+# Los pilotos generan repos editoriales completos; solo se conserva
+# evidence/ con la prueba archivada (configurada caso por caso).
+tests/editorial-pilot/sandbox/
+
+# === macOS / sistema ===
+.DS_Store
+Thumbs.db
+
+# === Editores ===
+.vscode/
+.idea/
+*.swp
+*.tmp
+
+# === Bash / scripts ===
+*.log
