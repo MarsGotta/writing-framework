@@ -39,6 +39,8 @@ Estándares editoriales de la constitución también respetados: plantilla de ca
 
 **Resultado del gate**: PASS sin violaciones. `Complexity Tracking` queda vacío.
 
+**Deuda heredada de la enmienda v1.1.0**: el Sync Impact Report de la constitución marca cuatro plantillas Spec Kit como `⚠ pending` (`spec-template.md`, `plan-template.md`, `tasks-template.md`, `checklist-template.md`). La adaptación a la voz editorial está cubierta por T030–T033 (Phase 4 / US2) y no bloquea la implementación de US1 (MVP), que reutiliza las plantillas tal cual.
+
 ## Project Structure
 
 ### Documentation (this feature)
@@ -126,13 +128,20 @@ writing-framework/   # Repositorio canónico (este repo)
 │   ├── guia-IA-writing.md
 │   └── Manual Maestro para la Producción de Textos Especializados.md
 │
+├── tools/
+│   └── dev-bootstrap.sh                  # T003: verificación de prerequisitos de desarrollo
+│
 ├── tests/
 │   ├── smoke/
 │   │   ├── install-on-empty-repo.sh      # US1 §AC1
 │   │   ├── install-preserves-claudemd.sh # US1 §AC2
 │   │   └── specify-after-install.sh      # US1 §AC3
+│   ├── lib/
+│   │   └── validate-citation.sh          # T049: helper de validación de CitationRecord
 │   └── editorial-pilot/
-│       └── README.md                      # Plan de la guía piloto de 3 capítulos (US2)
+│       ├── README.md                      # Plan de la guía piloto de 3 capítulos (US2)
+│       ├── sandbox/                       # Repos de pilotaje generados por T051–T065
+│       └── evidence/                      # Evidencia archivada (no se borra)
 │
 ├── CLAUDE.md                              # Contexto agente para el desarrollo del framework
 ├── README.md                              # Entrada al framework

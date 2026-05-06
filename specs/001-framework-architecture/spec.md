@@ -145,7 +145,7 @@ La persona mantenedora del framework actualiza una skill, una plantilla o la con
 
 **Memoria editorial**
 
-- **FR-021**: El framework MUST conservar el glosario consolidado, el ejemplo recurrente y los hallazgos firmados como artefactos del repositorio (no como caché externa) para que cualquier mantenedor pueda reconstruir el estado del proyecto sin acceso a sistemas externos.
+- **FR-021**: El framework MUST conservar el glosario consolidado, el ejemplo recurrente y los hallazgos firmados como artefactos primarios del repositorio (no como almacenamiento delegado a un sistema externo) para que cualquier mantenedor pueda reconstruir el estado del proyecto sin acceso a sistemas externos.
 - **FR-022**: El framework MAY apoyarse en una memoria externa vectorizada para acelerar consultas a glosarios extendidos, fragmentos canónicos y feedback de revisión, siempre que esa memoria pueda reconstruirse desde los artefactos del repositorio. La memoria externa es caché, nunca fuente de verdad.
 
 **Portabilidad y agnosticismo de agente**
@@ -189,12 +189,12 @@ La persona mantenedora del framework actualiza una skill, una plantilla o la con
 ### Measurable Outcomes
 
 - **SC-001**: La instalación inicial del framework en un repositorio Git vacío se completa en menos de 5 minutos en interacción humana, dejando el repositorio listo para `/speckit-specify`.
-- **SC-002**: Una guía de 8 capítulos producida con el flujo completo pasa las cinco pasadas del Principio V con menos de 2 hallazgos críticos por capítulo en la pasada 3 (naturalidad) y cero hallazgos críticos sin resolver en la pasada 4 (precisión) al cierre.
+- **SC-002**: Una guía de 8 capítulos producida con el flujo completo pasa las cinco pasadas del Principio V con menos de 2 hallazgos críticos *detectados* por capítulo en la pasada 3 (naturalidad), todos resueltos o documentados como `desviacion_justificada` antes del cierre, y cero hallazgos críticos abiertos en la pasada 4 (precisión) al cierre. La métrica mide volumen de incidencias durante la revisión; el cierre sigue gobernado por FR-020.
 - **SC-003**: El 100% de los capítulos publicados aplica la estructura didáctica del Principio II (las nueve secciones: problema, idea clave, por qué importa, cómo funciona, ejemplo, error frecuente, qué hacer en la práctica, checklist, puente).
 - **SC-004**: El glosario del proyecto cubre el 100% de los términos técnicos introducidos en el cuerpo de los capítulos; ningún término técnico aparece definido implícitamente sin entrada en el glosario.
 - **SC-005**: El ejemplo recurrente declarado en el brief aparece en al menos el 80% de los capítulos y no se introducen ejemplos inventados nuevos cuando el caso recurrente cubre la situación.
-- **SC-006**: La paralelización de redacción reduce el tiempo total de producción al menos un 40% comparada con la ejecución serial, manteniendo los mismos resultados de revisión multi-pasada.
-- **SC-007**: La portabilidad entre agentes se demuestra ejecutando el flujo completo sobre dos agentes distintos sin modificar las skills nucleares.
+- **SC-006**: La paralelización de redacción reduce el tiempo total de producción al menos un 40% comparada con la ejecución serial **sobre el mismo tema y manifiesto**, manteniendo equivalencia (±10%) en (a) número de hallazgos críticos por pasada y (b) cobertura del glosario consolidado.
+- **SC-007**: El framework v1 entrega los artefactos de portabilidad: skills nucleares libres de dependencias rígidas de agente, adaptador `agents/<name>/` con prompts canónicos versionados, y contratos publicados sin acoplamiento de agente. La demostración de extremo a extremo con un segundo agente real queda diferida a una feature posterior cuando exista un adaptador funcional para Codex o Cursor.
 - **SC-008**: Una persona mantenedora del framework puede actualizar una skill canónica y propagar el cambio a un proyecto existente en menos de 15 minutos sin pérdida de configuración local.
 - **SC-009**: La skill de investigación produce un `research.md` con al menos una fuente fechada por cada concepto técnico declarado en el brief.
 

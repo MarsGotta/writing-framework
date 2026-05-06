@@ -254,7 +254,7 @@ Esquema completo en `contracts/manifest-schema.json`. Campos clave:
 - `language_primary` (`es` por defecto)
 - `skills[]` con `name`, `version`, `source` (`bundled` | `external`)
 - `research_mode` (`byom` | `bundled`)
-- `signing_matrix` (mapping pasada → `autonomous` | `human`)
+- `signing_matrix` (objeto con claves `pasada_1_estructura`, `pasada_2_utilidad`, `pasada_3_naturalidad`, `pasada_4_precision`, `pasada_5_formato` y valores `autonomous` | `human`; ver `contracts/manifest-schema.json` § `$defs.signingPolicy`)
 - `human_operators[]` con `id`, `email`, `role`
 - `citation_contract_version` (semver)
 
