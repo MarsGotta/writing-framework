@@ -14,8 +14,8 @@ arquitectura del capítulo y `/marcela-prose` para la voz. Devuelve
 `chapters/[###]-titulo.md` con front-matter YAML y anexo de términos
 nuevos para alimentar a `writeonmars-glossary`.
 
-Modo serial por defecto. El modo `--parallel N` se añadirá en T062 (US3):
-NO está implementado en esta versión.
+Modo serial por defecto. El modo `--parallel N` (US3 / T062) habilita
+despacho concurrente de sub-agentes; ver § "Modo paralelo (`--parallel N`)".
 
 ## Cuándo dispararse
 
@@ -91,17 +91,103 @@ NO está implementado en esta versión.
 - Capítulo que no usa el ejemplo recurrente sin nota de excepción:
   warning de SC-005.
 
-## Modo paralelo (no implementado en esta versión)
+## Modo paralelo (`--parallel N`)
 
-`--parallel N` se entrega en T062 (US3). Hasta entonces, los capítulos
-se redactan en serie para preservar coherencia del hilo conductor con el
-glosario evolucionando.
+Activación con la bandera `--parallel N`, donde N ∈ [2, 8]. Sin la
+bandera, la skill mantiene el modo serial (default histórico). El modo
+paralelo despacha hasta N sub-agentes concurrentemente vía la herramienta
+Agent de Claude Code en una sola llamada con múltiples invocaciones.
+
+### Mecanismo
+
+1. Identifica todos los capítulos pendientes (sin archivo en `chapters/`
+   o marcados como `.draft.md`). Solo capítulos NO redactados se
+   distribuyen.
+2. Decide el reparto:
+   - Si `pendientes ≤ N`: cada sub-agente toma 1 capítulo.
+   - Si `pendientes > N`: round-robin en lotes secuenciales hasta
+     agotar la cola. Cada lote dispara N sub-agentes en paralelo y
+     espera la última respuesta antes de iniciar el siguiente lote.
+3. Compone el contexto compartido (idéntico para todos los sub-agentes
+   del mismo lote): brief, temario completo, glosario consolidado al
+   inicio del lote, descripciones encadenadas (anterior y siguiente
+   por capítulo objetivo), constitución, ejemplo recurrente del brief.
+4. En una única llamada del orquestador, despacha N invocaciones de la
+   herramienta Agent (`subagent_type: general-purpose`). Cada invocación
+   recibe:
+   - System prompt: contenido completo de
+     `agents/claude/prompts/redaccion.md` (idéntico al modo serial).
+   - Mensaje inicial: payload markdown con el capítulo objetivo
+     específico de ese sub-agente más el contexto compartido.
+5. Cada sub-agente escribe SOLO a su archivo de capítulo
+   (`chapters/[###]-<slug>.md`). No hay shared writes ni mutación
+   concurrente del glosario.
+6. Tras la última tanda, el orquestador recibe los N archivos, los
+   valida individualmente (front-matter, secciones, anexo) y persiste
+   los que pasan; los que fallan quedan como `.draft.md`.
+7. Una vez cerrados todos los lotes, recomienda invocar
+   `writeonmars-glossary` para consolidar los anexos y detectar
+   colisiones (ver T064 y FR-015).
+
+### Mapeo capítulo → sub-agente
+
+```
+pendientes = [cap_a, cap_b, cap_c, cap_d]
+N = 2
+lote_1: sub-agente A → cap_a, sub-agente B → cap_b   (paralelo)
+lote_2: sub-agente A → cap_c, sub-agente B → cap_d   (paralelo)
+```
+
+Round-robin para que cada sub-agente vea capítulos contiguos del
+temario y aproveche el contexto reciente de su lote anterior. El
+glosario consolidado se refresca entre lotes (no en mitad de un lote).
+
+### Reglas
+
+- Cada sub-agente recibe el mismo prompt canónico
+  (`agents/claude/prompts/redaccion.md`) sin alteraciones.
+- El glosario que recibe cada sub-agente es la versión consolidada al
+  inicio del lote: dos capítulos del mismo lote pueden introducir
+  términos colisionantes; eso lo detecta `writeonmars-glossary` después
+  (FR-015). El paralelismo no degrada la detección, solo la difiere
+  hasta el cierre del lote.
+- Si un sub-agente falla (timeout, validación, error de la herramienta
+  Agent), el orquestador reintenta ese capítulo en serie tras cerrar
+  el lote para no demorar el resto.
+- Si la validación post-redacción de un capítulo falla, queda como
+  `.draft.md` igual que en modo serial.
+
+### Cuándo usar paralelo
+
+- Guías con ≥ 4 capítulos donde cada capítulo tarda ≥ 10 minutos en el
+  modelo objetivo.
+- Capítulos cuya dependencia secuencial sea suave (descripciones
+  encadenadas bien diseñadas, ejemplo recurrente compartido).
+- Recursos disponibles: cuotas, latencia y costo del modelo objetivo
+  permiten N invocaciones concurrentes.
+
+### Cuándo evitarlo
+
+- Guías cortas (≤ 3 capítulos): el overhead de dispatch suele superar
+  la ganancia.
+- Capítulos con dependencia fuerte secuencial (un capítulo construye
+  artefactos que el siguiente referencia explícitamente). Suele
+  indicar que las descripciones encadenadas necesitan más diseño antes
+  que paralelismo.
+- Operador que quiere control fino capítulo a capítulo (revisión
+  intermedia entre capítulos).
+- Cuotas de modelo limitadas o latencia tan alta que el dispatch
+  paralelo introduce contención más que aceleración.
+
+Documentación operativa completa en `docs/parallel-execution.md`.
 
 ## FR cubierta
 
-- FR-014 (sub-agente fresco por capítulo).
-- FR-015 (anexo de glosario para consolidación).
+- FR-014 (sub-agente fresco por capítulo, serial o paralelo).
+- FR-015 (anexo de glosario para consolidación; colisiones detectadas
+  por `writeonmars-glossary` tras el cierre del lote paralelo).
 
 ## Versión
 
-v0.1.0-mvp — 2026-05-06
+v0.2.0-mvp-2026-05-06 — añade modo `--parallel N` (T062).
+v0.1.0-mvp — 2026-05-06.

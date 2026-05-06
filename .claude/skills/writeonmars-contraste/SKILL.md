@@ -87,11 +87,73 @@ Emite el bloque "Pasada 4" en `findings.md` conforme a
 - Citas con `motor: unknown` (regla 2 del contrato): se descartan y se
   reporta.
 
+## Modo paralelo por capítulo
+
+Cuando la guía tiene ≥ 4 capítulos redactados, esta skill puede
+despachar el contraste en paralelo (un sub-agente por capítulo). El
+modo serial sigue disponible para guías cortas o cuando el operador
+quiere revisión sincrónica capítulo a capítulo.
+
+### Mecanismo
+
+1. Identifica todos los `chapters/[###]-*.md` que requieren pasada 4.
+2. En una única llamada, dispara un sub-agente de contraste por
+   capítulo (`subagent_type: general-purpose`). Cada sub-agente recibe:
+   - System prompt: contenido completo de
+     `agents/claude/prompts/pasada-4.md`.
+   - Mensaje inicial: payload con el capítulo objetivo, el `research.md`
+     completo (todos los CitationRecord) y el bloque "Pasada 4" del
+     `findings.md` actual (vacío en la primera ejecución).
+3. Cada sub-agente devuelve un fragmento markdown con su bloque
+   "Pasada 4 — Capítulo N" siguiendo `pass-output-schema.md` v1.0.
+4. El orquestador NO permite que los sub-agentes escriban directamente
+   a `findings.md` (evita race conditions). Cada sub-agente devuelve el
+   fragmento y el orquestador consolida.
+
+### Consolidación
+
+Tras la última tanda:
+
+1. Concatena los bloques "Pasada 4 — Capítulo N" en un único bloque
+   "Pasada 4 — Precisión" en `findings.md`, ordenado por número de
+   capítulo.
+2. Detecta conflictos de citación: si dos capítulos citan la misma
+   fuente (`citation_id` idéntico) con interpretaciones divergentes
+   (campo `interpretacion` o glosa que diverge en cualquier dimensión
+   semántica), surface una nota consolidada al final del bloque
+   "Pasada 4 — global" en `findings.md`:
+   - `severidad: medio` (la decisión final la toma el operador humano
+     en la firma de pasada 4).
+   - Lista: `citation_id`, capítulo origen 1 con su lectura, capítulo
+     origen 2 con su lectura, sugerencia operativa (alinear ambas
+     lecturas, declarar excepción justificada, ampliar `research.md`).
+3. Reporta al operador: total por capítulo, total global, conflictos
+   detectados.
+
+### Cuándo usar paralelo por capítulo
+
+- ≥ 4 capítulos redactados (umbral por defecto del modo paralelo de
+  pasada 4).
+- `research.md` estable (ningún `CitationRecord` en proceso de
+  edición durante el despacho).
+
+### Cuándo evitarlo
+
+- < 4 capítulos: el modo serial es más simple y suficiente.
+- `research.md` en mutación (concurrencia entre lectura del sub-agente
+  y edición del operador).
+- Sub-agentes con cuotas o latencia que hacen que el dispatch paralelo
+  no compense.
+
+Documentación operativa en `docs/parallel-execution.md`.
+
 ## FR cubierta
 
-- FR-016 (toda afirmación verificable contra al menos una cita).
+- FR-016 (toda afirmación verificable contra al menos una cita; modo
+  serial o paralelo).
 - FR-017 (datos volátiles marcados [VERIFICAR]).
 
 ## Versión
 
-v0.1.0-mvp — 2026-05-06
+v0.2.0-mvp-2026-05-06 — añade dispatch paralelo por capítulo (T063).
+v0.1.0-mvp — 2026-05-06.
