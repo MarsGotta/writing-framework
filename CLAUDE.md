@@ -1,16 +1,18 @@
 <!-- SPECKIT START -->
-**Active feature**: 001-framework-architecture
-**Plan**: specs/001-framework-architecture/plan.md
-**Spec**: specs/001-framework-architecture/spec.md
+**Active feature**: 002-wom-cli
+**Plan**: specs/002-wom-cli/plan.md
+**Spec**: specs/002-wom-cli/spec.md
 **Constitution**: .specify/memory/constitution.md (v1.1.0)
 
-Lee el plan activo para conocer la arquitectura del harness Write.OnMars,
-el flujo editorial de ocho etapas y los contratos publicados:
+Lee el plan activo para conocer la CLI `wom` (Bash 5+) que envuelve las
+skills del framework para operación desde el shell:
 
-- specs/001-framework-architecture/research.md — decisiones técnicas resueltas (R1–R6)
-- specs/001-framework-architecture/data-model.md — esquemas de las 13 entidades
-- specs/001-framework-architecture/contracts/citation-contract.md — contrato de citación v1.0
-- specs/001-framework-architecture/contracts/manifest-schema.json — esquema del manifiesto del proyecto
-- specs/001-framework-architecture/contracts/pass-output-schema.md — formato de salida de las cinco pasadas
-- specs/001-framework-architecture/quickstart.md — primer uso de extremo a extremo
+- specs/002-wom-cli/research.md — decisiones técnicas resueltas (R1–R6)
+- specs/002-wom-cli/data-model.md — entidades derivadas (estado, lockfile, firma)
+- specs/002-wom-cli/contracts/command-schema.md — contrato de subcomandos, flags y exit codes
+- specs/002-wom-cli/quickstart.md — primer uso de extremo a extremo
+
+Feature base ya cerrada (referencia, NO activa): 001-framework-architecture
+(harness editorial v1.0.0). Su plan, contratos y pilotos viven en
+`specs/001-framework-architecture/`.
 <!-- SPECKIT END -->
