@@ -29,10 +29,10 @@ provides:
       name: "spec-template"
       file: "templates/spec-template.md"
       description: >
-        Spec en modo dual. En modo editorial añade el brief obligatorio de
-        nueve campos (Principio III) y renombra "User Stories" como
-        "Trayectos de lector". En modo software conserva la estructura clásica
-        de Spec Kit.
+        Spec en modo dual. En modo editorial añade el brief obligatorio
+        (8 campos descriptivos; el tono se hereda de las adendas) del Principio III
+        y renombra "User Stories" como "Trayectos de lector". En modo software
+        conserva la estructura clásica de Spec Kit.
       replaces: "spec-template"
     - type: "template"
       name: "plan-template"
@@ -65,6 +65,13 @@ provides:
         explicación → consecuencia, brief obligatorio, precisión léxica y
         revisión multi-pasada.
       replaces: "constitution-template"
+    - type: "template"
+      name: "adendas-template"
+      file: "templates/adendas-template.md"
+      description: >
+        Capa por guía (adendas del proyecto) que `speckit.constitution` monta sobre
+        el núcleo de la constitución: sector, tono calibrado, contrato terminológico,
+        anglicismos, matices léxicos, relajaciones, gobernanza. El núcleo no se edita.
 
     # --- Comandos (van en la misma lista; specify los distingue por `type`) ---
     - type: "command"
@@ -74,12 +81,21 @@ provides:
         Bootstrap del proyecto: copia la constitución y crea el manifest (lo que
         el preset no puede instalar). Correr una vez tras `specify preset add`.
     - type: "command"
+      name: "speckit.constitution"
+      file: "commands/speckit.constitution.md"
+      replaces: "speckit.constitution"
+      description: >
+        Primer paso del ciclo: guía con preguntas (y defaults por sector) para fijar
+        las adendas del proyecto sobre el núcleo de la constitución. Elige sector
+        (tecnología, …, ampliable), calibra tono, terminología y gobernanza.
+    - type: "command"
       name: "speckit.specify"
       file: "commands/speckit.specify.md"
       replaces: "speckit.specify"
       description: >
-        Brief editorial de 9 campos con preguntas; bloquea hasta resolver
-        audiencia, ejemplo recurrente y resultado esperado. Checkpoint humano 1.
+        Brief editorial de 8 campos descriptivos con preguntas (el tono se hereda
+        de las adendas); bloquea hasta resolver audiencia, ejemplo recurrente y
+        resultado esperado. Checkpoint humano 1.
     - type: "command"
       name: "speckit.research"
       file: "commands/speckit.research.md"

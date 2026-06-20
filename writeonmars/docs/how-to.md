@@ -15,8 +15,42 @@ specify preset add --from https://github.com/MarsGotta/writing-framework/...
 
 No hace falta instalar skills: la voz, la didáctica y el método viajan en el preset
 (`references/`). Tras instalar, corre **una vez** `/speckit-setup` (o
-`python3 .specify/presets/writeonmars/scripts/bootstrap.py`): copia la constitución
-y crea el manifest, que el preset no puede instalar.
+`python3 .specify/presets/writeonmars/scripts/bootstrap.py`): copia el núcleo de la
+constitución y crea el manifest, que el preset no puede instalar. Luego, el primer
+paso del ciclo es `/speckit-constitution` (sector + tono + terminología).
+
+## Cómo elegir el sector y ajustar la constitución del proyecto
+
+```text
+/speckit-constitution
+```
+
+El núcleo de la constitución es universal (voz, brief, revisión, neutralidad) y no
+se edita por guía. Lo que sí cambia por guía vive en las **adendas del proyecto**,
+que este comando rellena con un cuestionario guiado y **valores por defecto del
+sector** elegido: tono calibrado, anglicismos admitidos, contrato terminológico,
+relajaciones estructurales (p. ej. en tecnología, sin cajas obligatorias y checklist
+centralizado) y gobernanza. Pulsa Enter para mantener el estándar; responde para
+cambiarlo. Escribe `## Adendas del proyecto` sobre el núcleo intacto y guarda el
+`sector` en el manifest.
+
+Para repetirlo más tarde (cambiar de tono o de sector), vuelve a correrlo: detecta
+las adendas existentes y pide confirmación antes de reemplazarlas.
+
+## Cómo añadir un sector nuevo (veterinaria, medicina, ciencia…)
+
+Cada sector es **un archivo** en `references/sectores/<slug>.md`. Para crear uno:
+
+```bash
+cp writeonmars/references/sectores/tecnologia.md \
+   writeonmars/references/sectores/veterinaria.md
+# edita las secciones del esquema (tono, anglicismos, estructura de capítulo, cajas…)
+```
+
+El esquema y las reglas están en `references/sectores/_index.md`. En cuanto el
+archivo existe, `/speckit-constitution` lo ofrece como opción. No hay que tocar
+código. Un sector puede activar lo que tecnología relaja (p. ej. médico/veterinario
+suelen querer la caja "Síntoma → causa probable").
 
 ## Cómo escribir o rehacer un capítulo concreto
 
@@ -199,6 +233,8 @@ los `<h1>` de cada capítulo.
 **Ciclo completo (con agente).** Instala el preset (`specify preset add --dev
 ./writeonmars`), confirma que las skills están en su sitio y corre el ciclo
 `speckit.*` (ver [tutorial](tutorial-primera-guia.md)). Verifica en orden: (1)
-`specify preset add` no da error y aparecen los comandos; (2) `/speckit.specify` te
-hace las preguntas del brief; (3) `/speckit.implement` crea `chapters/` y
+`specify preset add` no da error y aparecen los comandos; (2) `/speckit.constitution`
+te deja elegir sector y rellena las adendas; (3) `/speckit.specify` te hace las
+preguntas del brief (ocho campos; el tono ya viene de las adendas); (4)
+`/speckit.implement` crea `chapters/` con su `## Fuentes` por capítulo y
 `findings.md`.

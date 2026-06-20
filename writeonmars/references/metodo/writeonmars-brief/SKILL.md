@@ -1,6 +1,6 @@
 ---
 name: writeonmars-brief
-description: Captura el brief editorial obligatorio de nueve campos (Constitución § III) durante /speckit-specify para proyectos editoriales. Trigger cuando la persona diga "brief editorial", "captura el brief", "arma el brief", "spec editorial", "/speckit-specify para una guía", o cuando `project_type=editorial` y la spec todavía no tenga las nueve secciones.
+description: Captura el brief editorial (ocho campos descriptivos; el tono se hereda de las adendas del proyecto) durante /speckit-specify para proyectos editoriales. Trigger cuando la persona diga "brief editorial", "captura el brief", "arma el brief", "spec editorial", "/speckit-specify para una guía", o cuando `project_type=editorial` y la spec todavía no tenga las secciones del brief.
 allowed-tools: Bash, Read, Write, Edit
 ---
 
@@ -22,7 +22,7 @@ están resueltos (FR-006).
 - "/speckit-specify para una guía"
 - Inicio de un proyecto cuyo `.writeonmars-manifest.json` declara
   `project_type: editorial` y `specs/[###-feature]/spec.md` carece de las
-  nueve secciones obligatorias.
+  secciones del brief.
 
 NO actives la skill en proyectos de software (`project_type: software`); en
 ese caso `/speckit-specify` opera con la plantilla clásica.
@@ -32,15 +32,18 @@ ese caso `/speckit-specify` opera con la plantilla clásica.
 1. Verifica que existe `.writeonmars-manifest.json` y que
    `project_type` esté presente. Si falta, propone correr
    `writeonmars-install --reconfigure`.
-2. Lanza un cuestionario en español que cubre los nueve campos de
-   data-model.md §1: audiencia, problema, resultado_esperado, nivel, tono,
-   conceptos_obligatorios, ejemplo_recurrente, riesgos, acciones_practicas.
+2. Lanza un cuestionario en español que cubre los **ocho campos descriptivos**:
+   audiencia, problema, resultado_esperado, nivel, conceptos_obligatorios,
+   ejemplo_recurrente, riesgos, acciones_practicas. El **tono NO se pregunta**:
+   es normativo y vive en las adendas del proyecto (constitución), fijado por
+   `/speckit-constitution`. Léelo de ahí y refléjalo en el campo 5 como eco.
 3. Valida el contenido por campo:
    - audiencia: ≥ 20 caracteres, sin `[NEEDS CLARIFICATION]`.
    - problema: ≥ 30 caracteres.
    - resultado_esperado: sin `[NEEDS CLARIFICATION]`.
    - nivel: enum `principiante|intermedio|avanzado`.
-   - tono: declara la combinación admitida (experto/directo/natural/sobrio).
+   - tono: NO se valida aquí; se hereda de las adendas. Si no existen adendas,
+     advierte y sugiere `/speckit-constitution`.
    - conceptos_obligatorios: lista cerrada con ≥ 1 elemento.
    - ejemplo_recurrente: contexto, objetivo, restricción, riesgo,
      resultado esperado.
@@ -51,12 +54,13 @@ ese caso `/speckit-specify` opera con la plantilla clásica.
    validación. Campos críticos para FR-006: audiencia, ejemplo_recurrente,
    resultado_esperado.
 5. Renderiza la sección Brief en `specs/[###-feature]/spec.md` siguiendo
-   la plantilla editorial (`.specify/templates/spec-template.md`).
+   la plantilla editorial (`.specify/templates/spec-template.md`); el campo 5
+   refleja el tono leído de las adendas.
 6. Actualiza el archivo de contexto del agente (`CLAUDE.md` o `AGENTS.md`)
    entre los marcadores `<!-- WRITEONMARS START -->` y
    `<!-- WRITEONMARS END -->` con: audiencia, ejemplo_recurrente,
-   tono, glosario inicial derivado de conceptos_obligatorios y referencia
-   al plan activo.
+   tono (heredado de las adendas), glosario inicial derivado de
+   conceptos_obligatorios y referencia al plan activo.
 
 ## Inputs
 
@@ -64,12 +68,13 @@ ese caso `/speckit-specify` opera con la plantilla clásica.
   `agent_target`.
 - `.specify/templates/spec-template.md` — plantilla editorial adaptada por
   T030.
-- `.specify/memory/constitution.md` — Principio III y § IV (microestilo).
+- `.specify/memory/constitution.md` — Principio III y § IV (microestilo), y la
+  sección **Adendas del proyecto** de donde se lee el tono calibrado.
 - Respuestas del cuestionario.
 
 ## Outputs
 
-- `specs/[###-feature]/spec.md` con sección Brief de nueve campos.
+- `specs/[###-feature]/spec.md` con sección Brief de 8 campos descriptivos (el tono se hereda de las adendas).
 - `CLAUDE.md` o `AGENTS.md` con bloque `<!-- WRITEONMARS ... -->`
   actualizado.
 
@@ -103,7 +108,7 @@ ese caso `/speckit-specify` opera con la plantilla clásica.
 
 ## FR cubierta
 
-- FR-005 (brief de nueve campos materializado).
+- FR-005 (brief materializado: 8 campos descriptivos + tono heredado de adendas).
 - FR-006 (bloqueo cuando audiencia, ejemplo_recurrente o
   resultado_esperado tienen `[NEEDS CLARIFICATION]`).
 - FR-007 (actualización de `CLAUDE.md` o `AGENTS.md`).

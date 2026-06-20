@@ -24,8 +24,13 @@ import sys
 from pathlib import Path
 
 PRESET = Path(__file__).resolve().parent.parent  # .../presets/writeonmars
-CONSTITUTION_VERSION = "1.2.0"
+CONSTITUTION_VERSION = "1.3.0"
 FRAMEWORK_VERSION = "0.1.0"
+# Centinela que separa el núcleo de la capa por guía. Es una marca única que NO
+# aparece en el núcleo (a diferencia del título "## Adendas del proyecto", que el
+# núcleo menciona inline). `/speckit-constitution` escribe las adendas a partir de
+# esta línea, tomándola de templates/adendas-template.md.
+ADENDAS_MARKER = "<!-- WRITEONMARS:ADENDAS -->"
 
 
 def fail(msg: str) -> "NoReturn":  # type: ignore[name-defined]
@@ -57,6 +62,9 @@ def default_manifest(operator: str, email: str) -> dict:
         "human_operators": [op],
         "citation_contract_version": "1.0",
         "project_type": "editorial",
+        # El sector lo fija `/speckit-constitution` (primer paso del ciclo) a partir
+        # de las bases en references/sectores/. null = adendas aún sin configurar.
+        "sector": None,
     }
 
 
@@ -78,11 +86,23 @@ def main() -> None:
         fail(f"no encuentro la constitución bundled en {src}")
     dst = proj / ".specify" / "memory" / "constitution.md"
     dst.parent.mkdir(parents=True, exist_ok=True)
-    if dst.exists() and not args.force and "Write.OnMars Constitution" in dst.read_text(encoding="utf-8"):
-        print(f"[bootstrap] constitución ya presente (v{CONSTITUTION_VERSION}); --force para sobrescribir")
-    else:
+    if not dst.exists():
         shutil.copyfile(src, dst)
-        print(f"[bootstrap] constitución copiada → .specify/memory/constitution.md (v{CONSTITUTION_VERSION})")
+        print(f"[bootstrap] núcleo copiado → .specify/memory/constitution.md (v{CONSTITUTION_VERSION})")
+    elif not args.force:
+        print(f"[bootstrap] constitución ya presente (v{CONSTITUTION_VERSION}); --force para re-sellar el núcleo")
+    else:
+        # --force: re-sella el núcleo desde el preset, PRESERVANDO las adendas de
+        # la guía (todo lo que vive desde `## Adendas del proyecto` hacia abajo).
+        current = dst.read_text(encoding="utf-8")
+        idx = current.find(ADENDAS_MARKER)
+        if idx != -1:
+            adendas = current[idx:]
+            dst.write_text(src.read_text(encoding="utf-8").rstrip() + "\n\n" + adendas, encoding="utf-8")
+            print(f"[bootstrap] núcleo re-sellado (v{CONSTITUTION_VERSION}); adendas del proyecto preservadas")
+        else:
+            shutil.copyfile(src, dst)
+            print(f"[bootstrap] núcleo sobrescrito (v{CONSTITUTION_VERSION}); no había adendas que preservar")
 
     # 2. Manifest
     man = proj / ".writeonmars-manifest.json"

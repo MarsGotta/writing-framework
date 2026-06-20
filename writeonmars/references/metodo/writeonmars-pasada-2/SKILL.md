@@ -49,10 +49,12 @@ Idéntico al de pasada 1, sustituyendo prompt y plantilla.
 
 - Cada concepto técnico tiene al menos un ejemplo concreto en el
   capítulo.
-- Cada capítulo cierra con acción práctica (checklist, plantilla,
-  síntoma → causa probable).
-- Existe al menos una caja visual ("Quédate con esto", "Qué hacer
-  mañana", "Síntoma → causa probable").
+- Acción práctica y checklist **según lo declaren las adendas del proyecto**: por
+  capítulo, o centralizados en el cierre y los anexos (p. ej. tecnología los
+  centraliza). No exijas checklist por capítulo si el sector lo relaja.
+- Cajas visuales ("Quédate con esto", "Qué hacer mañana", "Síntoma → causa
+  probable") **solo si las adendas las declaran obligatorias** para el sector. No
+  son obligatorias por defecto (constitución § Estándares editoriales, v1.3.0).
 - Errores frecuentes con síntoma y causa probable, no abstracciones.
 - Criterios de éxito explícitos cuando aplica.
 

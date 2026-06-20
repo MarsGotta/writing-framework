@@ -22,9 +22,11 @@ orquestación (Paperclip) y pulir la distribución.
 
 ## Inventario del preset (`writeonmars/`)
 
-- **5 plantillas** (modo dual editorial/software).
-- **17 comandos**:
-  - arranque: `setup`
+- **6 plantillas** (modo dual editorial/software + `adendas-template` para la capa
+  por guía de la constitución).
+- **18 comandos**:
+  - arranque: `setup` → `constitution` (adendas del proyecto: sector + tono +
+    terminología + gobernanza, guiado con defaults por sector; `replaces` el core)
   - ciclo: `specify`, `research`, `plan`, `implement`, `intro` (specify/plan/implement
     **reemplazan** a los core; `intro` genera el README de presentación del PDF)
   - revisión: `review` (agrupado) + `review-structure` / `review-voice` /
@@ -34,7 +36,9 @@ orquestación (Paperclip) y pulir la distribución.
 - **6 scripts deterministas**: `bootstrap`, `status`, `export`, `feedback_intake`,
   `close`, `index`.
 - **`references/`**: voz (`marcela-prose`), didáctica (`technical-guide-design`),
-  método (`writeonmars-*`). **`contracts/`**: citación, manifest, pass-output.
+  método (`writeonmars-*`), **sectores** (`sectores/<slug>.md`: defaults por dominio
+  para las adendas; hoy `tecnologia`, ampliable con solo añadir un archivo).
+  **`contracts/`**: citación, manifest, pass-output.
   **`memory/constitution.md`** (bundled).
 - **`AGENTS.md`** (contrato agente-agnóstico) + **`docs/`** (Diátaxis: tutorial,
   how-to, referencia, arquitectura) + **`smoke-test.sh`**.
@@ -68,22 +72,17 @@ Prueba en un repo aparte (`guia-prueba`), tema *servidor MCP en Node/TS*:
 - Comandos editoriales **reemplazan** (`replaces`) a los core → sin ambigüedad.
 - Sin `wom` CLI (lo cubren `status.py` / `close.py`); spec `002-wom-cli` superseded.
 - `speckit-setup` para lo que el preset no puede instalar (constitución, manifest).
-- Constitución **v1.2.0** (Principio V 3+1; Principio VI neutralidad de modelo).
+- Constitución **v1.3.0** (Principio V 3+1; Principio VI neutralidad de modelo).
 
 ## Pendiente (orden sugerido)
 
-1. **Reinstalar el preset** en `guia-prueba` para tomar los últimos arreglos
-   (rutas de `references/`, `implement` solo-escribe, override de core, numeración
-   de pasadas, `setup`); re-correr cap 1 + review.
-2. **Terminar la prueba E2E**: 1-2 capítulos más, revisar con otro modelo, `export`
-   a PDF, loop de `feedback` (PDF anotado), `close`.
-3. **Registrar los comandos para Codex/Gemini nativamente** (hoy se les apunta al
+1. **Registrar los comandos para Codex/Gemini nativamente** (hoy se les apunta al
    archivo del comando; funciona, pero registrarlos evita pegar la ruta).
-4. **Opcionales del preset**: búsqueda semántica real en `index.py` (embeddings,
+2. **Opcionales del preset**: búsqueda semántica real en `index.py` (embeddings,
    chromadb); hook `after_close` para auto-export.
-5. **Capa Paperclip**: modelar la "empresa", un goal por guía, agentes por
+3. **Capa Paperclip**: modelar la "empresa", un goal por guía, agentes por
    paso/modelo, presupuestos y heartbeats.
-6. **Distribución**: elegir licencia, publicar el preset
+4. **Distribución**: elegir licencia, publicar el preset
    (`specify preset add --from <github>`), versionar releases.
 
 ## Deuda y cosas honestas a saber
@@ -107,9 +106,10 @@ Prueba en un repo aparte (`guia-prueba`), tema *servidor MCP en Node/TS*:
 mkdir mi-guia && cd mi-guia && git init
 # 2. instalar el método
 specify preset add --dev ~/Projects/writing-framework/writeonmars
-# 3. bootstrap (constitución + manifest)  →  /speckit-setup  (o:)
+# 3. bootstrap (núcleo de la constitución + manifest)  →  /speckit-setup  (o:)
 python3 .specify/presets/writeonmars/scripts/bootstrap.py
 # 4. ciclo (en el agente):
+#   /speckit-constitution (sector + tono + terminología; guiado, con defaults)
 #   /speckit-specify "tema" → /speckit-research → /speckit-plan
 #   /speckit-implement N → /speckit-review N (idealmente otro modelo)
 #   /speckit-revise N (aplica los hallazgos) → /speckit-intro

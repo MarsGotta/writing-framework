@@ -37,10 +37,14 @@ empezar.
 
 ## Qué haces
 
-1. Escribe `chapters/<NN>-titulo.md` con las nueve secciones de la plantilla de
-   capítulo y la voz de `.specify/presets/writeonmars/references/voz`. Usa el ejemplo recurrente real, no
-   inventado.
-2. Añade el anexo de glosario del capítulo (términos nuevos).
+1. Escribe `chapters/<NN>-titulo.md` con la estructura de capítulo que fije la
+   **base del sector** (`.specify/presets/writeonmars/references/sectores/<sector>.md`,
+   sector en el manifiesto) y la voz de `.specify/presets/writeonmars/references/voz`.
+   Usa el ejemplo recurrente real, no inventado.
+2. **Cierra el capítulo con una sección `## Fuentes`** (obligatoria, Estándares
+   editoriales): nombre, enlace y fecha de cada fuente citada en ESE capítulo. No
+   basta con el research consolidado; la trazabilidad es por capítulo.
+3. Añade el anexo de glosario del capítulo (términos nuevos).
 
 **Este comando SOLO redacta. No revises aquí.** Las pasadas de revisión las corre
 `speckit.review`, idealmente con **otro modelo** distinto al que escribió: quien

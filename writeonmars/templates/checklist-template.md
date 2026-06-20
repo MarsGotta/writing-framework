@@ -108,8 +108,12 @@ FR-018.)
 
 - [ ] CHK201 Cada concepto técnico introducido tiene al menos un ejemplo
   concreto dentro del mismo capítulo.
-- [ ] CHK202 Cada capítulo cierra con una sección "Qué hacer en la práctica"
-  (checklist, plantilla, síntoma → causa probable u operación equivalente).
+- [ ] CHK202 La salida operativa ("Qué hacer en la práctica" / checklist) aparece
+  según lo declaren las adendas del proyecto: por capítulo, o centralizada en el
+  cierre y los anexos (p. ej. tecnología la centraliza). No exigir por capítulo si
+  el sector lo relaja.
+- [ ] CHK205 Cada capítulo cierra con su sección "## Fuentes" (nombre, enlace y
+  fecha de las fuentes citadas en ese capítulo). Obligatoria desde v1.3.0.
 - [ ] CHK203 La sección "Error frecuente" de cada capítulo describe síntomas
   observables (no abstracciones).
 - [ ] CHK204 Cada capítulo declara criterios de éxito verificables (qué debe
@@ -228,9 +232,10 @@ de texto excesivos. (Constitución § V.5, FR-018, FR-029.)
 
 ### Items
 
-- [ ] CHK501 Cada capítulo incluye al menos una caja: "Quédate con esto",
-  "Qué hacer mañana" o "Síntoma → causa probable" (constitución § Estándares
-  editoriales).
+- [ ] CHK501 Cajas visuales ("Quédate con esto", "Qué hacer mañana", "Síntoma →
+  causa probable") presentes **solo si las adendas del proyecto las declaran
+  obligatorias** para el sector. No son obligatorias por defecto (constitución §
+  Estándares editoriales, v1.3.0). Tecnología las omite.
 - [ ] CHK502 Los ejemplos están visualmente diferenciados del cuerpo
   expositivo (bloque, recuadro, tipografía o etiqueta clara).
 - [ ] CHK503 Los títulos son claros antes que ingeniosos; sin emojis; sin

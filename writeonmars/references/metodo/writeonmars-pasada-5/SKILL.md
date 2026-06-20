@@ -70,9 +70,11 @@ la guía. Construye y valida los artefactos finales del proyecto editorial.
    manteniendo `capitulo_origen` para trazabilidad.
 3. Construir `index.md` a partir del brief y del temario aprobado.
 4. Para cada capítulo, comprobar:
-   - Cajas visuales: regex sobre `> [!`, callouts personalizados, o
-     encabezados específicos.
-   - Tabla de promesas o "Qué hacer en la práctica" cierra el capítulo.
+   - **Sección `## Fuentes` presente al cierre** (obligatoria desde v1.3.0). Su
+     ausencia es un finding de formato.
+   - Cajas visuales y "Qué hacer en la práctica" / checklist: **solo si las adendas
+     del proyecto los declaran obligatorios** para el sector. No los marques como
+     falta si el sector los relaja o centraliza (p. ej. tecnología).
    - Sin bloques de texto excesivos.
 5. Validar `glossary.md` y `templates/`.
 6. Emitir findings por incumplimiento. `severidad: medio` para faltas de

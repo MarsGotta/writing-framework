@@ -1,133 +1,103 @@
 # Contributing — Write.OnMars
 
-Audiencia: personas que quieran proponer una nueva skill, certificar un MCP
-contra el contrato de citación, contribuir a `resources/` o enmendar la
-constitución. Esta guía complementa
-`docs/maintenance/skill-update-procedure.md` y
-`docs/maintenance/constitution-update-procedure.md`.
+Audiencia: personas que quieran extender el método (un comando, una referencia, un
+sector), certificar un MCP contra el contrato de citación, contribuir a `resources/`
+o enmendar la constitución.
+
+El método se distribuye como **preset de Spec Kit** (`writeonmars/`): la lógica vive
+en **comandos** neutrales de modelo, las reglas en **referencias**, lo determinista
+en **scripts**. No hay skills de un proveedor. Cualquier extensión sigue ese reparto.
 
 ## Reglas generales
 
-- **Idioma**: español. Excepciones (siglas, términos técnicos) declaradas en
-  el glosario o front-matter.
-- **Sin emojis** en archivos canónicos. Constitución § I.
-- **Smoke tests verdes** antes de proponer un PR.
-- **Sync impact report** cuando el cambio afecte plantillas Spec Kit o la
-  constitución.
+- **Idioma**: español. Excepciones (siglas, términos técnicos) declaradas en el
+  glosario o front-matter.
+- **Sin emojis** en archivos canónicos (constitución § I).
+- **Smoke test verde** antes de proponer un PR (`bash writeonmars/smoke-test.sh`).
+- **Sync impact report** cuando el cambio afecte plantillas o la constitución.
 
-## Cómo proponer una nueva capacidad (comando del preset)
+## Cómo añadir una capacidad al método (un comando)
 
-> **Refactor preset.** Una capacidad nueva del método se añade como **comando del
-> preset** (`writeonmars/commands/speckit.<nombre>.md`, neutral de modelo) y, si
-> hace falta, una referencia en `writeonmars/references/`, declarándola en
-> `writeonmars/preset.yml`. Lo determinista va a un script en `writeonmars/scripts/`.
-> Los pasos de abajo (crear una skill en `.claude/skills/`) describen la vía
-> **legacy**; úsalos solo si mantienes el flujo antiguo basado en `install.sh`.
+1. **Justifica la necesidad**: qué falta o qué comando existente no cubre el caso.
+   Si la capacidad mapea a un principio de la constitución, decláralo.
+2. **Crea el comando** `writeonmars/commands/speckit.<nombre>.md` (neutral de
+   modelo). Si reemplaza a un core de Spec Kit, usa `replaces:` en su front-matter.
+3. **Si hay detalle de método**, añade una referencia en
+   `writeonmars/references/metodo/writeonmars-<nombre>/SKILL.md`.
+4. **Lo determinista va a un script** en `writeonmars/scripts/`, invocado por el
+   comando por ruta (no reimplementado en prosa).
+5. **Decláralo en `writeonmars/preset.yml`** dentro de `provides.templates` con
+   `type: command`.
+6. **Smoke test**: adapta `writeonmars/smoke-test.sh` si el comando tiene parte
+   determinista.
 
-1. **Justificar la necesidad**: documentar en una issue qué falta o qué
-   skill existente no cubre el caso. Si la skill nueva sustituye o
-   solapa a una existente, declarar la migración.
-2. **Crear el directorio** `.claude/skills/<nombre>/` con dos archivos
-   mínimos:
-   - `SKILL.md` con front-matter YAML (`name`, `description`,
-     `allowed-tools`) y cuerpo siguiendo el patrón de
-     `writeonmars-install/SKILL.md`: cuándo dispararse, qué hace, inputs,
-     outputs, procedimiento numerado, errores comunes, FR cubierta.
-   - `VERSION` con primera línea `vX.Y.Z` o `vX.Y.Z-suffix-fecha`.
-3. **Añadir entrada en `docs/skill-catalog.md`**: nombre, qué envuelve,
-   inputs, outputs, FR coverage. La tabla del catálogo es fuente de verdad
-   para mantenedores y para portar a otros agentes.
-4. **Documentar el principio que materializa**. Cada skill MUST mapear a un
-   principio o regla de la constitución (FR-024). Si no mapea a ninguno,
-   reabrir la justificación.
-5. **Ajustar el instalador si la skill es bundled**: las skills bundled
-   las copia `install/lib/copy-skills.sh` automáticamente cuando el nombre
-   empieza por `writeonmars-` o coincide con la lista hardcoded
-   (`marcela-prose`, `technical-guide-design`). Si la skill nueva no
-   encaja en ese patrón, ampliar la lista del script.
-6. **Smoke tests**: añadir o adaptar al menos un test bajo
-   `tests/smoke/` que valide la activación de la skill end-to-end. PR sin
-   test de invocación se rechaza.
+## Cómo añadir un sector
 
-## Cómo certificar un nuevo MCP para el contrato de citación
+Cada sector es un archivo `writeonmars/references/sectores/<slug>.md` con los
+*defaults* de las adendas para ese dominio (tono, anglicismos, estructura de
+capítulo, cajas, citación). Copia `tecnologia.md`, rellena el esquema de
+`references/sectores/_index.md` y listo: `/speckit-constitution` lo ofrece sin tocar
+código. Ver también `docs/how-to.md` § "Cómo añadir un sector nuevo".
 
-El contrato canónico vive en `contracts/citation-contract.md` § "Cómo
-certificar". Resumen operativo:
+## Cómo mantener la voz
 
-1. **Construir un fixture mínimo**: tres CitationRecord representativos
-   (uno `documentacion_oficial`, uno `web_publica`, uno `archivo_local`)
-   serializados como JSON.
-2. **Validar contra el schema**:
+`references/voz/` es una copia de la voz canónica (`mars-voice`). Si la actualizas
+allí, re-sincroniza la del preset (`cp`). No edites la voz directamente en el preset
+sin reflejarlo en la fuente.
+
+## Cómo certificar un MCP para el contrato de citación
+
+El contrato canónico vive en `contracts/citation-contract.md` § "Cómo certificar".
+Resumen operativo:
+
+1. **Fixture mínimo**: tres `CitationRecord` representativos (uno
+   `documentacion_oficial`, uno `web_publica`, uno `archivo_local`) en JSON.
+2. **Valida contra el schema**:
 
    ```bash
-   ajv validate \
-     --spec=draft2020 \
-     -s contracts/citation-record.schema.json \
-     -d <fixture>.json
+   ajv validate --spec=draft2020 \
+     -s contracts/citation-record.schema.json -d <fixture>.json
    ```
 
-3. **Documentar el motor** en `docs/compatibility-matrix.md` §
-   "MCPs investigación compatibles": nombre, versión mínima, tipo de
-   `motor`, ejemplo de `referencia` y notas operativas (tasa de fallo
-   conocida, latencia, costo).
-4. **Smoke test**: añadir un script bajo `tests/smoke/` que invoque al MCP
-   nuevo y verifique que las citas que emite validan. Sin smoke test, el
-   MCP queda como "compatible declarado, no certificado".
+3. **Documenta el motor** en `docs/compatibility-matrix.md`: nombre, tipo de
+   `motor`, ejemplo de `referencia`, notas operativas (latencia, coste, fallo
+   conocido).
 
 ## Cómo contribuir a `resources/`
 
-`resources/` aloja las fuentes documentales que sostienen las decisiones
-normativas del framework (constitución § Trazabilidad documental).
-Criterios:
+`resources/` aloja las fuentes que sostienen las decisiones normativas (constitución
+§ Trazabilidad documental). Criterios:
 
-- **Tipo de fuente admitido**: documentación oficial, manuales editoriales,
-  papers académicos, material editorial propio (estándares Marcela).
-- **Metadatos requeridos** en el front-matter o en una nota inicial:
-  fecha de incorporación, autoría original, ruta de origen (URL o vault),
-  licencia o permiso de uso, versión consultada.
-- **Sin material confidencial**. `resources/` queda commiteado en el repo
-  canónico; cualquier persona con acceso al repo lo lee.
-- **Naming**: `<dominio-corto>-<tema>.md`. Ejemplos: `guia-IA-writing.md`,
-  `manual-textos-especializados.md`.
-- **Cross-link al uso**: si la fuente sostiene un principio o regla de la
-  constitución, añadir una referencia explícita desde la constitución a la
-  fuente en `resources/`.
+- **Tipo admitido**: documentación oficial, manuales editoriales, papers, material
+  editorial propio.
+- **Metadatos**: fecha de incorporación, autoría, origen (URL o vault), licencia,
+  versión consultada.
+- **Sin material confidencial** (`resources/` se commitea al repo canónico).
+- **Naming**: `<dominio-corto>-<tema>.md`.
+- **Cross-link**: si la fuente sostiene un principio, enlázala desde la constitución.
 
 ## Cómo proponer una enmienda a la constitución
 
-Sigue `docs/maintenance/constitution-update-procedure.md` paso a paso. Resumen:
-
-1. Trigger documentado.
-2. Rama dedicada con prefijo `constitution/`.
-3. `/speckit-constitution` con la propuesta.
-4. Sync impact report en la cabecera del archivo.
-5. Plan de migración para guías ya publicadas si aplica.
-6. Bump semver editorial (MAJOR/MINOR/PATCH) según las reglas de § Governance.
-7. Commit `docs: amend constitution to vX.Y.Z (motivo)`.
-8. Entrada en `CHANGELOG.md` § "Constitution".
+Sigue `docs/maintenance/constitution-update-procedure.md`. En corto: trigger
+documentado → rama `constitution/` → `/speckit-constitution` → sync impact report →
+bump semver editorial → commit `docs: amend constitution to vX.Y.Z (motivo)` →
+entrada en `CHANGELOG.md`.
 
 ## Política de PRs
 
-- **Rama dedicada** con prefijo descriptivo:
-  - `feat/` para nuevas skills, MCPs o features.
-  - `fix/` para bug fixes en scripts.
-  - `docs/` para cambios documentales puros.
-  - `chore/` para bumps de versión y mantenimiento.
-  - `constitution/` para enmiendas constitucionales.
-- **Smoke tests verdes** localmente antes del PR. Si los tests requieren
-  Python, ajv o herramientas adicionales, declararlas en el PR.
-- **Sync impact report** cuando el cambio toque
-  `.specify/templates/*.md` o `.specify/memory/constitution.md`.
-- **Sin emojis** en archivos canónicos.
-- **Una feature por PR**. Cambios mezclados (skill nueva + bump de
-  constitución + bug fix) se separan en PRs distintos para revisión limpia.
+- **Rama dedicada** con prefijo: `feat/` (comando/sector/feature), `fix/` (scripts),
+  `docs/` (documentación), `chore/` (bumps/mantenimiento), `constitution/`
+  (enmiendas).
+- **Smoke test verde** localmente; declara dependencias (Python, `ajv`) en el PR.
+- **Sync impact report** cuando toques `writeonmars/templates/*` o
+  `writeonmars/memory/constitution.md`.
+- **Sin emojis**. **Una feature por PR**.
 
 ## Referencias
 
+- `writeonmars/AGENTS.md` — contrato del agente.
 - `.specify/memory/constitution.md` — fuente de verdad editorial.
-- `docs/skill-catalog.md` — catálogo de skills bundled.
-- `docs/maintenance/skill-update-procedure.md` — bumps y propagación.
-- `docs/maintenance/constitution-update-procedure.md` — enmiendas
-  constitucionales.
+- `writeonmars/docs/referencia.md` — comandos, scripts y esquemas del preset.
 - `contracts/citation-contract.md` — § "Cómo certificar".
 - `docs/compatibility-matrix.md` — MCPs y agentes soportados.
+- `docs/maintenance/constitution-update-procedure.md` — enmiendas constitucionales.

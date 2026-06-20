@@ -9,11 +9,12 @@ Arranque y ciclo editorial:
 
 | Comando | Hace |
 |---|---|
-| `speckit.setup` | Bootstrap: copia constitución + crea manifest (una vez tras instalar). |
-| `speckit.specify` | Brief de 9 campos con preguntas (checkpoint humano 1). |
+| `speckit.setup` | Bootstrap: copia el **núcleo** de la constitución + crea manifest (una vez tras instalar). |
+| `speckit.constitution` | **Primer paso del ciclo.** Guiado con defaults por sector: elige sector y rellena las **adendas del proyecto** (tono, terminología, anglicismos, relajaciones, gobernanza) sobre el núcleo. `replaces` el core de Spec Kit. |
+| `speckit.specify` | Brief de **8 campos descriptivos** con preguntas; el tono se hereda de las adendas (checkpoint humano 1). |
 | `speckit.research` | `research.md` con cita por concepto obligatorio. |
 | `speckit.plan` | Temario + descripciones encadenadas (índice del PDF). |
-| `speckit.implement` | Redacta UN capítulo con la voz. SOLO escribe (la revisión es aparte). Acepta nº de capítulo; sin nº, el siguiente pendiente; rehace si ya existe. |
+| `speckit.implement` | Redacta UN capítulo con la voz y la estructura del sector; cierra con su `## Fuentes`. SOLO escribe (la revisión es aparte). Acepta nº de capítulo; sin nº, el siguiente pendiente; rehace si ya existe. |
 | `speckit.intro` | Genera el `README.md` de presentación (apertura del PDF) desde el brief y el temario. Antes del export. |
 
 Revisión (escribe uno, revisa otro — cada pasada asignable a un modelo distinto):
@@ -37,11 +38,31 @@ Operación (envuelven un script determinista):
 | `speckit.close` | `close.py` | Gate de cierre + export en un paso. |
 | `speckit.memory` | `index.py` | Indexa y busca el contenido del proyecto. |
 
-`speckit.specify`, `speckit.plan` y `speckit.implement` **reemplazan** (`replaces`)
-a los comandos core de Spec Kit en modo editorial, así el flujo estándar es
-editorial y el agente no duda entre dos comandos. `research`, las `review.*` y la
-operación se suman. La voz, la didáctica y el método viajan en `references/` para
-que cualquier modelo los aplique (ver `../AGENTS.md`).
+`speckit.constitution`, `speckit.specify`, `speckit.plan` y `speckit.implement`
+**reemplazan** (`replaces`) a los comandos core de Spec Kit en modo editorial, así
+el flujo estándar es editorial y el agente no duda entre dos comandos. `research`,
+las `review.*` y la operación se suman. La voz, la didáctica y el método viajan en
+`references/` para que cualquier modelo los aplique (ver `../AGENTS.md`).
+
+## Constitución por capas: núcleo + adendas + sectores
+
+La constitución de cada guía tiene dos capas:
+
+- **Núcleo** (`.specify/memory/constitution.md`, versionado): las reglas universales
+  (Principios I–VI, estándares, gobernanza). Lo copia `speckit.setup` y NO se edita
+  por guía. `bootstrap.py --force` lo re-sella desde el preset **preservando las
+  adendas** (frontera: el centinela `<!-- WRITEONMARS:ADENDAS -->`).
+- **Adendas del proyecto** (sección `## Adendas del proyecto` del mismo archivo): lo
+  normativo que varía por guía — sector, tono calibrado, contrato terminológico,
+  anglicismos admitidos, matices léxicos, relajaciones estructurales y gobernanza.
+  Las rellena `speckit.constitution`; la revisión las verifica.
+
+Las **bases de sector** (`references/sectores/<slug>.md`) aportan los valores por
+defecto de las adendas por dominio. Hoy: `tecnologia`. Ampliable creando un archivo
+(esquema en `references/sectores/_index.md`). El brief (`spec.md`) queda para lo
+descriptivo; las adendas, para lo normativo por guía.
+
+La plantilla de la capa por guía es `templates/adendas-template.md`.
 
 ## Scripts (deterministas, sin agente)
 
@@ -111,15 +132,16 @@ tachado → Recortar…) y la severidad por defecto es `medio`.
 
 ```text
 mi-guia/
-├── .writeonmars-manifest.json     # versiones, signing_matrix, operadores
+├── .writeonmars-manifest.json     # versiones, signing_matrix, operadores, sector
+├── .specify/memory/constitution.md# núcleo (versionado) + ## Adendas del proyecto
 ├── README.md                      # intro (entra al PDF como "Acerca de…")
 ├── chapters/
-│   ├── 00-titulo.md               # capítulos (<NN>-titulo.md)
+│   ├── 00-titulo.md               # capítulos (<NN>-titulo.md); cierran con ## Fuentes
 │   └── 01-titulo.md
 ├── glossary.md | glosario.md      # glosario consolidado
 ├── anexos.md, common-errors.md    # referencia (entran al PDF)
 └── specs/<###-feature>/
-    ├── spec.md                    # brief (9 campos) — título del PDF
+    ├── spec.md                    # brief (8 campos; tono heredado) — título del PDF
     ├── plan.md                    # temario + descripciones — índice del PDF
     ├── research.md                # citas por concepto
     ├── findings.md                # salida de las pasadas

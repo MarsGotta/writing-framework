@@ -1,105 +1,84 @@
 # Procedimiento de enmienda de la constitución
 
 Audiencia: persona mantenedora del framework Write.OnMars. Cubre el ciclo
-"detectar discrepancia → enmendar → propagar plantillas → comunicar a
-proyectos instalados". Complementa la sección **Governance § Procedimiento
-de enmienda** de `.specify/memory/constitution.md`.
+"detectar discrepancia → enmendar el núcleo → propagar → comunicar". Complementa
+la sección **Governance § Procedimiento de enmienda** de
+`writeonmars/memory/constitution.md`.
+
+## Núcleo vs adendas: qué se enmienda aquí
+
+La constitución tiene dos capas:
+
+- **Núcleo** (`writeonmars/memory/constitution.md`, versionado): las reglas
+  universales. **Esto es lo que se enmienda con este procedimiento.**
+- **Adendas del proyecto** (por guía, vía `/speckit-constitution`): lo normativo que
+  varía por guía (tono, terminología, relajaciones por sector). No se enmienda aquí;
+  se ajusta por proyecto.
+
+Si lo que cambia es un default por dominio (p. ej. qué anglicismos admite
+tecnología), no toques el núcleo: edita la **base de sector**
+(`writeonmars/references/sectores/<slug>.md`).
 
 ## Cuándo aplicar este procedimiento
 
-Aplica cuando aparezca alguna de estas señales:
-
-- **Discrepancia recurrente** entre la constitución y las guías reales
-  publicadas (un anti-pattern detectado en pasada 3 que no está codificado,
-  una checklist que en la práctica todas las personas operadoras deben
-  modificar, un campo del brief que sistemáticamente queda vacío).
-- **Nuevo estándar editorial** validado en uno o varios pilotos: una nueva
-  caja visual obligatoria, un cierre de capítulo distinto, una pasada
-  adicional, un campo nuevo del brief.
-- **Refinamiento normativo de una regla existente**: aclaración o expansión
-  que cambia el comportamiento esperable del agente o de la persona
-  operadora (ej. extender la lista de anglicismos a sustituir, redefinir
-  qué cuenta como "ejemplo recurrente").
-- **Cambio en la arquitectura del framework** (sección "Arquitectura del
-  framework"): nueva integración con MCPs, nueva fuente obligatoria, nueva
-  política de memoria externa.
+- **Discrepancia recurrente** entre el núcleo y las guías reales (un anti-pattern
+  detectado en revisión que no está codificado, un estándar que todas las guías
+  acaban relajando).
+- **Nuevo estándar editorial** validado en uno o varios pilotos.
+- **Refinamiento normativo** de una regla existente (aclaración o expansión que
+  cambia el comportamiento esperable).
+- **Cambio de arquitectura** del framework (nueva integración, nueva fuente
+  obligatoria, nueva política de memoria).
 
 ## Pasos
 
-1. **Trigger documentado.** Antes de tocar la constitución, documentar la
-   causa en una issue o nota: discrepancia detectada, evidencia que la
-   sostiene, alcance estimado del cambio.
-2. **Crear rama dedicada.** Prefijo obligatorio `constitution/`. Ejemplos:
-   `constitution/v1-2-add-pasada-six` o
-   `constitution/v1-1-1-clarify-pasada-3`.
-3. **Ejecutar `/speckit-constitution`.** Lanzar la skill con la propuesta
-   redactada en lenguaje editorial natural. La skill generará el sync
-   impact report dentro del propio archivo de la constitución.
-4. **Sync impact report.** Identificar qué plantillas de
-   `.specify/templates/*.md` quedan afectadas. La constitución exige marcar
-   cada plantilla como `pending` o `updated` en la cabecera del archivo.
-   Plantillas a revisar siempre:
-   - `spec-template.md` (brief de nueve campos, "Trayectos de lector").
-   - `plan-template.md` ("Temario", "Descripciones encadenadas",
-     Constitution Check editorial).
+1. **Trigger documentado.** Antes de tocar el núcleo, documenta la causa: la
+   discrepancia, la evidencia que la sostiene, el alcance estimado.
+2. **Rama dedicada.** Prefijo obligatorio `constitution/` (p. ej.
+   `constitution/v1-3-0-fuentes-por-capitulo`).
+3. **Ejecuta `/speckit-constitution`** (o edita el núcleo a mano para mantenedores):
+   redacta la propuesta y genera el **sync impact report** en la cabecera del propio
+   archivo de la constitución.
+4. **Sync impact report.** Identifica qué plantillas de `writeonmars/templates/*.md`
+   quedan afectadas y márcalas. Plantillas a revisar:
+   - `spec-template.md` (brief de 8 campos descriptivos, "Trayectos de lector").
+   - `plan-template.md` ("Temario", "Descripciones encadenadas", Constitution Check).
    - `tasks-template.md` (fases editoriales y software).
    - `checklist-template.md` (checklist por pasada).
-5. **Plan de migración para guías ya publicadas.** Si la enmienda afecta
-   guías que ya pasaron las cinco pasadas, declarar:
-   - Lista de guías impactadas.
-   - Criterio de re-revisión (¿se reescribe la pasada afectada?, ¿se añade
-     un anexo?, ¿se deja como "guía bajo constitución vX.Y.Z" sin tocar?).
-   - Plazo razonable para la re-revisión.
-6. **Bump de versión semver editorial.** Reglas explicitadas en la
-   constitución § Governance:
-   - **MAJOR**: eliminación o redefinición incompatible de un principio o
-     sección de gobierno; cambios que invalidan guías publicadas.
-   - **MINOR**: nuevo principio, nueva sección de estándares editoriales o
-     expansión material de una regla existente.
-   - **PATCH**: aclaraciones, correcciones tipográficas, refinamientos no
-     semánticos.
-7. **Commit dedicado.** Mensaje canónico:
-   `docs: amend constitution to vX.Y.Z (<motivo>)`. Ejemplo histórico:
-   `docs: amend constitution to v1.1.0 (Write.OnMars naming + arquitectura del framework)`.
-8. **Propagación a proyectos instalados.** Tras el merge:
-   - El campo `constitution_version` del manifest del repo canónico se
-     bumpea automáticamente cuando una persona operadora corre
-     `writeonmars-update`.
-   - `writeonmars-update` notifica el bump de `constitution_version`,
-     muestra el diff de la sección "Sync Impact Report" y propone copiar
-     las plantillas afectadas (`.specify/templates/*.md`) sin sobreescribir
-     personalizaciones que el proyecto haya hecho. La persona operadora
-     decide qué plantillas adoptar.
-   - Las pasadas en curso (en estado `blocked` o `pending`) se vuelven a
-     evaluar bajo la nueva constitución solo si la persona operadora lo
-     declara explícitamente. Por defecto, una pasada cerrada bajo una
-     constitución previa se considera firme.
-9. **Comunicar el cambio.** Añadir entrada al `CHANGELOG.md` del framework
-   describiendo el bump (sección "Constitution") y enlazar el sync impact
-   report. Si el bump es MAJOR, abrir un aviso explícito invitando a las
-   personas operadoras a re-correr las pasadas afectadas en sus guías.
+   - `adendas-template.md` (capa por guía) si la enmienda toca lo que va en adendas.
+5. **Bump de versión semver editorial** (reglas en § Governance):
+   - **MAJOR**: eliminación o redefinición incompatible; invalida guías publicadas.
+   - **MINOR**: nuevo principio, nuevo estándar o expansión material de una regla.
+   - **PATCH**: aclaraciones y refinamientos no semánticos.
+   Actualiza la línea `**Version**` al final del núcleo, `CONSTITUTION_VERSION` en
+   `writeonmars/scripts/bootstrap.py`, y las menciones de versión en docs/plantillas.
+6. **Commit dedicado.** Mensaje canónico:
+   `docs: amend constitution to vX.Y.Z (<motivo>)`.
+7. **Propagación a proyectos instalados.** El núcleo se rige por versión:
+   - En cada guía instalada, `python3 .specify/presets/writeonmars/scripts/bootstrap.py --force`
+     **re-sella el núcleo** desde el preset **preservando las adendas del proyecto**
+     (la frontera es el centinela `<!-- WRITEONMARS:ADENDAS -->`). No hay que
+     parchear copias a mano.
+   - Las guías ya cerradas bajo una versión previa se consideran firmes salvo que se
+     decida re-revisar explícitamente.
+8. **Comunica el cambio.** Añade entrada al `CHANGELOG.md` describiendo el bump y
+   enlazando el sync impact report.
 
 ## Errores comunes
 
+- **Relajar un default de sector en el núcleo.** Si solo cambia para un dominio, va a
+  la base de sector, no al núcleo.
 - **Plantillas no actualizadas tras una MINOR.** El sync impact report queda
-  incompleto si una plantilla afectada se marca como `updated` sin haberla
-  tocado. Re-correr `/speckit-constitution` tras modificar la plantilla.
-- **Bump confundido con bump de skill.** El bump de la constitución
-  (`constitution_version` en el manifest) y el bump de skills
-  (`skills[].version`) son independientes. Una enmienda de la constitución
-  no implica bumpear todas las skills; sí implica revisar si alguna skill
-  cambia de comportamiento normativo.
-- **Rama sin prefijo `constitution/`.** El hook Spec Kit `validate-branch`
-  no rechaza el push, pero la persona mantenedora debería rechazarlo en
-  revisión: el prefijo es la única señal automatizada de que la rama
-  modifica la constitución.
+  incompleto si marcas una plantilla como `updated` sin tocarla.
+- **`--force` sin centinela de adendas.** Si una guía tiene adendas pero falta el
+  centinela `<!-- WRITEONMARS:ADENDAS -->`, el re-sellado no puede preservarlas:
+  verifica que la sección de adendas empieza por el centinela.
+- **Rama sin prefijo `constitution/`.** Es la única señal de que la rama toca el
+  núcleo; recházala en revisión si falta.
 
 ## Referencias
 
-- `.specify/memory/constitution.md` § Governance § "Procedimiento de
-  enmienda" — fuente normativa.
-- `.claude/skills/writeonmars-update/SKILL.md` — propagación a proyectos
-  instalados (incluye `constitution_version`).
-- `docs/maintenance/skill-update-procedure.md` — procedimiento análogo
-  para skills bundled.
+- `writeonmars/memory/constitution.md` § Governance — fuente normativa.
+- `writeonmars/scripts/bootstrap.py` — copia y re-sellado del núcleo.
+- `writeonmars/references/sectores/` — defaults por sector (lo que NO va al núcleo).
 - `CHANGELOG.md` — registro histórico de enmiendas.

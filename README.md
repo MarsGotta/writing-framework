@@ -53,9 +53,9 @@ Recorrido paso a paso: [`writeonmars/docs/tutorial-primera-guia.md`](writeonmars
 ## Estado
 
 - **Preset `writeonmars`**: v0.1.0, agente-agnóstico, probado con proyecto
-  sintético. 5 plantillas + 10 comandos + 5 scripts.
+  sintético. 6 plantillas + 18 comandos + 6 scripts.
 - **Framework**: 0.x.0 (pre-tag; v1.0.0 pendiente).
-- **Constitución**: v1.2.0 (Principio V → 3 pasadas locales + 1 global; nuevo
+- **Constitución**: v1.3.0 (Principio V → 3 pasadas locales + 1 global; nuevo
   Principio VI de neutralidad de agente y modelo).
 - **Contrato de citación**: v1.0 · **Manifest**: v1.0.
 

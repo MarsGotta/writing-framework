@@ -2,7 +2,7 @@
 
 Audiencia: personas que mantienen Write.OnMars y operadores que crean o auditan proyectos editoriales. Para el schema autoritativo, ver `contracts/manifest-schema.json`. Este documento explica cada campo con ejemplos y notas operativas.
 
-El manifiesto vive en la raíz del proyecto editorial (no de este repo canónico) en `.writeonmars-manifest.json`. Lo produce `writeonmars-install` durante la instalación inicial (FR-001..FR-004) y se actualiza cuando cambian versiones, matriz de firmas u operadores autorizados.
+El manifiesto vive en la raíz del proyecto editorial (no de este repo canónico) en `.writeonmars-manifest.json`. Lo produce `bootstrap.py` (`/speckit-setup`) tras instalar el preset y se actualiza cuando cambian versiones, matriz de firmas u operadores autorizados.
 
 ## Estructura general
 
@@ -31,18 +31,26 @@ Ejemplo mínimo válido:
   "human_operators": [
     {"id": "marcela", "email": "marcela@example.com", "role": "author"}
   ],
-  "citation_contract_version": "1.0"
+  "citation_contract_version": "1.0",
+  "project_type": "editorial",
+  "sector": "tecnologia"
 }
 ```
+
+> **Nota (constitución por capas, v1.3.0).** El `bootstrap.py` actual escribe
+> `project_type` y `sector` (este último `null` hasta que `speckit.constitution`
+> lo fije). `constitution_version` referencia el **núcleo** versionado; las
+> **adendas del proyecto** (tono, terminología, relajaciones por sector) viven en
+> `.specify/memory/constitution.md` § Adendas, no en el manifiesto.
 
 ## Campos obligatorios
 
 ### `framework_version`
 
 - **Tipo**: string semver (`X.Y.Z`).
-- **Default**: el `writeonmars-install` lo rellena con la versión del repo canónico desde el que se instaló.
+- **Default**: `bootstrap.py` lo rellena con la versión del preset desde el que se instaló.
 - **Ejemplo**: `"1.0.0"`.
-- **Notas**: identifica la versión de Write.OnMars instalada en este proyecto. Permite a `writeonmars-update` calcular el diff cuando hay un bump.
+- **Notas**: identifica la versión de Write.OnMars instalada en este proyecto. Permite calcular el diff cuando el preset sube de versión.
 
 ### `constitution_version`
 
@@ -63,12 +71,12 @@ Ejemplo mínimo válido:
 - **Tipo**: string ISO-639 con región opcional (`^[a-z]{2}(-[A-Z]{2})?$`).
 - **Default**: `es`.
 - **Ejemplo**: `"es"`, `"es-AR"`, `"en-US"`.
-- **Notas**: el framework está calibrado en español por defecto (constitución § IV). Otros idiomas son posibles pero las skills `/marcela-prose` están afinadas para español.
+- **Notas**: el framework está calibrado en español por defecto (constitución § IV). Otros idiomas son posibles pero la voz (`references/voz`) está afinada para español.
 
 ### `skills`
 
 - **Tipo**: array de objetos con campos `name`, `version`, `source` (obligatorios) y `path` (opcional).
-- **Default**: el array que `writeonmars-install` puebla desde el `VERSION` file de cada skill bundled.
+- **Default**: el array que `bootstrap.py` puebla con las referencias bundled del preset.
 - **Ejemplo**:
 
   ```json
@@ -137,6 +145,22 @@ Ejemplo mínimo válido:
 
 ## Campos opcionales
 
+### `project_type`
+
+- **Tipo**: string del enum `editorial` | `software` | `mixed`.
+- **Default**: `editorial` (lo escribe `bootstrap.py`).
+- **Notas**: las plantillas en modo dual (spec/plan/tasks/checklist) se comportan
+  según este campo. En `editorial` el brief del Principio III es obligatorio.
+
+### `sector`
+
+- **Tipo**: string (slug del sector) o `null`.
+- **Default**: `null` tras el bootstrap; lo fija `speckit.constitution` al elegir
+  sector (p. ej. `"tecnologia"`).
+- **Notas**: apunta a la base de defaults `references/sectores/<sector>.md` desde la
+  que se derivaron las adendas del proyecto (tono, anglicismos, estructura de
+  capítulo, relajaciones). Ampliable creando un archivo de sector nuevo.
+
 ### `memory_external`
 
 - **Tipo**: objeto con `enabled`, `provider`, `uri`, `rebuildable_from_repo`.
@@ -173,7 +197,7 @@ Ejemplo mínimo válido:
 
 El manifiesto sigue semver. Las reglas para bumpear el schema:
 
-- **MAJOR (`v2.0`)**: cualquier cambio que rompa manifiestos existentes. Por ejemplo: renombrar `signing_matrix.pasada_1_estructura`, cambiar el tipo de `language_primary`, hacer obligatorio un campo que antes era opcional. Un bump MAJOR exige que cada proyecto instalado migre su manifiesto. La skill `writeonmars-update` debe ofrecer un migrador o, en su defecto, instrucciones claras.
+- **MAJOR (`v2.0`)**: cualquier cambio que rompa manifiestos existentes. Por ejemplo: renombrar `signing_matrix.pasada_1_estructura`, cambiar el tipo de `language_primary`, hacer obligatorio un campo que antes era opcional. Un bump MAJOR exige que cada proyecto instalado migre su manifiesto; `bootstrap.py --force` re-sella lo que puede y el resto se documenta en `docs/maintenance/`.
 - **MINOR (`v1.y`)**: añadir campos opcionales (como `memory_external` en su día), ampliar enums (añadir un nuevo `agent_target` cuando se porte). Los manifiestos existentes siguen siendo válidos sin tocar nada.
 - **PATCH (`v1.0.z`)**: aclaraciones en `description`, ejemplos nuevos, correcciones de patrones regex que no cambian el universo aceptado.
 
@@ -183,7 +207,7 @@ El manifiesto sigue semver. Las reglas para bumpear el schema:
 2. Refrescar el espejo en `contracts/manifest-schema.json` (T010 manual o vía script de mirror).
 3. Actualizar este documento (`docs/manifest-schema.md`) con el campo nuevo o el cambio.
 4. Actualizar `install/lib/render-manifest.sh` para que rellene el campo nuevo en proyectos nuevos.
-5. Para MAJOR: añadir migrador en `writeonmars-update` y entrada en `docs/maintenance/`.
+5. Para MAJOR: documentar la migración del manifiesto en `docs/maintenance/`.
 6. Bumpear `framework_version` en consecuencia (un cambio MAJOR del manifiesto suele implicar MAJOR del framework).
 7. Documentar en `CHANGELOG.md` y, si aplica, en `releases/<version>/`.
 
@@ -199,5 +223,5 @@ Dentro de la misma MAJOR, un manifiesto generado por una versión MINOR anterior
 
 - Schema autoritativo: `contracts/manifest-schema.json`.
 - Contrato de citación referenciado: `docs/citation-contract.md`.
-- Procedimiento de actualización del framework: `docs/maintenance/skill-update-procedure.md` (T069).
-- Memoria externa opcional: `docs/memory-external.md` (T076a).
+- Enmienda de la constitución (núcleo + propagación): `docs/maintenance/constitution-update-procedure.md`.
+- Memoria externa opcional: `docs/memory-external.md`.

@@ -138,7 +138,21 @@ def collect_chapters(chapters_dir: Path) -> list[tuple[int, Path]]:
 # --------------------------------------------------------------------------- #
 # Conversión y ensamblado
 # --------------------------------------------------------------------------- #
-def pandoc_fragment(md: Path, anchor_id: str) -> str:
+# Localiza el "## Fuentes" de cierre de capítulo en el HTML de pandoc para
+# envolverlo como aparato (clase .chapter-sources): en PDF queda inline pero
+# atenuado, sin tocar el markdown (que conserva la sección por capítulo).
+SOURCES_H2 = re.compile(r"<h2\b[^>]*>\s*Fuentes\b", re.I)
+
+
+def wrap_chapter_sources(html_out: str) -> str:
+    m = SOURCES_H2.search(html_out)
+    if not m:
+        return html_out  # capítulo sin "## Fuentes": lo señala la pasada de revisión
+    head, tail = html_out[: m.start()], html_out[m.start():]
+    return f'{head}<div class="chapter-sources">\n{tail}\n</div>\n'
+
+
+def pandoc_fragment(md: Path, anchor_id: str, is_chapter: bool = False) -> str:
     try:
         out = subprocess.run(
             ["pandoc", str(md)], capture_output=True, text=True, check=True
@@ -147,6 +161,8 @@ def pandoc_fragment(md: Path, anchor_id: str) -> str:
         fail("pandoc no está instalado (brew install pandoc / apt install pandoc)")
     except subprocess.CalledProcessError as e:
         fail(f"pandoc falló en {md}: {e.stderr.strip()}")
+    if is_chapter:
+        out = wrap_chapter_sources(out)
     return f'<div class="chapter" id="{anchor_id}">\n{out}\n</div>\n'
 
 
@@ -262,7 +278,7 @@ def main() -> None:
         meta_t = temario.get(num, {})
         title_c = meta_t.get("title") or first_h1(path)
         desc_c = meta_t.get("promesa", "")
-        body_parts.append(pandoc_fragment(path, anchor))
+        body_parts.append(pandoc_fragment(path, anchor, is_chapter=True))
         chap_toc.append((f"{num:02d}", title_c, desc_c, anchor))
 
     for fname, label, anchor, desc in [

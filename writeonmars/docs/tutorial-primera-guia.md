@@ -26,9 +26,7 @@ mkdir ~/Projects/guia-prueba && cd ~/Projects/guia-prueba && git init
 specify preset add --dev ~/Projects/writing-framework/writeonmars
 ```
 
-Instala las plantillas editoriales, los comandos y los scripts. (Verifica que tu
-versión de `specify` copia también `references/`; si no, ese directorio debe
-quedar accesible para los comandos.)
+Instala las plantillas editoriales, los comandos y los scripts. (Verifica que tu versión de `specify` copia también `references/`; si no, ese directorio debe quedar accesible para los comandos.)
 
 ## 2. Bootstrap del proyecto
 
@@ -36,24 +34,49 @@ quedar accesible para los comandos.)
 /speckit.setup
 ```
 
-Copia la constitución editorial y crea el `.writeonmars-manifest.json` (versiones,
-`signing_matrix`, operadores) — lo que el preset no puede instalar solo. Se corre
-una vez, justo después de instalar. (También como script:
+Copia el **núcleo de la constitución** (las reglas universales: voz, brief,
+revisión, neutralidad) y crea el `.writeonmars-manifest.json` (versiones,
+`signing_matrix`, operadores, sector) — lo que el preset no puede instalar solo. Se
+corre una vez, justo después de instalar. (También como script:
 `python3 .specify/presets/writeonmars/scripts/bootstrap.py`.) Por defecto todas las
 pasadas quedan **autónomas**: el control humano son los dos checkpoints (brief y PDF
 anotado), no pasada por pasada.
 
-## 3. El brief, con preguntas (checkpoint humano 1)
+## 3. La constitución del proyecto (sector + tono)
+
+```text
+/speckit.constitution
+```
+
+Es el **primer paso del ciclo**. El núcleo de la constitución es universal y no se
+toca; aquí defines la **capa por guía** (las *adendas*): lo normativo que sí cambia
+de una guía a otra. El comando te guía con preguntas y **un valor por defecto en
+cada una** — pulsar Enter mantiene el estándar:
+
+1. **Sector** — tecnología, y los que vayas creando (veterinaria, medicina…). El
+   sector carga sus *defaults* (tono, anglicismos, estructura de capítulo).
+2. **Camino rápido**: aceptar el estándar del sector tal cual, o ir pregunta por
+   pregunta (tono calibrado, anglicismos admitidos, contrato terminológico,
+   relajaciones estructurales, idioma, gobernanza).
+
+Escribe la sección `## Adendas del proyecto` sobre el núcleo intacto y guarda el
+`sector` en el manifest. A partir de aquí, el tono y la terminología que la guía
+usará ya están fijados: el brief y las pasadas de revisión los leen de ahí.
+
+## 4. El brief, con preguntas (checkpoint humano 1)
 
 ```text
 /speckit.specify "una guía básica de prompts efectivos para developers"
 ```
 
-Rellena el brief de nueve campos y te pregunta lo que falte. El avance se bloquea
-hasta que audiencia, ejemplo recurrente y resultado esperado estén claros. Cuando
-el brief te convenza, es tu firma.
+Rellena el brief de **ocho campos descriptivos** (audiencia, problema, resultado,
+nivel, conceptos, ejemplo recurrente, riesgos, acciones) y te pregunta lo que
+falte. El **tono no se pregunta aquí**: ya está calibrado en las adendas (paso 3) y
+el brief solo lo refleja. El avance se bloquea hasta que audiencia, ejemplo
+recurrente y resultado esperado estén claros. Cuando el brief te convenza, es tu
+firma.
 
-## 4. Investigación con fuentes
+## 5. Investigación con fuentes
 
 Pon tus fuentes en `resources/` y:
 
@@ -64,7 +87,7 @@ Pon tus fuentes en `resources/` y:
 Produce `specs/<###>/research.md` con una cita por concepto obligatorio. Bloquea
 si algún concepto queda sin respaldo.
 
-## 5. Temario y descripciones encadenadas
+## 6. Temario y descripciones encadenadas
 
 ```text
 /speckit.plan
@@ -73,18 +96,20 @@ si algún concepto queda sin respaldo.
 Genera el temario (`Número | Título | Promesa`) y las descripciones encadenadas.
 El temario es además el índice de tu futuro PDF.
 
-## 6. Redacción (un capítulo cada vez)
+## 7. Redacción (un capítulo cada vez)
 
 ```text
 /speckit.implement 1
 ```
 
-Redacta UN capítulo en `chapters/<NN>-titulo.md` con la voz de la autora. El número
-elige el capítulo (`1`); **sin número**, escribe el siguiente pendiente (el primero
-del temario que aún no tiene archivo). Si el archivo ya existe, lo **rehace**.
-**Solo escribe**: no se revisa a sí mismo.
+Redacta UN capítulo en `chapters/<NN>-titulo.md` con la voz de la autora y la
+**estructura que fija la base del sector**. Cada capítulo **cierra con su sección
+`## Fuentes`** (nombre, enlace y fecha de lo citado en ese capítulo): es requisito,
+no opcional. El número elige el capítulo (`1`); **sin número**, escribe el siguiente
+pendiente (el primero del temario que aún no tiene archivo). Si el archivo ya
+existe, lo **rehace**. **Solo escribe**: no se revisa a sí mismo.
 
-## 7. Revisión (idealmente con OTRO modelo)
+## 8. Revisión (idealmente con OTRO modelo)
 
 La revisión va aparte, para que quien escribe no se autoevalúe. Agrupada:
 
@@ -104,9 +129,9 @@ O cada pasada por separado, para asignarla a un modelo distinto:
 Cada pasada escribe su bloque en `findings.md`. Las tres locales son por capítulo;
 la global, una vez sobre el libro entero. La de precisión no solo confía en
 `research.md`: **abre la fuente en vivo** (URL/web) para contrastar los datos
-volátiles.
+volátiles, y comprueba que cada capítulo tiene su `## Fuentes`.
 
-## 8. Aplica los hallazgos
+## 9. Aplica los hallazgos
 
 ```text
 /speckit.revise 1
@@ -116,7 +141,7 @@ Lee los hallazgos abiertos de `findings.md` y reescribe SOLO los pasajes señala
 marcándolos como resueltos. Cierra el loop revisión → corrección. Lo puede correr el
 modelo que escribió; un hallazgo `critico` sin resolver bloquea el cierre.
 
-## 9. Mira el estado
+## 10. Mira el estado
 
 ```text
 /speckit.status
@@ -126,7 +151,7 @@ Tablero de capítulos × pasadas × firmas y los gates de cierre (críticos abie
 firmas humanas pendientes y completitud del temario). (También como script:
 `python3 ~/Projects/writing-framework/writeonmars/scripts/status.py`.)
 
-## 10. Genera el PDF
+## 11. Genera el PDF
 
 Primero, la **presentación** de la guía (lo que abre el PDF):
 
@@ -143,9 +168,10 @@ el PDF:
 
 Toma el título del brief, el índice del temario y ensambla los capítulos con el
 estilo editorial. El PDF sale con portada, índice navegable y page-break por
-capítulo.
+capítulo. Las `## Fuentes` de cada capítulo se mantienen, atenuadas como aparato de
+cierre (no como cuerpo).
 
-## 11. Anótalo y aplica el feedback (checkpoint humano 2)
+## 12. Anótalo y aplica el feedback (checkpoint humano 2)
 
 Abre el PDF, resalta y comenta (puedes etiquetar `#voz`, `#dato`, `#critico`…):
 
@@ -157,7 +183,7 @@ Cada anotación se mapea a su capítulo por el texto resaltado, y los cambios se
 aplican SOLO en los pasajes señalados. Un comentario en el capítulo 5 no reescribe
 el 1–4.
 
-## 12. Cierra
+## 13. Cierra
 
 ```text
 /speckit.close
@@ -168,7 +194,7 @@ regenera el PDF final. Si está bloqueado, te dice qué resolver y no exporta.
 
 ## Qué tienes ahora
 
-Una guía redactada con voz coherente, revisada, contrastada con fuentes, exportada
-a PDF y cerrada con tu visto bueno — producida por comandos que cualquier modelo
-puede lanzar. El mismo recorrido corre desatendido bajo un orquestador (Paperclip):
-ver [`how-to.md`](how-to.md).
+Una guía redactada con voz coherente, revisada, contrastada con fuentes (con su
+bloque de fuentes por capítulo), exportada a PDF y cerrada con tu visto bueno —
+producida por comandos que cualquier modelo puede lanzar. El mismo recorrido corre
+desatendido bajo un orquestador (Paperclip): ver [`how-to.md`](how-to.md).

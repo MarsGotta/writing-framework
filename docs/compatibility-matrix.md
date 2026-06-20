@@ -1,27 +1,37 @@
 # Matriz de compatibilidad
 
-Este documento registra qué MCPs de investigación y qué agentes son compatibles con Write.OnMars en cada versión. Es la referencia rápida para operadores que instalan el framework y para mantenedores que evalúan PRs nuevos.
+Registra qué MCPs de investigación y qué agentes son compatibles con Write.OnMars.
+Es la referencia rápida para quien instala el preset y para mantenedores que evalúan
+PRs nuevos.
 
-Para los criterios de certificación de un MCP, ver `docs/citation-contract.md` § "Cómo certificar un MCP como compatible". Para portar un agente, ver `docs/portability-validation.md` (T075, pendiente).
+Para los criterios de certificación de un MCP, ver `docs/citation-contract.md` §
+"Cómo certificar un MCP como compatible". El método es **agente-agnóstico** por
+diseño (lógica en comandos + referencias, no en skills de un proveedor): portar a
+otro agente no requiere reescribir la lógica, solo apuntar al preset (ver
+`writeonmars/AGENTS.md`).
 
-## MCPs investigación compatibles
+## MCPs de investigación compatibles
 
 | Nombre | Estado | Tipo | Notas |
 |--------|--------|------|-------|
-| `context7` | v1 | `documentacion_oficial` | Soporta versionado por libreria. Recomendado para docs de SDK/API/CLI. |
+| `context7` | v1 | `documentacion_oficial` | Soporta versionado por biblioteca. Recomendado para docs de SDK/API/CLI. |
 | `web-search:tavily` | v1 | `web_publica` | Marca `volatil=true` por defecto. Usar con `[VERIFICAR]` antes de publicar. |
 | `fetch` | v1 | `web_publica` | Sin reranker; manual. El operador decide qué fragmento citar. |
-| `local:resources` | v1 | `archivo_local` | Lee `resources/` del proyecto editorial. Fuente obligatoria si existe (FR-008). |
+| `local:resources` | v1 | `archivo_local` | Lee `resources/` del proyecto editorial. Fuente obligatoria si existe. |
 
 ## Agentes soportados
 
-| Agente | Estado v1 | Adaptador | Notas |
-|--------|-----------|-----------|-------|
-| claude-code | v1 (prioritario) | `agents/claude/prompts/` | Implementacion canonica. Cubre todas las skills `writeonmars-*`. |
-| codex | planned | `agents/codex/prompts/` | Scaffolding en T074 (Polish). Sin paridad funcional en v1. |
-| cursor | planned | TBD | Sin scaffolding aun. Requiere PR completo para entrar al roadmap. |
-| other | manual | TBD | Requiere portar adapter. El operador asume el coste de mantenimiento. |
+El pipeline lo lanza cualquier agente que sepa leer archivos y ejecutar los
+comandos del preset (ver `writeonmars/AGENTS.md`). Probado cross-model: redacción
+con un modelo, revisión con otro.
+
+| Agente | Estado | Notas |
+|--------|--------|-------|
+| Claude Code | probado | Los comandos se registran como skills con guion (`/speckit-specify`). |
+| Codex | probado (review) | Corrió la pasada de precisión leyendo el preset por ruta. Registro nativo de comandos pendiente. |
+| Cursor / Gemini / otros | manual | Apuntar al archivo del comando por ruta hasta registrarlos nativamente. |
 
 ---
 
-Para añadir un MCP: ver `docs/citation-contract.md` § Certificación. Para portar un agente: ver `docs/portability-validation.md` (T075).
+Para añadir un MCP: ver `docs/citation-contract.md` § Certificación. Para portar un
+agente: el contrato operativo está en `writeonmars/AGENTS.md`.

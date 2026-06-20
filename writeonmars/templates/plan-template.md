@@ -42,15 +42,15 @@ design.*
 
 <!--
   La tabla siguiente verifica conformidad con los cinco principios editoriales
-  (constitución v1.2.0). Cuando `project_type=software`, sustituye o amplía
+  (constitución v1.3.0). Cuando `project_type=software`, sustituye o amplía
   esta tabla con los principios técnicos del proyecto.
 -->
 
 | Principio | Conformidad | Evidencia |
 |-----------|-------------|-----------|
 | **I. Voz natural y sobria** (NO NEGOCIABLE) | [pasa / desviación justificada] | [Frases comprimidas evitadas, transiciones explicadas, ausencia de eslóganes. Apunta secciones del plan donde se garantiza.] |
-| **II. Estructura situación → explicación → consecuencia** | [pasa / desviación justificada] | [Cada capítulo del temario aplica la plantilla de nueve secciones. Listar excepciones aquí.] |
-| **III. Brief obligatorio** (NO NEGOCIABLE) | [pasa / desviación justificada] | [Brief de nueve campos archivado en `specs/[###-feature]/spec.md` y citado en este plan. Confirmar campos críticos sin `[NEEDS CLARIFICATION]`.] |
+| **II. Estructura situación → explicación → consecuencia** | [pasa / desviación justificada] | [Cada capítulo del temario aplica la estructura de capítulo que fije la base del sector (references/sectores/). Listar excepciones aquí.] |
+| **III. Brief obligatorio** (NO NEGOCIABLE) | [pasa / desviación justificada] | [Brief (8 campos descriptivos; tono en las adendas) archivado en `specs/[###-feature]/spec.md` y citado en este plan. Confirmar campos críticos sin `[NEEDS CLARIFICATION]`.] |
 | **IV. Precisión léxica y arquitectura sintáctica** | [pasa / desviación justificada] | [Glosario inicial, anglicismos justificados, univocidad terminológica garantizada en las descripciones encadenadas.] |
 | **V. Revisión multi-pasada** (NO NEGOCIABLE) | [pasa / desviación justificada] | [Cinco pasadas declaradas como tareas en `tasks.md`; matriz de firmas alineada con `.writeonmars-manifest.json`.] |
 

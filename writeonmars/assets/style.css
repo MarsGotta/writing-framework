@@ -94,6 +94,33 @@ h4 {
   color: #2a2a2a;
 }
 
+/* ===== Fuentes por capítulo (aparato de cierre) ===== */
+/* En MD cada capítulo cierra con "## Fuentes". En PDF se mantiene inline pero
+   atenuado, como aparato de cierre de capítulo (no como cuerpo). El wrapper
+   .chapter-sources lo añade export.py alrededor del bloque Fuentes. */
+
+.chapter-sources {
+  margin-top: 2.4em;
+  padding-top: 0.8em;
+  border-top: 1px solid #e7e5e4;
+  font-size: 9.5pt;
+  line-height: 1.45;
+  color: #57534e;
+}
+
+.chapter-sources h2 {
+  font-size: 11pt;
+  margin: 0 0 0.5em 0;
+  color: #78716c;
+  letter-spacing: 0;
+}
+
+.chapter-sources a { color: #57534e; }
+
+.chapter-sources ul, .chapter-sources ol { margin: 0; padding-left: 1.3em; }
+
+.chapter-sources li { margin: 0 0 0.25em 0; }
+
 /* ===== Inline elements ===== */
 
 em {

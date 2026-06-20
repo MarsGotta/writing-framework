@@ -61,6 +61,9 @@ defecto (FR-020a).
 ## Lente específica (constitución § V.4)
 
 - Sin datos inventados; cada afirmación verificable tiene cita.
+- **El capítulo cierra con su sección `## Fuentes`** (obligatoria, Estándares
+  editoriales v1.3.0): cada fuente citada en el capítulo aparece con nombre,
+  enlace y fecha. Su ausencia es un finding de precisión.
 - Versiones, comandos y precios verificados con fecha de consulta
   reciente.
 - Afirmaciones absolutas matizadas cuando el dominio admite excepción.

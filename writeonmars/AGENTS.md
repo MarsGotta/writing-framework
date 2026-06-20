@@ -27,13 +27,15 @@ neutrales de modelo. Léelas antes de ejecutar cualquier `speckit.*` de este pre
 | Aplicar la voz al redactar/revisar | `.specify/presets/writeonmars/references/voz/SKILL.md` (+ su `.specify/presets/writeonmars/references/`) |
 | Diseño didáctico (estructura, carga cognitiva) | `.specify/presets/writeonmars/references/didactica/SKILL.md` |
 | Detalle de cada paso del método | `.specify/presets/writeonmars/references/metodo/writeonmars-<paso>/SKILL.md` |
-| Reglas editoriales no negociables | `.specify/memory/constitution.md` |
+| Defaults por sector para las adendas | `.specify/presets/writeonmars/references/sectores/<sector>.md` (esquema en `_index.md`) |
+| Reglas editoriales: núcleo + adendas de la guía | `.specify/memory/constitution.md` |
 
 ## Orden del ciclo (comandos del preset, no pisan los de Spec Kit)
 
 ```
-speckit.setup      → bootstrap: constitución + manifest   (una vez tras instalar)
-speckit.specify    → brief con preguntas                  (checkpoint humano 1)
+speckit.setup        → bootstrap: núcleo de la constitución + manifest (una vez tras instalar)
+speckit.constitution → adendas del proyecto: sector + tono + terminología + gobernanza (primer paso, guiado con defaults)
+speckit.specify      → brief con preguntas                  (checkpoint humano 1)
 speckit.research   → research.md con citas
 speckit.plan       → temario + descripciones encadenadas
 speckit.implement  → redacción de UN capítulo (solo escribe; repetir por capítulo)

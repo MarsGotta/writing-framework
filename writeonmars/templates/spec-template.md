@@ -11,9 +11,9 @@
   El comportamiento de este template depende de `project_type` declarado en
   `.writeonmars-manifest.json` (campo opcional `project_type`):
 
-  - `editorial`: el brief de nueve campos del Principio III es OBLIGATORIO.
-    "User Stories" se renombra como "Trayectos de lector" (sync impact
-    constitución v1.2.0).
+  - `editorial`: el brief del Principio III es OBLIGATORIO (8 campos descriptivos
+    + el tono heredado de las adendas del proyecto). "User Stories" se renombra
+    como "Trayectos de lector" (sync impact constitución v1.3.0).
   - `software` (default Spec Kit): conserva "User Stories" tal cual.
   - `mixed`: rellena ambas secciones.
 
@@ -25,7 +25,8 @@
 
 <!--
   Esta sección materializa el Principio III de la constitución (FR-005). Los
-  nueve campos son obligatorios. Ningún campo MUST contener marcadores
+  ocho campos descriptivos son obligatorios; el campo 5 (tono) se hereda de las
+  adendas del proyecto. Ningún campo MUST contener marcadores
   `[NEEDS CLARIFICATION]` cuando se cierre la spec; mientras existan, el avance
   a `/speckit-plan` queda bloqueado por FR-006 en los campos críticos
   (audiencia, ejemplo recurrente, resultado esperado).
@@ -59,9 +60,14 @@
 
 ### 5. Tono
 
-<!-- Declarar variantes admitidas: experto / directo / natural / sobrio. -->
+<!--
+  NO se captura aquí. El tono es normativo y se calibra una vez por guía en las
+  adendas del proyecto (`.specify/memory/constitution.md` § Adendas → Tono
+  calibrado), vía `/speckit-constitution`. Este campo solo lo refleja para que el
+  brief quede completo; la fuente de verdad es la constitución.
+-->
 
-[Lista de variantes permitidas en la guía. La constitución § I exige sobriedad como base.]
+Heredado de las adendas del proyecto: [eco del tono calibrado en la constitución].
 
 ### 6. Conceptos obligatorios
 
@@ -177,7 +183,7 @@
 
 ### Functional Requirements
 
-- **FR-001**: System MUST [capacidad concreta, ej. "validar el brief de nueve campos antes de planificar"]
+- **FR-001**: System MUST [capacidad concreta, ej. "validar el brief antes de planificar"]
 - **FR-002**: System MUST [capacidad concreta]
 - **FR-003**: Users MUST be able to [interacción clave]
 - **FR-004**: System MUST [requisito de datos]

@@ -40,7 +40,7 @@ Supongamos que el MCP `context7` resolvió documentación oficial de React 19 so
 
 3. **Recortar el `fragmento` literal**. El record almacena el texto que se va a citar, no un resumen. Si excede 500 caracteres, se permite usar `[...]` para marcar elisiones siempre que se conserve el sentido.
 
-4. **Registrar `fecha_consulta` en formato ISO**. Solo `YYYY-MM-DD`. La fecha debe ser hoy o anterior; las skills rechazan fechas futuras.
+4. **Registrar `fecha_consulta` en formato ISO**. Solo `YYYY-MM-DD`. La fecha debe ser hoy o anterior; el framework rechaza fechas futuras.
 
 5. **Declarar `motor` exacto**. Para este ejemplo: `context7`. Nunca usar `unknown`: si el agente no sabe qué motor trajo el dato, no puede emitir el record.
 
@@ -73,7 +73,7 @@ Para validarlo desde la consola:
 ajv validate -s contracts/citation-record.schema.json -d /tmp/record.json
 ```
 
-Si la validación falla, el record no entra en `research.md`. La skill correspondiente debe rechazarlo y devolver el error al operador o al sub-agente.
+Si la validación falla, el record no entra en `research.md`. El comando correspondiente debe rechazarlo y devolver el error al operador o al sub-agente.
 
 ## Errores comunes
 
@@ -81,7 +81,7 @@ Estos casos aparecen con frecuencia cuando un MCP empieza a emitir records. Conv
 
 - **`motor: "unknown"` o vacío**. El contrato lo prohíbe explícitamente (regla 2 de validación). Si el MCP envuelve a otro motor, debe declarar el suyo propio (por ejemplo `mi-mcp:tavily-wrapper`).
 - **`fragmento` con menos de 20 caracteres**. La regla 4 exige texto significativo, salvo cuando la fuente sea estructurada y la cita sea un valor concreto (una versión, un precio). Para casos generales, fragmentos demasiado cortos suelen indicar que se citó un encabezado en lugar del cuerpo.
-- **`fecha_consulta` en el futuro**. Las skills rechazan estas fechas (regla 3). Suele ocurrir cuando un script normaliza zonas horarias mal o cuando se reutiliza una plantilla con fecha placeholder.
+- **`fecha_consulta` en el futuro**. El framework rechaza estas fechas (regla 3). Suele ocurrir cuando un script normaliza zonas horarias mal o cuando se reutiliza una plantilla con fecha placeholder.
 - **`tipo` o `confianza` con un valor fuera del enum**. Los enums son cerrados (regla 5). Si una fuente no encaja en `documentacion_oficial`, `web_publica`, `archivo_local` o `cita_bibliografica`, el MCP no puede emitir el record en v1; debe esperar a una extensión MINOR del enum o reclasificar.
 - **Editar un record existente**. Está prohibido (regla 1: inmutabilidad). Una corrección genera un record nuevo con `citation_id` distinto y deja el original con sufijo `:superseded`. Esto preserva el historial completo de la investigación.
 - **Olvidar `version_aplicable` cuando `versionado_aplicable: true`**. El schema lo exige condicionalmente (`if`/`then`). Si el MCP marca la fuente como versionable, debe poder declarar la versión exacta.
@@ -94,13 +94,13 @@ El contrato sigue semver. Las reglas de versionado vienen de `contracts/citation
 - **MINOR (`v1.y`)**: añadir campos opcionales nuevos (por ejemplo, `idioma_original`) o ampliar enums sin romper los valores existentes (añadir `cita_pre_print` al enum `tipo`). Los consumidores existentes siguen funcionando porque los campos opcionales se pueden ignorar.
 - **PATCH (`v1.0.z`)**: aclaraciones en la documentación, ejemplos nuevos, correcciones tipográficas. No cambia la forma de los records ni los campos.
 
-Cada proyecto declara la versión soportada en `manifest.citation_contract_version` (ver `docs/manifest-schema.md`). Los MCPs que producen records emiten `contract_version` en cada record. Las skills del framework comparan ambos al recibir y rechazan mismatches MAJOR.
+Cada proyecto declara la versión soportada en `manifest.citation_contract_version` (ver `docs/manifest-schema.md`). Los MCPs que producen records emiten `contract_version` en cada record. Los comandos del framework comparan ambos al recibir y rechazan mismatches MAJOR.
 
 Antes de proponer un bump, conviene revisar:
 
 1. **Coste para los consumidores**: cuántos MCPs deben adaptarse y cuántos proyectos quedan en v1.x.
 2. **Alternativa MINOR posible**: muchas mejoras se pueden expresar como campos opcionales sin romper compatibilidad.
-3. **Actualización en cadena**: un bump MAJOR obliga a actualizar `contracts/citation-contract.md`, `contracts/citation-record.schema.json`, todas las skills que emiten records y `docs/compatibility-matrix.md`.
+3. **Actualización en cadena**: un bump MAJOR obliga a actualizar `contracts/citation-contract.md`, `contracts/citation-record.schema.json`, todos los comandos que emiten records y `docs/compatibility-matrix.md`.
 
 ## Para profundizar
 

@@ -187,7 +187,7 @@ agrupan por user story; en modo editorial, por etapa del flujo editorial.
 investigar o redactar.
 
 - [ ] E001 Run `writeonmars-brief` (vía `/speckit-specify`) para producir el
-  brief de nueve campos en `specs/[###-feature]/spec.md`.
+  brief (8 campos descriptivos) en `specs/[###-feature]/spec.md`.
 - [ ] E002 Resolver cualquier `[NEEDS CLARIFICATION]` en campos críticos
   (audiencia, ejemplo recurrente, resultado esperado) antes de avanzar a
   Investigación. Bloqueante por FR-006.
@@ -243,7 +243,7 @@ II y consolidar el glosario sin colisiones.
   cuando US3 esté activo) con el prompt canónico
   `agents/claude/prompts/redaccion.md`.
 - [ ] E031 Cada sub-agente devuelve `chapters/[###]-titulo.md` con front-matter
-  YAML (data-model § 7) y las nueve secciones obligatorias.
+  YAML (data-model § 7), la estructura de capítulo del sector y la sección `## Fuentes`.
 - [ ] E032 Ejecutar `writeonmars-glossary` para consolidar
   `terminos_introducidos`; bloquear ante colisiones de definición (FR-015).
 

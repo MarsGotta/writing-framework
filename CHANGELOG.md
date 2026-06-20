@@ -23,12 +23,25 @@ trayectorias paralelas: framework (`vX.Y.Z` del repo) y constitución
 - `install.sh` pasa a **legacy**; `specify preset add` es la vía canónica.
 - **Constitución v1.2.0**: Principio V → 3 pasadas locales + 1 global; nuevo
   Principio VI (neutralidad de agente y modelo); distribución canónica = preset.
+- **Constitución por capas (v1.2.1 → v1.3.0)**: el núcleo deja de copiarse
+  íntegro y editable. Ahora núcleo universal versionado + **adendas del proyecto**
+  por guía. El **tono** sale de los 9 campos del brief (pasa a 8 descriptivos) y se
+  calibra en las adendas (Principio III). Las **cajas** y el **checklist por
+  capítulo** pasan de obligatorios a opcionales por sector. Nuevo requisito
+  **`## Fuentes` por capítulo** (cada capítulo cierra con sus fuentes nombradas).
+- `bootstrap.py --force` re-sella el núcleo preservando las adendas (centinela
+  `<!-- WRITEONMARS:ADENDAS -->`). El PDF mantiene las `## Fuentes` por capítulo,
+  atenuadas como aparato de cierre (`.chapter-sources`).
 
 ### Añadido
 
 - Scripts deterministas: `export.py` (PDF, reusa el estilo de `markdown-to-pdf`),
   `status.py` (tablero + gates), `feedback_intake.py` (PDF anotado → change-set),
   `close.py` (gate + export), `index.py` (memoria BM25/TF).
+- Comando `speckit.constitution` (primer paso del ciclo, guiado con defaults por
+  sector; `replaces` el core), plantilla `adendas-template`, y **bases de sector**
+  en `references/sectores/` (hoy `tecnologia`, ampliable creando un archivo).
+- Campo `sector` en el manifiesto del proyecto.
 - Documentación de uso en `writeonmars/docs/` (Diátaxis) y `writeonmars/AGENTS.md`.
 
 ### Obsoleto

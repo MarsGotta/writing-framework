@@ -1,6 +1,45 @@
 <!--
 SYNC IMPACT REPORT
 ==================
+Version change: 1.2.1 → 1.3.0
+Bump rationale: MINOR — relaja estándares y añade un requisito, sin invalidar
+guías. (1) "Plantilla de capítulo" y "Qué hacer en la práctica" pasan de MUST a
+SHOULD, y el checklist puede centralizarse, cuando las adendas del proyecto lo
+declaren (calibrado contra la guía de referencia guide-ai-developers-basic, que
+centraliza el checklist y no usa cajas). (2) Las cajas visuales pasan de
+"obligatoria al menos una" a SHOULD-según-sector. (3) NUEVO requisito: "Fuentes por
+capítulo" — cada capítulo MUST cerrar con su sección Fuentes. Añadir requisito +
+relajar estándares = MINOR.
+
+Modified standards (Estándares editoriales):
+- Plantilla de capítulo: MUST → SHOULD; checklist/“qué hacer” centralizable por adendas.
+- Cajas visuales: obligatorias → SHOULD según sector.
+- Principio II: la salida operativa por capítulo pasa a SHOULD condicional.
+
+Added standards:
+- "Fuentes por capítulo" (MUST): trazabilidad de fuentes al cierre de cada capítulo.
+
+Historial previo
+----------------
+Version change: 1.2.0 → 1.2.1
+Bump rationale: PATCH — aclaración, sin redefinir ningún principio. (1) El
+Principio III precisa que el "tono" se calibra una vez por guía en las adendas del
+proyecto (no campo a campo en cada brief); el brief lo refleja como eco. El brief
+sigue exigiendo las mismas dimensiones. (2) Se documenta el modelo núcleo + adendas
++ bases de sector en "Arquitectura del framework". No se añade ni elimina principio,
+no se invalidan guías: PATCH, no MINOR.
+
+Modified principles:
+- III. Brief obligatorio — el campo "tono" se declara en las adendas (constitución
+  § Adendas) vía /speckit-constitution; el brief lo refleja. Sigue NO NEGOCIABLE.
+
+Added sections:
+- "Arquitectura del framework" § Núcleo y adendas — formaliza la separación entre
+  el núcleo universal (versionado) y la capa por guía (adendas), con bases de
+  sector para los valores por defecto.
+
+Historial previo
+----------------
 Version change: 1.1.0 → 1.2.0
 Bump rationale: MINOR — se añade un principio nuevo (VI. Neutralidad de agente y
 modelo) y se expande materialmente el Principio V para fijar el modelo de
@@ -100,8 +139,11 @@ Reglas obligatorias:
 
 - Cada concepto técnico introducido MUST tener al menos un ejemplo concreto
   dentro del mismo capítulo.
-- Cada capítulo MUST terminar con una sección "Qué hacer en la práctica" o
-  equivalente operativa (checklist, plantilla, síntoma → causa probable).
+- Cada capítulo SHOULD ofrecer una salida operativa ("Qué hacer en la práctica",
+  checklist, plantilla, síntoma → causa probable) cuando el tema tiene acción
+  accionable real. Las adendas del proyecto declaran si esta salida es obligatoria
+  por capítulo o se centraliza (p. ej. el sector tecnología la deja opcional por
+  capítulo y centraliza el checklist en el cierre y los anexos).
 - MUST existir un ejemplo recurrente compartido a lo largo de la guía. No se
   permiten ejemplos inventados nuevos en cada capítulo cuando el caso recurrente
   ya cubre la situación.
@@ -120,7 +162,10 @@ siguientes campos:
 3. **Resultado esperado**: qué podrá hacer después.
 4. **Nivel**: principiante, intermedio o avanzado.
 5. **Tono**: experto, directo, natural, sobrio (variantes admitidas, pero
-   declaradas).
+   declaradas). Se calibra **una vez por guía en las adendas del proyecto**
+   (constitución § Adendas, vía `/speckit-constitution`), no campo a campo en
+   cada brief: el brief lo refleja como eco. Es lo único del brief que es
+   normativo y por eso vive en la constitución, no en `spec.md`.
 6. **Conceptos obligatorios**: lista cerrada.
 7. **Ejemplo recurrente**: caso que se usará durante toda la guía.
 8. **Riesgos**: malentendidos a evitar.
@@ -234,12 +279,21 @@ que convenga en cada paso.
 
 Restricciones materiales aplicables a todo artefacto del framework:
 
-- **Plantilla de capítulo**: cada capítulo MUST seguir el patrón "Problema real →
+- **Plantilla de capítulo**: cada capítulo SHOULD seguir el patrón "Problema real →
   Idea clave → Por qué importa → Cómo funciona → Ejemplo → Error frecuente → Qué
-  hacer en la práctica → Checklist → Puente al siguiente capítulo".
-- **Cajas obligatorias por capítulo**: al menos una de las siguientes cajas
-  MUST aparecer: "Quédate con esto", "Qué hacer mañana", "Síntoma → causa
-  probable".
+  hacer en la práctica → Puente al siguiente capítulo". El checklist y la salida
+  "Qué hacer en la práctica" pueden centralizarse u omitirse por capítulo cuando
+  las adendas del proyecto lo declaren. La estructura concreta del capítulo la fija
+  la base del sector (p. ej. `references/sectores/tecnologia.md`).
+- **Fuentes por capítulo**: cada capítulo MUST cerrar con una sección "Fuentes"
+  que nombre las fuentes citadas en ese capítulo (nombre, enlace y fecha cuando
+  aplique), además del research consolidado. Es trazabilidad por capítulo, no solo
+  un research.md central.
+- **Cajas visuales**: las cajas "Quédate con esto", "Qué hacer mañana" o "Síntoma →
+  causa probable" SHOULD usarse cuando aportan, y las adendas del proyecto declaran
+  si alguna es obligatoria por capítulo. Algunos sectores (médico, veterinario) se
+  benefician de "Síntoma → causa probable"; otros (tecnología) las omiten. No son
+  obligatorias por defecto.
 - **Estructura de guía completa**: portada, promesa, "Para quién es", "Para
   quién no es", "Qué vas a aprender", ruta rápida de lectura, conceptos base,
   desarrollo por capítulos, checklists prácticos, plantillas reutilizables,
@@ -293,6 +347,23 @@ los hooks de auto-commit aplican igual a artefactos editoriales que a código.
 Write.OnMars se materializa como un conjunto de extensiones instalables sobre un
 proyecto editorial nuevo. Esta sección codifica las decisiones de arquitectura
 que sostienen los cinco principios.
+
+**Núcleo y adendas**:
+
+- La constitución de cada guía tiene dos capas. El **núcleo** (este documento:
+  Principios I–VI, estándares, gobernanza) es universal y se rige por versión: NO
+  se edita por guía. Garantiza que toda guía comparta la voz y el método.
+- Las **adendas del proyecto** son la capa por guía, en su propia sección
+  (`## Adendas del proyecto`) al final de `.specify/memory/constitution.md`.
+  Recogen lo normativo que sí varía: sector, tono calibrado, contrato
+  terminológico, anglicismos admitidos, matices léxicos, relajaciones y
+  gobernanza. Las fija `/speckit-constitution` (primer paso del ciclo) y la
+  revisión las verifica. Ninguna adenda MUST debilitar un principio NO NEGOCIABLE.
+- Las **bases de sector** (`references/sectores/<slug>.md`) proponen los valores
+  por defecto de las adendas según el dominio (tecnología, veterinaria, medicina,
+  ciencia, humanidades, literatura…). Son ampliables: añadir un sector es crear su
+  archivo. El brief (`spec.md`) queda para lo descriptivo (audiencia, problema,
+  ejemplo recurrente); las adendas, para lo normativo por guía.
 
 **Distribución**:
 
@@ -374,4 +445,4 @@ cumplimiento explícito antes de cerrarse.
 - La guía operativa de runtime para agentes (p.ej., `CLAUDE.md`, `AGENTS.md`)
   MUST citar esta constitución como fuente de verdad editorial.
 
-**Version**: 1.2.0 | **Ratified**: 2026-05-06 | **Last Amended**: 2026-06-14
+**Version**: 1.3.0 | **Ratified**: 2026-05-06 | **Last Amended**: 2026-06-20

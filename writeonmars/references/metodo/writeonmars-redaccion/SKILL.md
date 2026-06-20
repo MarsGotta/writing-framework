@@ -47,7 +47,10 @@ despacho concurrente de sub-agentes; ver § "Modo paralelo (`--parallel N`)".
    `<!-- glossary-annex START -->` … `<!-- glossary-annex END -->`.
 5. Tras recibir el archivo, esta skill verifica:
    - Front-matter YAML sintácticamente válido.
-   - Las nueve secciones obligatorias en orden.
+   - La estructura de capítulo que fije la base del sector
+     (`references/sectores/<sector>.md`); en su defecto, el patrón del núcleo.
+   - **Sección `## Fuentes` al cierre del capítulo** (obligatoria, Estándares
+     editoriales): fuentes citadas con nombre, enlace y fecha.
    - Anexo de glosario presente.
    - `terminos_introducidos` del front-matter coincide con el anexo.
 6. Si la verificación falla, NO persiste; reporta el bloqueo y deja el
@@ -63,7 +66,7 @@ despacho concurrente de sub-agentes; ver § "Modo paralelo (`--parallel N`)".
 
 ## Outputs
 
-- `chapters/[###]-titulo.md` con front-matter, nueve secciones y anexo
+- `chapters/[###]-titulo.md` con front-matter, la estructura de capítulo del sector y anexo
   de glosario.
 
 ## Procedimiento
@@ -83,7 +86,7 @@ despacho concurrente de sub-agentes; ver § "Modo paralelo (`--parallel N`)".
 
 ## Errores comunes
 
-- Sub-agente devuelve un capítulo sin alguna de las nueve secciones: se
+- Sub-agente devuelve un capítulo sin la estructura de capítulo del sector (o sin `## Fuentes`): se
   guarda como `.draft.md` y se reporta.
 - Front-matter YAML inválido: se reporta línea por línea.
 - Términos del anexo que no figuran en `terminos_introducidos`: se
