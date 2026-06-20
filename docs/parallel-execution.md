@@ -117,7 +117,7 @@ Mecánica:
 
 `writeonmars-glossary` detecta colisiones cuando dos capítulos
 introducen el mismo término con definiciones divergentes. Es el
-caso edge declarado en FR-015 del spec.
+caso edge conocido.
 
 ### Detección
 
@@ -149,7 +149,7 @@ La consolidación se suspende. La skill NO escribe `glossary.md`
    - Se registra como `desviacion_justificada`.
    - El glosario lleva ambas entradas con su contexto declarado.
 
-Para cualquiera de las tres, la skill ofrece un patch sugerido
+Para cualquiera de las tres, la redacción ofrece un patch sugerido
 (diff) que el operador acepta o rechaza. Sin aceptación explícita,
 la consolidación queda bloqueada.
 
@@ -194,7 +194,7 @@ consolidación.
    capítulos del mismo lote no ven los términos que introducen
    sus pares del mismo lote. La detección de colisiones se
    difiere a `writeonmars-glossary` tras el cierre del lote
-   (FR-015 cubierto, pero con latencia). En guías densas en
+   (cubierto, pero con latencia). En guías densas en
    terminología compartida, considera `--parallel 2` (lotes
    pequeños) en lugar de `--parallel 4` (más colisiones
    posibles por lote).

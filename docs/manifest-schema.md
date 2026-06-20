@@ -76,21 +76,19 @@ Ejemplo mínimo válido:
 ### `skills`
 
 - **Tipo**: array de objetos con campos `name`, `version`, `source` (obligatorios) y `path` (opcional).
-- **Default**: el array que `bootstrap.py` puebla con las referencias bundled del preset.
+- **Default**: el array que `bootstrap.py` puebla con las referencias bundled del preset (la voz y la didáctica).
 - **Ejemplo**:
 
   ```json
   "skills": [
-    {"name": "marcela-prose", "version": "0.1.0", "source": "bundled"},
-    {"name": "technical-guide-design", "version": "0.1.0", "source": "bundled"},
-    {"name": "writeonmars-brief", "version": "0.1.0", "source": "bundled"},
-    {"name": "humanizer", "version": "1.1.0", "source": "external", "path": ".claude/skills/humanizer"}
+    {"name": "marcela-prose", "version": "2.0.0", "source": "bundled"},
+    {"name": "technical-guide-design", "version": "1.0.0", "source": "bundled"}
   ]
   ```
 
 - **Valores de `source`**:
-  - `bundled`: shipping con Write.OnMars (`/marcela-prose`, `/technical-guide-design`, todas las `writeonmars-*`).
-  - `external`: instaladas por el operador desde otra fuente. El framework las respeta pero no las versiona.
+  - `bundled`: viaja en el preset como referencia (`references/voz`, `references/didactica`). La lógica del método vive en comandos + referencias, no en skills de un proveedor.
+  - `external`: declarada por el operador desde otra fuente. El framework la respeta pero no la versiona.
 
 ### `research_mode`
 
@@ -99,7 +97,7 @@ Ejemplo mínimo válido:
 - **Ejemplo**: `"byom"`.
 - **Notas**:
   - `byom` (Bring Your Own MCPs): el proyecto usa MCPs externos compatibles con el contrato de citación. Es el modo por defecto.
-  - `bundled`: activa el módulo opcional `mcp/writeonmars-research/` (FR-009b) como MCP canónico de investigación y contraste. Requiere también declarar `writeonmars_research_module.enabled: true`.
+  - `bundled`: activa el módulo opcional `mcp/writeonmars-research/` como MCP canónico de investigación y contraste. Requiere también declarar `writeonmars_research_module.enabled: true`.
 
 ### `signing_matrix`
 
@@ -119,7 +117,7 @@ Ejemplo mínimo válido:
   }
   ```
 
-- **Notas**: `autonomous` permite que la pasada cierre cuando el checklist queda en verde. `human` exige firma de un operador listado en `human_operators`. La skill `writeonmars-close-project` usa esta matriz para decidir si el proyecto puede cerrarse (FR-020a).
+- **Notas**: `autonomous` permite que la pasada cierre cuando el checklist queda en verde. `human` exige firma de un operador listado en `human_operators`. El cierre (`close.py` / `speckit.close`) usa esta matriz para decidir si el proyecto puede cerrarse.
 
 ### `human_operators`
 
@@ -176,7 +174,7 @@ Ejemplo mínimo válido:
   }
   ```
 
-- **Notas**: la memoria externa es caché, nunca fuente de verdad (constitución § "Arquitectura del framework"). El campo `rebuildable_from_repo` está fijado a `true` por el schema: el proyecto debe poder reconstruir la memoria desde sus artefactos sin información adicional. Para más detalle, ver `docs/memory-external.md` (T076a).
+- **Notas**: la memoria externa es caché, nunca fuente de verdad (constitución § "Arquitectura del framework"). El campo `rebuildable_from_repo` está fijado a `true` por el schema: el proyecto debe poder reconstruir la memoria desde sus artefactos sin información adicional. Para más detalle, ver `docs/memory-external.md`.
 
 ### `writeonmars_research_module`
 
@@ -191,7 +189,7 @@ Ejemplo mínimo válido:
   }
   ```
 
-- **Notas**: activa el MCP de investigación bundled (FR-009b). Requiere coherencia con `research_mode: bundled`. Ver `mcp/writeonmars-research/README.md`.
+- **Notas**: activa el MCP de investigación bundled. Requiere coherencia con `research_mode: bundled`. Ver `mcp/writeonmars-research/README.md`.
 
 ## Notas de migración
 
@@ -204,7 +202,7 @@ El manifiesto sigue semver. Las reglas para bumpear el schema:
 ### Procedimiento de bump
 
 1. Editar `specs/001-framework-architecture/contracts/manifest-schema.json` (fuente de verdad).
-2. Refrescar el espejo en `contracts/manifest-schema.json` (T010 manual o vía script de mirror).
+2. Refrescar el espejo en `contracts/manifest-schema.json` (manual o vía script de mirror).
 3. Actualizar este documento (`docs/manifest-schema.md`) con el campo nuevo o el cambio.
 4. Actualizar `install/lib/render-manifest.sh` para que rellene el campo nuevo en proyectos nuevos.
 5. Para MAJOR: documentar la migración del manifiesto en `docs/maintenance/`.

@@ -44,6 +44,19 @@ trayectorias paralelas: framework (`vX.Y.Z` del repo) y constitución
 - Campo `sector` en el manifiesto del proyecto.
 - Documentación de uso en `writeonmars/docs/` (Diátaxis) y `writeonmars/AGENTS.md`.
 
+### Eliminado (limpieza de docs legacy)
+
+- Docs raíz que describían el mundo pre-preset (skills, `install.sh`, T-numbers,
+  scaffolding SC-007) y duplicaban en versión vieja los docs canónicos de
+  `writeonmars/docs/`: `docs/editorial-cycle.md`, `docs/skill-catalog.md`,
+  `docs/installation.md`, `docs/portability-validation.md`,
+  `docs/maintenance/sync-from-vault.md`, `docs/maintenance/skill-update-procedure.md`.
+- `docs/contributing.md`, `docs/compatibility-matrix.md`,
+  `docs/maintenance/constitution-update-procedure.md`, `docs/citation-contract.md` y
+  `docs/manifest-schema.md` reescritos/scrubeados al modelo de preset (comandos +
+  referencias + sectores; sin skills/install.sh). La copia de dogfooding
+  `.specify/memory/constitution.md` se sincronizó al núcleo v1.3.0.
+
 ### Obsoleto
 
 - Spec `002-wom-cli` **superseded**: el `wom` CLI se descarta; `status.py` y

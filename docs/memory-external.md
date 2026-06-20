@@ -1,7 +1,7 @@
 # Memoria externa vectorizada (opcional)
 
 Audiencia: persona mantenedora o operadora que quiera activar la memoria
-externa declarada en FR-022 y en la constitución § Arquitectura del
+externa declarada en la constitución § Arquitectura del
 framework. La memoria externa es **opcional, caché acelerada y nunca fuente
 de verdad**. Esta página documenta el esquema mínimo, el procedimiento de
 activación y la regla de reconstrucción.

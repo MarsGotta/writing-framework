@@ -67,13 +67,10 @@ Recorrido paso a paso: [`writeonmars/docs/tutorial-primera-guia.md`](writeonmars
 
 - **Estado y roadmap**: [`ROADMAP.md`](ROADMAP.md) — empieza aquí para retomar.
 - Preset (unidad instalable): [`writeonmars/`](writeonmars/) · [README](writeonmars/README.md) · [AGENTS.md](writeonmars/AGENTS.md)
-- Documentación de uso: [`writeonmars/docs/`](writeonmars/docs/)
-- Constitución: [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
+- **Documentación de uso (canónica)**: [`writeonmars/docs/`](writeonmars/docs/) — tutorial, how-to, referencia, arquitectura
+- Constitución: [`writeonmars/memory/constitution.md`](writeonmars/memory/constitution.md) (núcleo) — las adendas por guía las fija `/speckit-constitution`
 - Contratos: [`contracts/`](contracts/) (citación, manifest, pass-output)
-- Catálogo del método: [`docs/skill-catalog.md`](docs/skill-catalog.md)
-- Ciclo editorial: [`docs/editorial-cycle.md`](docs/editorial-cycle.md)
-- Instalación: [`docs/installation.md`](docs/installation.md)
-- Paralelización: [`docs/parallel-execution.md`](docs/parallel-execution.md)
+- Referencia de mantenimiento: [`docs/`](docs/) — contrato de citación, manifest, compatibilidad, paralelización, memoria externa, contributing
 - Contributing: [`docs/contributing.md`](docs/contributing.md)
 - CHANGELOG: [`CHANGELOG.md`](CHANGELOG.md)
 
