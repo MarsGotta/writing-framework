@@ -15,7 +15,14 @@ constitución. Esta guía complementa
 - **Sync impact report** cuando el cambio afecte plantillas Spec Kit o la
   constitución.
 
-## Cómo proponer una nueva skill
+## Cómo proponer una nueva capacidad (comando del preset)
+
+> **Refactor preset.** Una capacidad nueva del método se añade como **comando del
+> preset** (`writeonmars/commands/speckit.<nombre>.md`, neutral de modelo) y, si
+> hace falta, una referencia en `writeonmars/references/`, declarándola en
+> `writeonmars/preset.yml`. Lo determinista va a un script en `writeonmars/scripts/`.
+> Los pasos de abajo (crear una skill en `.claude/skills/`) describen la vía
+> **legacy**; úsalos solo si mantienes el flujo antiguo basado en `install.sh`.
 
 1. **Justificar la necesidad**: documentar en una issue qué falta o qué
    skill existente no cubre el caso. Si la skill nueva sustituye o

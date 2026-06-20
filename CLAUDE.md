@@ -1,18 +1,19 @@
 <!-- SPECKIT START -->
-**Active feature**: 002-wom-cli
-**Plan**: specs/002-wom-cli/plan.md
-**Spec**: specs/002-wom-cli/spec.md
-**Constitution**: .specify/memory/constitution.md (v1.1.0)
+**Foco actual**: el preset agente-agnóstico `writeonmars/`
+**Preset**: writeonmars/preset.yml · **Contrato del agente**: writeonmars/AGENTS.md
+**Constitution**: .specify/memory/constitution.md (v1.2.0)
 
-Lee el plan activo para conocer la CLI `wom` (Bash 5+) que envuelve las
-skills del framework para operación desde el shell:
+Write.OnMars se distribuye y ejecuta como un preset de Spec Kit. La lógica vive en
+comandos (`writeonmars/commands/speckit.*`) y las reglas en referencias
+(`writeonmars/references/`: voz, didáctica, método), neutrales de modelo: lo corre
+cualquier agente. Empieza por:
 
-- specs/002-wom-cli/research.md — decisiones técnicas resueltas (R1–R6)
-- specs/002-wom-cli/data-model.md — entidades derivadas (estado, lockfile, firma)
-- specs/002-wom-cli/contracts/command-schema.md — contrato de subcomandos, flags y exit codes
-- specs/002-wom-cli/quickstart.md — primer uso de extremo a extremo
+- writeonmars/AGENTS.md — contrato para ejecutar el pipeline con cualquier modelo.
+- writeonmars/docs/ — tutorial, how-to, referencia, arquitectura.
+- writeonmars/README.md — qué empaqueta el preset y cómo se instala.
 
-Feature base ya cerrada (referencia, NO activa): 001-framework-architecture
-(harness editorial v1.0.0). Su plan, contratos y pilotos viven en
-`specs/001-framework-architecture/`.
+Specs (referencia, NO activas):
+- 001-framework-architecture — base del harness editorial (v1.0.0). Vive en `specs/001-framework-architecture/`.
+- 002-wom-cli — **superseded**: el `wom` CLI se descartó; `scripts/status.py` y
+  `scripts/close.py` cubren su función.
 <!-- SPECKIT END -->

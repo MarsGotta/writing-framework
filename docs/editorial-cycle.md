@@ -1,7 +1,14 @@
 # Ciclo editorial Write.OnMars
 
 **Audiencia**: persona mantenedora del framework + agentes que ejecutan el
-ciclo. **Cobertura**: FR-001..FR-029, constitución v1.1.0.
+ciclo. **Cobertura**: FR-001..FR-029, constitución v1.2.0.
+
+> **Nota (refactor preset).** El ciclo se ejecuta ahora con los **comandos del
+> preset** (`speckit.specify`, `speckit.research`, `speckit.plan`,
+> `speckit.implement`, `speckit.review` + `status`/`export`/`feedback`/`close`), no
+> con skills. Las pasadas son **3 locales por capítulo + 1 global**. Este documento
+> conserva las ocho etapas como mapa interno; la guía de uso canónica está en
+> `../writeonmars/docs/`. Ver el mapeo actualizado al final.
 
 Este documento describe el flujo editorial canónico de ocho etapas, con
 entradas, salidas, skill responsable, requisito funcional / principio
@@ -194,7 +201,17 @@ para que la pasada 4 lo refine y lo firme.
 **Bloqueo**: la etapa puede repetirse hasta que `research.md` cubra cada
 afirmación verificable.
 
-## Etapa 8: Cinco pasadas + cierre
+## Etapa 8: Pasadas de revisión + cierre
+
+> **Modelo actual (refactor):** **3 pasadas locales por capítulo**
+> (estructura+utilidad, naturalidad, precisión) **+ 1 global** (formato +
+> coherencia), vía `speckit.review` (o cada pasada suelta: `review-structure`,
+> `review-voice`, `review-precision`, `review-global`, asignable a otro modelo).
+> La precisión **verifica las fuentes en vivo**, no solo confía en `research.md`.
+> Por defecto **todas las pasadas son autónomas**: el control humano son los dos
+> checkpoints (brief y PDF anotado), no las firmas P3/P4 que muestra el diagrama
+> histórico de abajo. `speckit.revise` aplica al texto los hallazgos abiertos. La
+> descomposición en cinco se conserva como mapa de las dimensiones del Principio V.
 
 **Skills responsables**: `writeonmars-pasada-1`..`writeonmars-pasada-5`
 (T041–T045, planned), `writeonmars-close-project` (T046, planned). Cada
@@ -231,7 +248,9 @@ pasada se delega a un sub-agente fresco siguiendo
 
 - ≥ 1 finding con `severidad = critico` y `estado = abierto` (FR-020).
 - Pasada con `firma.tipo = autonomous` cuando la matriz declara `human`
-  (FR-020a).
+  (FR-020a). Con el default (todas autónomas) este gate no aplica.
+- Faltan capítulos del temario de `plan.md` (gate de completitud): `export`
+  permite un PDF parcial como preview, pero `close` exige la guía completa.
 
 **Constitución / FR**: FR-018, FR-019, FR-020, FR-020a, Principio V.
 
@@ -301,23 +320,34 @@ pasada se delega a un sub-agente fresco siguiendo
 El ciclo editorial reutiliza los comandos Spec Kit existentes. Equivalencias
 canónicas:
 
-| Comando Spec Kit | Etapa editorial | Skill que envuelve / activa |
-|------------------|-----------------|------------------------------|
-| `/speckit-specify` | 1 (Brief) + 2 (Contexto) | `writeonmars-brief` |
-| `/speckit-clarify` | refinamiento del brief | `writeonmars-brief` (modo clarify) |
-| `/speckit-plan` | 4 (Temario) + 5 (Descripciones) | `writeonmars-temario`, `writeonmars-descripciones` |
-| `/speckit-tasks` | descomposición editorial | `writeonmars-redaccion`, pasadas como tareas |
-| `/speckit-implement` | 6 (Redacción) + 7 (Contraste) + 8 (Pasadas) | `writeonmars-redaccion`, `writeonmars-contraste`, `writeonmars-pasada-{1..5}` |
-| `/speckit-analyze` | auditoría brief / plan / tareas | `writeonmars-close-project` (bloqueo final) |
-| `/speckit-checklist` | materialización de pasadas | `writeonmars-pasada-{1..5}` |
-| `/speckit-constitution` | actualización de la constitución | (mantenimiento, fuera del ciclo de proyecto) |
+| Comando del preset | Etapa editorial | Notas |
+|------------------|-----------------|-------|
+| `speckit.setup` | 0 (Bootstrap) | copia constitución + crea manifest; una vez tras instalar |
+| `speckit.specify` | 1 (Brief) + 2 (Contexto) | checkpoint humano 1; bloquea por campos críticos |
+| `speckit.research` | 3 (Investigación) | una cita por concepto obligatorio |
+| `speckit.plan` | 4 (Temario) + 5 (Descripciones) | no pisa el `plan` core de Spec Kit |
+| `speckit.implement` | 6 (Redacción) | SOLO escribe un capítulo; la revisión va aparte (otro modelo) |
+| `speckit.review` (+ `-structure`/`-voice`/`-precision`/`-global`) | 8 (3 locales + 1 global) | cada pasada asignable a otro modelo; precisión verifica fuentes en vivo |
+| `speckit.revise` | aplica los hallazgos abiertos al texto | cierra el loop revisión → corrección |
+| `speckit.intro` | README de presentación (apertura del PDF) | antes del export |
+| `speckit.status` | tablero + 3 gates (críticos · firmas · completitud) | script `status.py` |
+| `speckit.export` | PDF editorial | script `export.py` |
+| `speckit.feedback` | intake del PDF anotado | checkpoint humano 2; script `feedback_intake.py` |
+| `speckit.close` | cierre (gate + export) | script `close.py` |
+
+Las pasadas dejaron de ser 5 secuenciales: son **3 locales por capítulo**
+(estructura+utilidad, naturalidad, precisión) **+ 1 global** (formato + coherencia
+entre capítulos). Las reglas de voz, didáctica y método viajan en
+`../writeonmars/references/`, neutrales de modelo. Los comandos core de Spec Kit
+(`specify`, `plan`, `tasks`, `implement`, `clarify`, `analyze`, `constitution`)
+siguen disponibles.
 
 Las extensiones Git registradas en `.specify/extensions.yml` (auto-commit
 y validación de rama) aplican igual a artefactos editoriales que a código.
 
 ## Referencias
 
-- Constitución vigente: `.specify/memory/constitution.md` (v1.1.0).
+- Constitución vigente: `.specify/memory/constitution.md` (v1.2.0).
 - Esquemas de entidades: `specs/001-framework-architecture/data-model.md`.
 - Contrato de citación: `contracts/citation-contract.md` (v1.0).
 - Esquema de pasadas: `contracts/pass-output-schema.md` (v1.0).

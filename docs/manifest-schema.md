@@ -96,7 +96,9 @@ Ejemplo mínimo válido:
 ### `signing_matrix`
 
 - **Tipo**: objeto con cinco claves obligatorias, una por pasada. Cada valor es un enum `autonomous` | `human`.
-- **Default v1**: pasadas 1, 2, 5 = `autonomous`; pasadas 3, 4 = `human`.
+- **Default del bootstrap del preset**: **todas las pasadas `autonomous`** (el
+  control humano es el PDF anotado al final, no pasada por pasada). El esquema
+  admite `human` en cualquier pasada para guías que quieran firma humana explícita.
 - **Ejemplo**:
 
   ```json

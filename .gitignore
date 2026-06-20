@@ -27,3 +27,11 @@ Thumbs.db
 
 # === Bash / scripts ===
 *.log
+
+# === Python (scripts del preset writeonmars) ===
+__pycache__/
+*.pyc
+
+# === Caché generada por el preset (reconstruible desde el repo) ===
+/.writeonmars-index.json
+/feedback-changeset.json

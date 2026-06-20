@@ -1,0 +1,405 @@
+/* ===== Page setup ===== */
+
+@page {
+  size: A4;
+  margin: 2.4cm 2.6cm 2.6cm 2.6cm;
+
+  @bottom-center {
+    content: counter(page);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    font-size: 9pt;
+    color: #aaa;
+  }
+}
+
+@page :first {
+  margin: 0;
+  @bottom-center { content: none; }
+}
+
+@page cover {
+  margin: 0;
+  @bottom-center { content: none; }
+}
+
+/* ===== Body & typography ===== */
+
+html {
+  font-size: 12pt;
+}
+
+body {
+  font-family: Charter, "Iowan Old Style", "Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
+  font-size: 12pt;
+  line-height: 1.65;
+  color: #1f1f1f;
+  margin: 0;
+  padding: 0;
+  font-feature-settings: "kern" 1, "liga" 1, "onum" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+p {
+  margin: 0 0 0.85em 0;
+  text-align: left;
+  hyphens: auto;
+  orphans: 3;
+  widows: 3;
+}
+
+/* ===== Headings ===== */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+  font-weight: 700;
+  color: #0d0d0d;
+  letter-spacing: -0.01em;
+  page-break-after: avoid;
+  break-after: avoid;
+  margin: 0;
+}
+
+h1 {
+  font-size: 28pt;
+  line-height: 1.15;
+  margin: 0 0 0.6em 0;
+  page-break-before: always;
+  break-before: page;
+  padding-top: 0.4em;
+}
+
+h1:first-of-type {
+  page-break-before: avoid;
+  break-before: avoid;
+}
+
+h2 {
+  font-size: 16pt;
+  line-height: 1.25;
+  margin: 1.8em 0 0.5em 0;
+  letter-spacing: -0.005em;
+}
+
+h3 {
+  font-size: 13pt;
+  line-height: 1.3;
+  margin: 1.5em 0 0.4em 0;
+  color: #1a1a1a;
+}
+
+h4 {
+  font-size: 11.5pt;
+  margin: 1.2em 0 0.3em 0;
+  color: #2a2a2a;
+}
+
+/* ===== Inline elements ===== */
+
+em {
+  font-style: italic;
+}
+
+strong {
+  font-weight: 700;
+  color: #0d0d0d;
+}
+
+a {
+  color: #1a5fb4;
+  text-decoration: none;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Code ===== */
+
+code {
+  font-family: "JetBrains Mono", "SF Mono", "Menlo", "Monaco", "Cascadia Code", Consolas, monospace;
+  font-size: 0.88em;
+  background: #f5f5f4;
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: #1f1f1f;
+  word-break: break-word;
+}
+
+pre {
+  background: #fafaf9;
+  border: 1px solid #e7e5e4;
+  border-radius: 5px;
+  padding: 0.85em 1em;
+  font-size: 9.5pt;
+  line-height: 1.5;
+  margin: 1em 0 1.2em 0;
+  overflow-x: hidden;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+  color: #1f1f1f;
+}
+
+/* ===== Blockquote ===== */
+
+blockquote {
+  margin: 1.2em 0 1.2em 0;
+  padding: 0 0 0 1.2em;
+  border-left: 3px solid #1f1f1f;
+  color: #2a2a2a;
+  font-style: italic;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+blockquote p {
+  margin: 0.3em 0;
+}
+
+/* ===== Lists ===== */
+
+ul, ol {
+  margin: 0.5em 0 0.9em 0;
+  padding-left: 1.6em;
+}
+
+li {
+  margin: 0.25em 0;
+  line-height: 1.6;
+}
+
+li > p {
+  margin: 0.3em 0;
+}
+
+/* ===== Tables ===== */
+
+table {
+  border-collapse: collapse;
+  margin: 1em 0 1.3em 0;
+  font-size: 10pt;
+  width: 100%;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+th, td {
+  border-bottom: 1px solid #d6d3d1;
+  padding: 0.55em 0.8em 0.55em 0;
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.45;
+}
+
+th {
+  border-bottom: 2px solid #57534e;
+  font-weight: 700;
+  color: #0d0d0d;
+  background: transparent;
+}
+
+table code {
+  font-size: 0.92em;
+}
+
+/* ===== Horizontal rule ===== */
+
+hr {
+  border: none;
+  border-top: 1px solid #d6d3d1;
+  margin: 2.5em auto;
+  width: 30%;
+}
+
+/* ===== Cover page ===== */
+
+.cover {
+  page: cover;
+  page-break-after: always;
+  break-after: page;
+  height: 26.7cm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 4cm 3cm;
+  margin: 0;
+  background: #fafaf9;
+}
+
+.cover-eyebrow {
+  font-family: "Inter", -apple-system, sans-serif;
+  font-size: 10pt;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #78716c;
+  margin-bottom: 2cm;
+}
+
+.cover-title {
+  font-family: "Inter", -apple-system, sans-serif;
+  font-size: 44pt;
+  font-weight: 800;
+  line-height: 1.05;
+  color: #0d0d0d;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5cm 0;
+  page-break-before: avoid;
+  break-before: avoid;
+}
+
+.cover-subtitle {
+  font-family: Charter, Georgia, serif;
+  font-size: 18pt;
+  font-style: italic;
+  font-weight: 400;
+  color: #44403c;
+  margin: 0 0 3.5cm 0;
+  line-height: 1.4;
+}
+
+.cover-meta {
+  font-family: "Inter", -apple-system, sans-serif;
+  font-size: 10pt;
+  color: #78716c;
+  letter-spacing: 0.05em;
+}
+
+/* ===== Pandoc title header — hide (duplicated by cover) ===== */
+
+#title-block-header {
+  display: none;
+}
+
+/* ===== Manual table of contents ===== */
+
+.toc-page {
+  page-break-after: always;
+  break-after: page;
+  padding: 0.8cm 0 0 0;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.toc-eyebrow {
+  font-size: 9pt;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #78716c;
+  margin-bottom: 0.4cm;
+}
+
+.toc-title {
+  font-family: "Inter", -apple-system, sans-serif;
+  font-size: 36pt;
+  font-weight: 800;
+  color: #0d0d0d;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin: 0 0 1.4cm 0;
+  page-break-before: avoid;
+  break-before: avoid;
+  padding-top: 0;
+}
+
+.toc-section {
+  margin-bottom: 0.7cm;
+}
+
+.toc-section + .toc-section {
+  border-top: 1px solid #e7e5e4;
+  padding-top: 0.6cm;
+  margin-top: 0.5cm;
+}
+
+.toc-section-label {
+  font-size: 8.5pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #57534e;
+  margin-bottom: 0.35cm;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+a.toc-entry {
+  display: grid;
+  grid-template-columns: 1.5cm 1fr;
+  column-gap: 0.55cm;
+  align-items: baseline;
+  margin-bottom: 0.4cm;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  text-decoration: none;
+  color: inherit;
+}
+
+a.toc-entry:hover {
+  text-decoration: none;
+}
+
+a.toc-entry:hover .toc-entry-title {
+  text-decoration: underline;
+}
+
+.toc-entry-num {
+  font-family: "Inter", -apple-system, sans-serif;
+  font-size: 18pt;
+  font-weight: 300;
+  color: #a8a29e;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+.toc-entry-text {
+  display: block;
+}
+
+.toc-entry-title {
+  font-family: Charter, "Iowan Old Style", Georgia, serif;
+  font-size: 13pt;
+  font-weight: 600;
+  color: #0d0d0d;
+  line-height: 1.25;
+  margin-bottom: 0.12cm;
+}
+
+.toc-entry-desc {
+  font-family: "Inter", -apple-system, sans-serif;
+  font-size: 9.5pt;
+  font-weight: 400;
+  color: #57534e;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+/* ===== Misc ===== */
+
+/* Better first paragraph after heading */
+h1 + p, h2 + p, h3 + p {
+  margin-top: 0;
+}
+
+/* Avoid breaks immediately after headings */
+h1, h2, h3, h4 {
+  page-break-after: avoid;
+  break-after: avoid-page;
+}
+
+/* Drop caps could go here but we keep it conservative */

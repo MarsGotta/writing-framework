@@ -1,5 +1,13 @@
 # Catálogo de skills — Write.OnMars
 
+> **Nota (refactor preset).** Tras el refactor agente-agnóstico, la lógica de las
+> skills `writeonmars-*` se ejecuta como **comandos del preset**
+> (`writeonmars/commands/speckit.*`) y sus cuerpos viajan como referencias en
+> `writeonmars/references/metodo/`. `marcela-prose` y `technical-guide-design` van
+> en `writeonmars/references/voz/` y `references/didactica/`. Este catálogo se
+> conserva como inventario del método; la documentación de uso canónica está en
+> `writeonmars/docs/` (referencia de comandos en `writeonmars/docs/referencia.md`).
+
 **Audiencia**: persona mantenedora del framework + portadores hacia Codex /
 Cursor. **Cobertura**: FR-025..FR-028.
 

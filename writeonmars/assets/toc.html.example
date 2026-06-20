@@ -1,0 +1,49 @@
+<!-- Ejemplo de índice manual editorial. Adaptar bloques y entradas al contenido real.
+     Cada bloque temático: <div class="toc-section"> con .toc-section-label arriba.
+     Cada entrada: <a class="toc-entry" href="#id-predecible"> con número, título y descripción.
+     IDs convencionales: intro-readme, intro-X, cap-00..cap-NN, ref-glosario, ref-anexos. -->
+
+<div class="toc-page">
+  <div class="toc-eyebrow">Una guía básica</div>
+  <h1 class="toc-title">Índice</h1>
+
+  <div class="toc-section">
+    <div class="toc-section-label">Material introductorio</div>
+    <a class="toc-entry" href="#intro-readme">
+      <div class="toc-entry-num">·</div>
+      <div class="toc-entry-text">
+        <div class="toc-entry-title">Acerca de esta guía</div>
+        <div class="toc-entry-desc">Promesa, alcance, postura editorial, cómo leerla</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="toc-section">
+    <div class="toc-section-label">Capítulos</div>
+    <a class="toc-entry" href="#cap-00">
+      <div class="toc-entry-num">00</div>
+      <div class="toc-entry-text">
+        <div class="toc-entry-title">Título del capítulo</div>
+        <div class="toc-entry-desc">Una o dos líneas con el ángulo del capítulo</div>
+      </div>
+    </a>
+    <a class="toc-entry" href="#cap-01">
+      <div class="toc-entry-num">01</div>
+      <div class="toc-entry-text">
+        <div class="toc-entry-title">Segundo capítulo</div>
+        <div class="toc-entry-desc">Descripción corta</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="toc-section">
+    <div class="toc-section-label">Material de referencia</div>
+    <a class="toc-entry" href="#ref-glosario">
+      <div class="toc-entry-num">·</div>
+      <div class="toc-entry-text">
+        <div class="toc-entry-title">Glosario</div>
+        <div class="toc-entry-desc">Definiciones rápidas de los términos clave</div>
+      </div>
+    </a>
+  </div>
+</div>

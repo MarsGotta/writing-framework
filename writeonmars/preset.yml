@@ -1,0 +1,188 @@
+schema_version: "1.0"
+
+preset:
+  id: "writeonmars"
+  name: "Write.OnMars — Guías y libros técnicos"
+  version: "0.1.0"
+  description: >
+    Spec-Driven Development para guías, manuales, artículos y libros técnicos
+    en español con la voz de Marcela. Modo editorial dual sobre Spec Kit:
+    "User Stories" → trayectos de lector; plan → temario + descripciones
+    encadenadas; tasks → redacción capítulo a capítulo + pasadas de revisión
+    (3 locales por capítulo + 1 global). Empaqueta todo lo necesario para correr
+    el pipeline: plantillas, comandos (speckit.*), scripts deterministas y las
+    referencias de voz, didáctica y método (marcela-prose, technical-guide-design,
+    writeonmars-*) que viajan dentro y cualquier modelo lee y aplica.
+    Agente-agnóstico: ver AGENTS.md de este preset.
+  author: "Marcela Gotta"
+  repository: "https://github.com/MarsGotta/writing-framework"
+  license: "TBD"
+
+requires:
+  # specify >= 0.5.0 introduce el mecanismo de presets (`specify preset add`).
+  # El repo trabaja hoy con speckit 0.8.7.
+  speckit_version: ">=0.5.0"
+
+provides:
+  templates:
+    - type: "template"
+      name: "spec-template"
+      file: "templates/spec-template.md"
+      description: >
+        Spec en modo dual. En modo editorial añade el brief obligatorio de
+        nueve campos (Principio III) y renombra "User Stories" como
+        "Trayectos de lector". En modo software conserva la estructura clásica
+        de Spec Kit.
+      replaces: "spec-template"
+    - type: "template"
+      name: "plan-template"
+      file: "templates/plan-template.md"
+      description: >
+        Plan editorial: temario (numero | titulo | promesa | estructura) y
+        descripciones encadenadas por capítulo (promesa específica, conexión
+        anterior/siguiente, ejemplo recurrente, conceptos introducidos).
+      replaces: "plan-template"
+    - type: "template"
+      name: "tasks-template"
+      file: "templates/tasks-template.md"
+      description: >
+        Tareas editoriales: redacción capítulo a capítulo + las pasadas de
+        revisión como tareas explícitas (3 locales por capítulo + 1 global).
+      replaces: "tasks-template"
+    - type: "template"
+      name: "checklist-template"
+      file: "templates/checklist-template.md"
+      description: >
+        Checklists de las cinco dimensiones del Principio V (estructura,
+        utilidad, naturalidad, precisión, formato), repartidas en 3 pasadas
+        locales por capítulo + 1 global.
+      replaces: "checklist-template"
+    - type: "template"
+      name: "constitution-template"
+      file: "templates/constitution-template.md"
+      description: >
+        Constitución editorial: voz natural, estructura situación →
+        explicación → consecuencia, brief obligatorio, precisión léxica y
+        revisión multi-pasada.
+      replaces: "constitution-template"
+
+    # --- Comandos (van en la misma lista; specify los distingue por `type`) ---
+    - type: "command"
+      name: "speckit.setup"
+      file: "commands/speckit.setup.md"
+      description: >
+        Bootstrap del proyecto: copia la constitución y crea el manifest (lo que
+        el preset no puede instalar). Correr una vez tras `specify preset add`.
+    - type: "command"
+      name: "speckit.specify"
+      file: "commands/speckit.specify.md"
+      replaces: "speckit.specify"
+      description: >
+        Brief editorial de 9 campos con preguntas; bloquea hasta resolver
+        audiencia, ejemplo recurrente y resultado esperado. Checkpoint humano 1.
+    - type: "command"
+      name: "speckit.research"
+      file: "commands/speckit.research.md"
+      description: >
+        research.md con una cita por concepto obligatorio (contrato de citación);
+        bloquea si algún concepto queda sin respaldo.
+    - type: "command"
+      name: "speckit.plan"
+      file: "commands/speckit.plan.md"
+      replaces: "speckit.plan"
+      description: >
+        Temario (Número | Título | Promesa) + descripciones encadenadas en
+        plan.md; el temario es el índice del PDF. Reemplaza el speckit.plan core
+        en modo editorial.
+    - type: "command"
+      name: "speckit.implement"
+      file: "commands/speckit.implement.md"
+      replaces: "speckit.implement"
+      description: >
+        Redacta cada capítulo con la voz. SOLO escribe; la revisión la hace
+        speckit.review (idealmente con otro modelo). Escribe un agente, revisa otro.
+        Reemplaza el speckit.implement core en modo editorial.
+    - type: "command"
+      name: "speckit.intro"
+      file: "commands/speckit.intro.md"
+      description: >
+        Genera el README.md de presentación (Acerca de / promesa / para quién es /
+        qué aprenderás / cómo leer) desde el brief y el temario, en la voz. Es la
+        apertura del PDF. Correr antes del export final.
+    - type: "command"
+      name: "speckit.review"
+      file: "commands/speckit.review.md"
+      description: >
+        Revisión AGRUPADA: corre las 4 pasadas (estructura, naturalidad, precisión
+        por capítulo + global). Cómoda. Cada pasada existe también como comando
+        suelto para asignarla a otro modelo.
+    - type: "command"
+      name: "speckit.review-structure"
+      file: "commands/speckit.review-structure.md"
+      description: >
+        Pasada local SUELTA: estructura + utilidad de un capítulo. Asignable a su
+        propio modelo. No toca voz ni datos.
+    - type: "command"
+      name: "speckit.review-voice"
+      file: "commands/speckit.review-voice.md"
+      description: >
+        Pasada local SUELTA: naturalidad (voz de Marcela). Asignable a su propio
+        modelo. No verifica datos.
+    - type: "command"
+      name: "speckit.review-precision"
+      file: "commands/speckit.review-precision.md"
+      description: >
+        Pasada local SUELTA: precisión (contraste contra research.md). Asignable a
+        su propio modelo; un dato sin fuente bloquea el cierre.
+    - type: "command"
+      name: "speckit.review-global"
+      file: "commands/speckit.review-global.md"
+      description: >
+        Pasada SUELTA global: formato + coherencia entre capítulos. Se corre una
+        vez sobre el libro entero.
+    - type: "command"
+      name: "speckit.revise"
+      file: "commands/speckit.revise.md"
+      description: >
+        Aplica al texto los hallazgos abiertos de findings.md (los que marcó
+        review): reescribe solo los pasajes señalados y marca resuelto. Cierra el
+        loop revisión → corrección. Lo puede correr el modelo que escribió.
+    - type: "command"
+      name: "speckit.status"
+      file: "commands/speckit.status.md"
+      description: >
+        Dashboard determinista: pasadas × estado × firma × hallazgos y los dos
+        gates de cierre (críticos abiertos + firmas humanas faltantes).
+        Sustituye `wom status` y el gate de `wom close`.
+    - type: "command"
+      name: "speckit.export"
+      file: "commands/speckit.export.md"
+      description: >
+        Genera el PDF editorial (portada desde el brief, índice desde el temario,
+        capítulos en orden) reutilizando el estilo de markdown-to-pdf.
+    - type: "command"
+      name: "speckit.feedback"
+      file: "commands/speckit.feedback.md"
+      description: >
+        Cierra el loop: ingiere un PDF anotado, lo convierte en change-set y
+        re-despacha quirúrgicamente solo los capítulos afectados (equivalente a
+        speckit.revise guiado por el PDF).
+    - type: "command"
+      name: "speckit.close"
+      file: "commands/speckit.close.md"
+      description: >
+        Cierre determinista: evalúa los gates (críticos abiertos + firmas
+        humanas) y, si pasa, genera el PDF. Si está bloqueado, lista blockers y
+        no exporta.
+    - type: "command"
+      name: "speckit.memory"
+      file: "commands/speckit.memory.md"
+      description: >
+        Indexa y consulta el markdown del proyecto (capítulos, research,
+        glosario, findings) para no contradecir ni redefinir lo ya escrito.
+
+# Scripts: spec-kit todavía no registra scripts vía preset ("reserved for future
+# use"). Viajan dentro del preset (writeonmars/scripts/) porque `specify preset
+# add` copia la carpeta completa; los comandos los invocan por ruta.
+
+tags: ["writing", "guia-tecnica", "libro", "español", "spec-driven", "marcela", "ai-first"]

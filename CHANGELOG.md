@@ -8,6 +8,38 @@ el versionado adopta [Semver](https://semver.org/lang/es/) con dos
 trayectorias paralelas: framework (`vX.Y.Z` del repo) y constitución
 (`vX.Y.Z` en `.specify/memory/constitution.md`).
 
+## [Unreleased] — refactor a preset agente-agnóstico
+
+### Cambiado
+
+- El método se distribuye y ejecuta como **preset de Spec Kit** (`writeonmars/`),
+  instalable con `specify preset add`. La lógica pasó de skills a **comandos**
+  (`speckit.specify`, `speckit.research`, `speckit.plan`, `speckit.implement`,
+  `speckit.review` + `status`, `export`, `feedback`, `close`, `memory`) y las reglas
+  (voz, didáctica, método) a **referencias** neutrales de modelo
+  (`writeonmars/references/`), para que lo ejecute cualquier agente, no solo Claude.
+- Revisión: de 5 pasadas secuenciales a **3 locales por capítulo + 1 global** (las
+  cinco dimensiones se conservan como checklist).
+- `install.sh` pasa a **legacy**; `specify preset add` es la vía canónica.
+- **Constitución v1.2.0**: Principio V → 3 pasadas locales + 1 global; nuevo
+  Principio VI (neutralidad de agente y modelo); distribución canónica = preset.
+
+### Añadido
+
+- Scripts deterministas: `export.py` (PDF, reusa el estilo de `markdown-to-pdf`),
+  `status.py` (tablero + gates), `feedback_intake.py` (PDF anotado → change-set),
+  `close.py` (gate + export), `index.py` (memoria BM25/TF).
+- Documentación de uso en `writeonmars/docs/` (Diátaxis) y `writeonmars/AGENTS.md`.
+
+### Obsoleto
+
+- Spec `002-wom-cli` **superseded**: el `wom` CLI se descarta; `status.py` y
+  `close.py` cubren su función.
+
+### Pendiente
+
+- Verificar que `specify preset add` copie `references/`.
+
 ## [1.0.0] - 2026-05-06 (pendiente de tag)
 
 Primera release del harness Write.OnMars. Materializa los cinco principios

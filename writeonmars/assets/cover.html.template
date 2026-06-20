@@ -1,0 +1,6 @@
+<div class="cover">
+  <div class="cover-eyebrow">{{EYEBROW}}</div>
+  <h1 class="cover-title">{{TITLE}}</h1>
+  <p class="cover-subtitle">{{SUBTITLE}}</p>
+  <div class="cover-meta">{{META}}</div>
+</div>

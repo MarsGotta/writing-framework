@@ -5,6 +5,13 @@ sobre un repositorio editorial nuevo. El recorrido extremo a extremo del
 flujo editorial vive en `specs/001-framework-architecture/quickstart.md`;
 este documento se concentra en la instalación.
 
+> **Nota (refactor preset).** La vía canónica de instalación es ahora
+> `specify preset add --dev <ruta>/writeonmars` (ver
+> [`../writeonmars/README.md`](../writeonmars/README.md)). El `install.sh` que se
+> describe abajo queda como **legacy**: aún sirve para copiar skills, manifest y
+> hooks, pero el método ya viaja dentro del preset (comandos + referencias
+> neutrales de modelo). Úsalo solo si no usas el preset.
+
 ---
 
 ## 1. Prerrequisitos
