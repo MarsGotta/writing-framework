@@ -17,6 +17,48 @@ skills de voz y método. Se ejecuta de dos formas, con el mismo código debajo:
 No hay dos pipelines que mantener: Paperclip envuelve el mismo método. Por eso los
 scripts son deterministas y no asumen un agente delante.
 
+## La capa de orquestación: el equipo y el reparto
+
+El ejecutor orquestado dejó de ser abstracto. La capa concreta (en `paperclip/`)
+monta una **casa editorial** con equipo permanente, no un montaje desechable por
+guía. Dos decisiones la sostienen.
+
+La primera es de unidad. Hay **una sola Company de Paperclip, "Write.OnMars"** —el
+equipo permanente, contratado una vez—, y **cada guía es un Project** dentro de la
+casa con su propio goal, su workspace y su tablero. Así el equipo acumula la voz y
+el método entre guías en lugar de re-instanciarse cada vez, y producir en volumen es
+abrir varios Projects en paralelo bajo la misma casa. El workspace de una guía es el
+repo **local** (Paperclip acepta `sourceType=local_path`): no hace falta GitHub para
+arrancar, basta el repo en disco.
+
+La segunda es de reparto. El equipo son cuatro roles agrupados **por oficio**, no
+una tarea-por-paso. Agrupar por oficio da menos relevos y un contexto coherente por
+rol: quien investiga es quien verifica, quien escribe es quien corrige. Y ese reparto
+es justo el que preserva las reglas duras del método —escribe uno, revisa otro
+(`writer ≠ reviewer`); voz separada de precisión; detector distinto de corrector—,
+ahora a nivel de roles y modelos cruzados en vez de a nivel de pasada:
+
+- **Editora jefa** = el orquestador (el "CEO" de Paperclip). Posee `constitution`,
+  `specify`, `plan`, `intro`, los gates y `close`. **No escribe prosa**: decide el
+  siguiente paso y delega. Su heartbeat es event-driven —despierta cuando se le
+  asigna una tarea, no por reloj.
+- **Documentalista**: `research` (las `resources/` locales más web rigurosa de alta
+  veracidad) y la pasada 4 (precisión). Puede correr en otro proveedor (p. ej. Codex)
+  para reforzar la independencia frente a quien escribe.
+- **Redactora**: `implement` (capítulos, en paralelo) y `revise`.
+- **Editora de mesa**: pasadas 1/2/3/5, con un modelo **distinto** al de la Redactora.
+
+La pieza que hace todo esto barato es `status.py --json`. La Editora jefa no razona
+sobre prosa: en cada heartbeat lee el campo `next_step` (`setup` → `constitution` →
+`specify` → `research` → `plan` → `implement` → `review` → `revise` → `close`),
+calculado desde el estado en disco (el manifest, `chapters/` contra el temario,
+`findings.md`), y según el paso crea y asigna la tarea al rol que toca. Es la
+**brújula del heartbeat**: una máquina de estados sin memoria, que delega y vuelve a
+leer del disco en vez de acumular en su contexto el ruido de la redacción.
+
+El detalle operativo —el modelo Company/Project completo, el flujo en actos, el grafo
+de tareas y el mapeo con Paperclip— vive en `paperclip/README.md`.
+
 ## Agente-agnóstico: la lógica en comandos, no en skills
 
 El pipeline lo lanzan distintos agentes con distintos modelos, no solo Claude. Por

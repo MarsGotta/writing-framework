@@ -21,14 +21,32 @@ modelo las aplica.
 
 ## 1. Crea el proyecto e instala el preset
 
+**Atajo recomendado**: un solo comando deja la guía montada (carpeta, repo git,
+`specify init`, preset y bootstrap), heredando operador y email de tu configuración
+de git, con un commit de base y el contexto multi-agente unificado por symlinks
+(`AGENTS.md` ← `CLAUDE.md`, `GEMINI.md`):
+
+```bash
+bash ~/Projects/writing-framework/tools/new-guide.sh ~/Projects/guia-prueba
+```
+
+El destino debe quedar **fuera del repo del framework**: cada guía es su propio
+repositorio. Si usas el atajo, sáltate al paso 3 (la constitución); el script ya
+hizo el bootstrap por ti.
+
+A mano, los mismos pasos son:
+
 ```bash
 mkdir ~/Projects/guia-prueba && cd ~/Projects/guia-prueba && git init
+specify init --integration claude .
 specify preset add --dev ~/Projects/writing-framework/writeonmars
 ```
 
 Instala las plantillas editoriales, los comandos y los scripts. (Verifica que tu versión de `specify` copia también `references/`; si no, ese directorio debe quedar accesible para los comandos.)
 
 ## 2. Bootstrap del proyecto
+
+(Si usaste `new-guide.sh` en el paso 1, esto ya está hecho: continúa en el paso 3.)
 
 ```text
 /speckit.setup
@@ -196,5 +214,11 @@ regenera el PDF final. Si está bloqueado, te dice qué resolver y no exporta.
 
 Una guía redactada con voz coherente, revisada, contrastada con fuentes (con su
 bloque de fuentes por capítulo), exportada a PDF y cerrada con tu visto bueno —
-producida por comandos que cualquier modelo puede lanzar. El mismo recorrido corre
-desatendido bajo un orquestador (Paperclip): ver [`how-to.md`](how-to.md).
+producida por comandos que cualquier modelo puede lanzar.
+
+Lo que acabas de hacer es el **modo directo**: tú, con un agente, lanzando los
+comandos uno a uno. Sobre ese mismo método hay una **capa de orquestación opcional**:
+el ciclo entero puede correr **desatendido bajo Paperclip**, con un equipo de cuatro
+roles editoriales (editora jefa orquestadora, documentalista, redactora y editora de
+mesa). El detalle operativo está en [`how-to.md`](how-to.md) ("Cómo correr todo
+desatendido bajo Paperclip") y en [`../paperclip/README.md`](../paperclip/README.md).

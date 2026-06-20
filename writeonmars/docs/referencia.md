@@ -90,6 +90,7 @@ Genera el PDF. Reutiliza `assets/style.css` (motor de `markdown-to-pdf`).
 | `--project-dir` | Raíz del proyecto. |
 | `--spec` | Spec a evaluar. |
 | `--gate` | Exit 1 si el proyecto NO cierra. |
+| `--json` | Emite el estado completo del proyecto en JSON, incluido el campo `next_step` (`setup`→`constitution`→`specify`→`research`→`plan`→`implement`→`review`→`revise`→`close`) que el orquestador (heartbeat de Paperclip) usa para decidir a qué rol delegar. |
 
 ### `feedback_intake.py`
 
@@ -116,6 +117,43 @@ index.py query "<texto>" [--top 5] [--project-dir .]
 ```
 
 Genera/usa `.writeonmars-index.json` (caché reconstruible).
+
+## Herramientas de scaffolding y orquestación
+
+Viven en la raíz del repo del framework (fuera del preset). Levantan una guía nueva
+y contratan el equipo ejecutor en Paperclip.
+
+### `tools/new-guide.sh`
+
+Scaffolding de una guía en un comando: crea el repo, `specify init --integration`,
+`preset add`, bootstrap, symlinks de contexto multi-agente y un commit que queda como
+base ref. El destino está siempre fuera del repo del framework.
+
+| Flag | Default | Descripción |
+|---|---|---|
+| `--agents` | `claude,gemini,codex` | CSV de agentes; el 1º es el primario de `specify init`. |
+| `--skip-init` | off | Omite `specify init`. |
+| `--refresh-preset` | off | Re-copia el preset en una guía ya scaffoldeada. |
+| `--preset` | preset del repo | Ruta del preset a copiar. |
+| `--operator` | de `git config` | Id del operador. |
+| `--email` | de `git config` | Email del operador. |
+
+### `paperclip/hire-team.sh`
+
+Contrata el equipo ejecutor (Documentalista, Redactora, Editora de mesa) en la Company
+de Paperclip vía su CLI. Idempotente; modelos cruzados (Redactora = Opus, revisoras =
+Sonnet).
+
+| Flag | Default | Descripción |
+|---|---|---|
+| `--no-headless` | off | Crea los agentes sin `dangerouslySkipPermissions`. |
+| `--company` | `Write.OnMars` | Nombre de la Company. |
+
+### Capa `paperclip/`
+
+Modelo de orquestación sobre Paperclip: una Company **Write.OnMars** (la casa), cada
+guía es un **Project** (workspace local) y un roster de 4 roles editoriales con bundles
+de instrucciones en `paperclip/agents/<rol>/`. Detalle en `paperclip/README.md`.
 
 ## Etiquetas de feedback (en los comentarios del PDF)
 

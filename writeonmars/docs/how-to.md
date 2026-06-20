@@ -19,6 +19,37 @@ No hace falta instalar skills: la voz, la didáctica y el método viajan en el p
 constitución y crea el manifest, que el preset no puede instalar. Luego, el primer
 paso del ciclo es `/speckit-constitution` (sector + tono + terminología).
 
+## Cómo crear una guía nueva (en un comando)
+
+El paso anterior (carpeta, `git init`, `specify init`, `preset add`, bootstrap…) está
+automatizado. Para arrancar una guía desde cero:
+
+```bash
+bash tools/new-guide.sh ~/guias/context-window
+```
+
+El destino va **siempre fuera del repo del framework**: cada guía es su propio repo.
+En un comando, el script: crea la carpeta y hace `git init`; corre `specify init`
+(con `--here --force --ignore-agent-tools --integration <agente>` —ojo, el flag es
+`--integration`, no `--ai`); instala el preset con `specify preset add --dev`; corre
+`bootstrap.py` (= `speckit.setup`: constitución núcleo + manifest); cablea el contexto
+multi-agente (un `AGENTS.md` canónico, con `CLAUDE.md` y `GEMINI.md` como symlinks; las
+carpetas de comandos **no** se symlinkean porque los formatos difieren —Claude usa `.md`,
+Gemini `.toml`); y hace el commit inicial, que es el **base ref** que Paperclip conecta.
+El operador y el email se heredan de tu `git config`.
+
+Es idempotente: puedes repetirlo sin romper nada. Flags útiles:
+
+```bash
+bash tools/new-guide.sh ~/guias/x --agents claude,gemini,codex  # 1º = primario de init
+bash tools/new-guide.sh ~/guias/x --skip-init       # ya corriste `specify init` a mano
+bash tools/new-guide.sh ~/guias/x --refresh-preset  # re-copia el preset en una guía ya creada
+bash tools/new-guide.sh ~/guias/x --preset /ruta/al/writeonmars
+bash tools/new-guide.sh ~/guias/x --operator otro.id --email otro@correo
+```
+
+Al terminar, entra en la carpeta y sigue con `/speckit-constitution` (sector + tono).
+
 ## Cómo elegir el sector y ajustar la constitución del proyecto
 
 ```text
@@ -183,16 +214,74 @@ python3 writeonmars/scripts/index.py query "context window" --top 5
 
 ## Cómo correr todo desatendido bajo Paperclip
 
-Todos los scripts son deterministas y no necesitan agente, así que Paperclip puede
-encadenarlos en heartbeats. El reparto humano se mantiene en los dos extremos:
+La capa `paperclip/` envuelve el método en una **Company de Paperclip**: una casa
+editorial "Write.OnMars" (una sola, no una por guía) con un equipo de cuatro roles y
+un tablero de tareas. Cada guía es un **Project** con workspace **local**
+(`sourceType=local_path`: no necesita GitHub). Detalle completo en
+`paperclip/README.md`. La operación tiene cuatro tiempos.
 
-1. **Checkpoint 1** — el brief con preguntas: lo resuelves tú antes de soltar la
-   automatización.
-2. **Centro automático** — research, redacción, pasadas locales, pasada global.
-3. **Checkpoint 2** — anotas el PDF; `feedback_intake.py` lo traduce y el agente
-   aplica los cambios.
+**1. Crea la guía (base ref).** Es el scaffold del Project: lo prepara
+`tools/new-guide.sh` (ver arriba), que deja el repo con el preset, la constitución
+núcleo y el commit inicial. Conecta ese repo a un Project nuevo en Paperclip como
+workspace local.
+
+**2. Monta la Company y el equipo (una vez).** Paperclip se opera por su CLI
+`paperclipai`. Crea la Company "Write.OnMars" y la Editora jefa (el orquestador),
+y luego contrata a los tres ejecutores:
+
+```bash
+bash paperclip/hire-team.sh                # idempotente; modelos cruzados
+bash paperclip/hire-team.sh --no-headless  # modo seguro (sin saltar permisos)
+```
+
+`hire-team.sh` contrata por el CLI a la **Documentalista** (research + pasada 4 de
+precisión; puede correr en Codex), la **Redactora** (`implement` + `revise`) y la
+**Editora de mesa** (pasadas, con un modelo **distinto** al de la Redactora, para que
+"escribe uno, revisa otro" se cumpla de verdad). Cada rol lleva su bundle de
+instrucciones en `paperclip/agents/<rol>/`. El equipo es permanente: persiste entre
+guías. Por defecto los agentes se crean headless (`dangerouslySkipPermissions:true`)
+para correr desatendidos; `--no-headless` los crea en modo seguro.
+
+**3. El orquestador corre el ciclo.** La Editora jefa **no escribe prosa**: en cada
+heartbeat lee el estado desde disco y delega. Su brújula es el campo `next_step` de
+
+```bash
+python3 .specify/presets/writeonmars/scripts/status.py --project-dir . --json
+```
+
+que avanza `setup` → `constitution` → `specify` → `research` → `plan` → `implement`
+→ `review` → `revise` → `close`. Según el paso, crea o asigna la tarea al rol que
+toca (research → Documentalista, un `implement` por capítulo → Redactoras en worktrees
+aislados, cada `in_review` → mesa + precisión, etc.). El heartbeat es **event-driven**:
+los agentes se crean con `heartbeat.enabled:false` + `wakeOnDemand:true`, así que no
+hay polling ciego; cada cambio de estado de tarea despierta al rol siguiente.
+
+**4. Arranca el flujo.** Crea un **issue asignado a la Editora jefa**: eso la
+despierta sobre el Project y echa a andar la máquina de estados.
+
+Los **dos checkpoints humanos** del método no cambian:
+
+- **Checkpoint 1** — el brief con preguntas (`specify`): lo firmas tú antes de soltar
+  la automatización. En Paperclip es la aprobación de estrategia.
+- **Checkpoint 2** — anotas el PDF; `feedback_intake.py` lo traduce y la Redactora
+  aplica los cambios (re-despacho quirúrgico).
 
 Para el cierre desatendido, usa `close.py`: solo exporta si los gates pasan.
+
+## Cómo autenticar un agente Codex con tu suscripción
+
+Si pones a la Documentalista (u otro rol) a correr en Codex con tu suscripción de
+ChatGPT, ten en cuenta que Paperclip **aísla el `CODEX_HOME` por agente**: ese Codex
+no ve tu `~/.codex/` y arranca sin sesión. Siémbralo enlazando tus credenciales al
+`CODEX_HOME` aislado del agente:
+
+```bash
+ln -s ~/.codex/auth.json   "$CODEX_HOME/auth.json"
+ln -s ~/.codex/config.toml "$CODEX_HOME/config.toml"
+```
+
+(`$CODEX_HOME` es la ruta que Paperclip asigna a ese agente.) Con el symlink, el Codex
+del agente hereda tu suscripción sin copiar el secreto.
 
 ## Cómo cambiar la política de firmas
 

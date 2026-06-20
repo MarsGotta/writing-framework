@@ -1,6 +1,6 @@
 # Write.OnMars — Roadmap y estado
 
-> Estado al **2026-06-15**. Resumen de lo construido, lo validado de verdad y lo
+> Estado al **2026-06-20**. Resumen de lo construido, lo validado de verdad y lo
 > que queda. Punto de retorno para no perder el hilo entre sesiones.
 
 ## En una frase
@@ -8,15 +8,26 @@
 El método editorial es un **preset de Spec Kit agente-agnóstico** (`writeonmars/`),
 instalable con `specify preset add` y **probado de punta a punta**. La voz, la
 didáctica y el método viajan como **referencias** neutrales de modelo; la lógica,
-como **comandos**; lo determinista, como **scripts**. Falta operacionalizar la
-orquestación (Paperclip) y pulir la distribución.
+como **comandos**; lo determinista, como **scripts**. La orquestación (Paperclip)
+ya tiene un **primer corte construido** en `paperclip/`; falta el webhook del
+checkpoint del PDF, los presupuestos y pulir la distribución.
 
 ## Cómo está montado (capas)
 
 - **Método** — el preset `writeonmars/`, que corre *dentro* de un agente (Claude,
   Codex, Gemini…) vía comandos `speckit.*`.
-- **Orquestación** — Paperclip, pendiente; envolverá el método para producir varias
-  guías en volumen.
+- **Orquestación** — Paperclip, **primer corte en `paperclip/`**: el "ejecutor
+  orquestado" concreto. UNA sola Company "Write.OnMars" (la casa, equipo
+  permanente); cada guía = un **Project** de Paperclip (su goal, workspace y
+  tablero); el workspace es el repo local (`sourceType=local_path`, sin GitHub).
+  Roster de 4 roles por oficio: **Editora jefa** (orquestador / "CEO":
+  constitution/specify/plan/intro/gates/close, decide leyendo `status.py --json`
+  y delega, no escribe prosa, heartbeat event-driven), **Documentalista**
+  (research + pasada de precisión, puede correr en Codex), **Redactora**
+  (implement en paralelo + revise) y **Editora de mesa** (pasadas de estructura /
+  utilidad / naturalidad / formato, con modelo distinto al de la Redactora).
+  Preserva las reglas: escribe-uno-revisa-otro, voz ≠ precisión, detector ≠
+  corrector.
 - **Regla rectora**: un solo método, dos ejecutores — a mano (un agente) o
   orquestado (Paperclip lanza agentes/modelos por paso).
 
@@ -34,7 +45,10 @@ orquestación (Paperclip) y pulir la distribución.
     (aplica los hallazgos al texto y cierra el loop)
   - operación: `status`, `export`, `feedback`, `close`, `memory`
 - **6 scripts deterministas**: `bootstrap`, `status`, `export`, `feedback_intake`,
-  `close`, `index`.
+  `close`, `index`. `status.py` ahora expone **`--json`** con el campo `next_step`
+  (`setup` → `constitution` → `specify` → `research` → `plan` → `implement` →
+  `review` → `revise` → `close`): la **brújula del heartbeat** del orquestador.
+  Tolera la ausencia de `specs/` y detecta `sector=null` → `constitution`.
 - **`references/`**: voz (`marcela-prose`), didáctica (`technical-guide-design`),
   método (`writeonmars-*`), **sectores** (`sectores/<slug>.md`: defaults por dominio
   para las adendas; hoy `tecnologia`, ampliable con solo añadir un archivo).
@@ -42,6 +56,26 @@ orquestación (Paperclip) y pulir la distribución.
   **`memory/constitution.md`** (bundled).
 - **`AGENTS.md`** (contrato agente-agnóstico) + **`docs/`** (Diátaxis: tutorial,
   how-to, referencia, arquitectura) + **`smoke-test.sh`**.
+
+## Inventario de la raíz (orquestación + tooling)
+
+- **`tools/new-guide.sh`**: scaffolding de una guía en **un comando** — crea el
+  repo, corre `specify init --integration <agente> --here --force
+  --ignore-agent-tools`, `specify preset add --dev`, `bootstrap.py`, los symlinks
+  de contexto multi-agente y un commit que queda como **base ref**. Operador y
+  email **heredan de git**. Idempotente; flags `--agents` / `--skip-init` /
+  `--refresh-preset` / `--preset` / `--operator` / `--email`.
+- **`paperclip/`** — la capa de orquestación sobre Paperclip:
+  - `README.md`: el modelo (Company única / Project por guía / workspace =
+    repo local), el flujo, el grafo de roles y el mapeo paso→rol.
+  - `agents/<rol>/`: los bundles de los 4 roles (`editora-jefa`,
+    `documentalista`, `redactora`, `editora-de-mesa`).
+  - `hire-team.sh`: contrata por CLI los **3 ejecutores** (idempotente, con
+    modelos cruzados entre Redactora y Editora de mesa).
+- **Operación**: Paperclip se maneja con su CLI `paperclipai`. Heartbeat
+  event-driven (`runtimeConfig.heartbeat.enabled:false` + `wakeOnDemand:true`);
+  headless con `dangerouslySkipPermissions:true`. Para usar Codex con suscripción
+  se siembra un `CODEX_HOME` aislado con symlink a `~/.codex/auth.json`.
 
 ## Validado de verdad
 
@@ -57,6 +91,11 @@ Prueba en un repo aparte (`guia-prueba`), tema *servidor MCP en Node/TS*:
 - **Cross-model**: Codex corrió la pasada de precisión, leyó todo el contexto (son
   archivos), **cazó un bug de numeración** (corregido) y **no fingió firma humana**.
   Confirma "escribe uno, revisa otro" y la neutralidad de modelo ✓
+
+Y, ya en Paperclip:
+
+- Se **montó la Company "Write.OnMars"**, un **Project** por guía y el **equipo de
+  ejecutores** (`hire-team.sh`), y se **arrancó el flujo** con `guide-nlp` ✓
 
 ## Decisiones de arquitectura tomadas
 
@@ -80,9 +119,13 @@ Prueba en un repo aparte (`guia-prueba`), tema *servidor MCP en Node/TS*:
    archivo del comando; funciona, pero registrarlos evita pegar la ruta).
 2. **Opcionales del preset**: búsqueda semántica real en `index.py` (embeddings,
    chromadb); hook `after_close` para auto-export.
-3. **Capa Paperclip**: modelar la "empresa", un goal por guía, agentes por
-   paso/modelo, presupuestos y heartbeats.
-4. **Distribución**: elegir licencia, publicar el preset
+3. **Webhook del checkpoint 2**: cerrar el lazo del segundo control humano — el
+   **PDF anotado** del documento terminado debe entrar por `feedback_intake`
+   (hoy ese paso es manual).
+4. **Presupuestos**: topes de gasto/tokens por Project y por rol en Paperclip.
+5. **Varias guías en paralelo**: hoy se corre **una guía a la vez**; falta operar
+   varios Projects a la vez bajo la misma Company.
+6. **Distribución**: elegir licencia, publicar el preset
    (`specify preset add --from <github>`), versionar releases.
 
 ## Deuda y cosas honestas a saber

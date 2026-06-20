@@ -42,13 +42,32 @@ framework sin agente (`wom new/status/sign/close`), pero:
 
 - la firma humana por pasada se sustituyó por el checkpoint del PDF anotado, así
   que `wom sign` sobra;
-- los dos modos de ejecución (speckit+agentes, speckit+paperclip+agentes)
+- los dos modos de ejecución (speckit+agentes, speckit+orquestación+agentes)
   siempre tienen agente, así que "operar sin agente" no aplica;
 - lo determinista que sí valía (status, close, validación) pasa a `scripts/` de
-  este preset, invocable por el agente o por Paperclip.
+  este preset, invocable por el agente o por la capa de orquestación.
 
-Una sola vía: `specify preset add` + skills + agente, con Paperclip por encima
-para volumen.
+Una sola vía: `specify preset add` + skills + agente, con la capa de orquestación
+por encima para volumen (ver abajo).
+
+## Capa de orquestación (opcional, por encima)
+
+El preset es agente-agnóstico y se basta solo. Por encima, **opcional**, hay un
+primer corte de la capa de orquestación que vive en la **raíz del repo**
+`writing-framework` (no dentro de este preset):
+
+- [`../paperclip/`](../paperclip/) — modelo de orquestación sobre Paperclip: una
+  Company «Write.OnMars» (la casa) y cada guía como un Project (workspace local),
+  con un equipo de 4 roles editoriales por oficio (Editora jefa como orquestador,
+  Documentalista, Redactora, Editora de mesa). El modelo, el flujo, el grafo y los
+  bundles de instrucciones están en [`../paperclip/README.md`](../paperclip/README.md);
+  `../paperclip/hire-team.sh` contrata el equipo por el CLI de Paperclip.
+- [`../tools/new-guide.sh`](../tools/new-guide.sh) — scaffolding de una guía en un
+  comando: repo + `specify init` + `preset add` + bootstrap + symlinks de contexto
+  + commit de referencia base.
+
+Ambos son una capa **por encima** del preset, no un sustituto: el preset se instala
+igual (`specify preset add`) lo uses con o sin orquestación.
 
 ## Instalación
 
