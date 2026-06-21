@@ -1,0 +1,28 @@
+{
+  "framework_version": "1.0.0",
+  "constitution_version": "1.4.0",
+  "agent_target": "claude-code",
+  "language_primary": "es",
+  "skills": [
+    {
+      "name": "x",
+      "version": "1.0.0",
+      "source": "bundled"
+    }
+  ],
+  "research_mode": "byom",
+  "signing_matrix": {
+    "pasada_1_estructura": "autonomous",
+    "pasada_2_utilidad": "autonomous",
+    "pasada_3_naturalidad": "autonomous",
+    "pasada_4_precision": "autonomous",
+    "pasada_5_formato": "autonomous"
+  },
+  "human_operators": [
+    {
+      "id": "m",
+      "role": "maintainer"
+    }
+  ],
+  "citation_contract_version": "1.0"
+}
