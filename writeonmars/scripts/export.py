@@ -136,6 +136,62 @@ def collect_chapters(chapters_dir: Path) -> list[tuple[int, Path]]:
 
 
 # --------------------------------------------------------------------------- #
+# Validación de factualidad contra claims.md (feature 003, decisión D1-A:
+# export VALIDA, no genera; la Redactora sigue escribiendo "## Fuentes").
+# --------------------------------------------------------------------------- #
+import json as _json  # noqa: E402  (uso local, evita tocar el bloque de imports)
+
+
+def load_claims_by_chapter(spec_dir: Path | None) -> dict[str, list[dict]]:
+    """Lee claims.md (bloques ```json por capítulo). Tolerante: {} si no existe o
+    no parsea. Gemelo ligero de status.parse_claims (export es standalone)."""
+    if not spec_dir:
+        return {}
+    claims_md = spec_dir / "claims.md"
+    if not claims_md.exists():
+        return {}
+    text = claims_md.read_text(encoding="utf-8")
+    out: dict[str, list[dict]] = {}
+    for blk in re.findall(r"```json\s*(.+?)```", text, re.S):
+        try:
+            data = _json.loads(blk)
+        except _json.JSONDecodeError:
+            continue
+        for rec in (data if isinstance(data, list) else [data]):
+            if isinstance(rec, dict):
+                key = str(rec.get("capitulo", "")).strip().strip("[]").strip() or "—"
+                out.setdefault(key, []).append(rec)
+    return out
+
+
+def validate_claims(spec_dir: Path | None, chapters: list[tuple[int, Path]]) -> list[str]:
+    """D1-A: comprueba coherencia capítulo↔claims.md SIN reescribir nada. Devuelve la
+    lista de avisos (vacía si claims.md no existe → feature inactiva, no se valida).
+
+    Avisa cuando: (a) una afirmación llega al PDF con soporte 'sin_fuente'/'contradicho'
+    (no debería sin marca); (b) un capítulo exportado no tiene cobertura en claims.md."""
+    by_chap = load_claims_by_chapter(spec_dir)
+    if not by_chap:
+        return []  # sin claims.md: no se valida (export sigue funcionando)
+    warnings: list[str] = []
+    UNSUPPORTED = {"sin_fuente", "contradicho"}
+    for num, _path in chapters:
+        recs = by_chap.get(str(num))
+        if recs is None:
+            warnings.append(f"cap {num:02d}: sin cobertura en claims.md (pasada 4 no lo registró)")
+            continue
+        for r in recs:
+            sop = r.get("soporte")
+            if sop in UNSUPPORTED:
+                frase = (r.get("frase") or "")[:60]
+                warnings.append(
+                    f"cap {num:02d}: afirmación con soporte '{sop}' llega al PDF — "
+                    f"\"{frase}…\" ({r.get('claim_id', '?')})"
+                )
+    return warnings
+
+
+# --------------------------------------------------------------------------- #
 # Conversión y ensamblado
 # --------------------------------------------------------------------------- #
 # Localiza el "## Fuentes" de cierre de capítulo en el HTML de pandoc para
@@ -243,6 +299,8 @@ def main() -> None:
     ap.add_argument("--output", default=None, help="Ruta del PDF (default: <proyecto>/<slug-titulo>.pdf).")
     ap.add_argument("--chrome", default=os.environ.get("WOM_CHROME"), help="Ruta a Chrome/Chromium.")
     ap.add_argument("--keep-temp", action="store_true", help="No borrar el HTML intermedio.")
+    ap.add_argument("--strict-claims", action="store_true",
+                    help="Falla (exit 1) si la validación de factualidad contra claims.md emite avisos.")
     args = ap.parse_args()
 
     project = Path(args.project_dir).resolve()
@@ -273,6 +331,15 @@ def main() -> None:
     chapters = collect_chapters(chapters_dir)
     if not chapters:
         fail(f"no hay capítulos en {chapters_dir} (esperaba <NN>-titulo.md)")
+
+    # D1-A: validar coherencia con claims.md (no reescribe "## Fuentes"; la Redactora
+    # sigue siendo su autora). Sin claims.md no hay avisos (feature inactiva).
+    claim_warnings = validate_claims(spec_dir, chapters)
+    for w in claim_warnings:
+        print(f"[export] aviso factualidad: {w}", file=sys.stderr)
+    if claim_warnings and args.strict_claims:
+        fail(f"--strict-claims: {len(claim_warnings)} aviso(s) de factualidad; abortando antes del PDF")
+
     for num, path in chapters:
         anchor = f"cap-{num:02d}"
         meta_t = temario.get(num, {})

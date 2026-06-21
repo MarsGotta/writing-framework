@@ -97,6 +97,11 @@ python3 .specify/presets/writeonmars/scripts/status.py --project-dir . --gate
   espera a que el ciclo por capítulo (o el revise global) los absorba.
 - `criticals_open > 0` → nunca cierres.
 - `sign_violations` no vacío → falta una firma humana exigida por el manifest; para.
+- `gates.factuality == false` (solo si el manifest declara `quality_gates` en modo
+  `blocking`) → la factualidad está bajo el umbral: **no cierres**. El déficit debe
+  estar como hallazgos crítico/medio de la pasada 4 y enrutarse por el ciclo
+  (revise), igual que cualquier accionable; no es un paso nuevo. Si ves `warnings`
+  sobre inconsistencia claims↔findings, la Documentalista debe re-emitir la pasada 4.
 - `closeable: false` → no llames a `close.py`; resuelve el blocker de `next_detail`.
 
 ## 6. Estados y subsistemas válidos (no inventes)

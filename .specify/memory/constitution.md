@@ -1,6 +1,27 @@
 <!--
 SYNC IMPACT REPORT
 ==================
+Version change: 1.3.0 → 1.4.0
+Bump rationale: MINOR — añade un requisito (atribución por afirmación + índice de
+factualidad derivado) sin invalidar guías ni redefinir principios. Refuerza IV y V;
+"Fuentes por capítulo" se conserva (MUST) y pasa a derivarse/validarse contra
+claims.md. Feature 003-atribucion-factualidad.
+
+Added standards:
+- Atribución por afirmación (MUST en pasada 4): cada afirmación verificable de un
+  capítulo se registra con su(s) cita(s) y el veredicto de relación en claims.md
+  (ClaimRecord v1.0). "Fuentes por capítulo" se valida/deriva desde ahí.
+- Índice de factualidad (derivado, determinista): status.py expone factualidad por
+  capítulo y global; gate de cierre opcional (manifest.quality_gates).
+
+Modified principles:
+- IV. Precisión léxica — gana grano de afirmación y veredicto de relación
+  (apoya/matiza/contradice/menciona). Sin redefinición incompatible.
+- V. Revisión multi-pasada — la pasada 4 (precisión) persiste claims.md y produce
+  métrica; conserva las cinco dimensiones y "detector ≠ corrector".
+
+Historial previo
+----------------
 Version change: 1.2.1 → 1.3.0
 Bump rationale: MINOR — relaja estándares y añade un requisito, sin invalidar
 guías. (1) "Plantilla de capítulo" y "Qué hacer en la práctica" pasan de MUST a
@@ -288,7 +309,15 @@ Restricciones materiales aplicables a todo artefacto del framework:
 - **Fuentes por capítulo**: cada capítulo MUST cerrar con una sección "Fuentes"
   que nombre las fuentes citadas en ese capítulo (nombre, enlace y fecha cuando
   aplique), además del research consolidado. Es trazabilidad por capítulo, no solo
-  un research.md central.
+  un research.md central. Esta sección se **valida/deriva** contra `claims.md`
+  (atribución por afirmación): la escribe la Redactora y `export.py` comprueba que
+  ninguna afirmación `sin_fuente`/`contradicho` llegue al PDF sin marca.
+- **Atribución por afirmación** (pasada 4): cada afirmación verificable de un
+  capítulo MUST quedar registrada en `claims.md` (ClaimRecord v1.0) con su(s)
+  cita(s) y el veredicto de relación (apoya/matiza/contradice/menciona). De ahí se
+  deriva un **índice de factualidad** determinista (`status.py`), gate de cierre
+  opcional vía `manifest.quality_gates`. El juicio vive en la referencia de la
+  pasada 4; el conteo, en el script (Principio VI).
 - **Cajas visuales**: las cajas "Quédate con esto", "Qué hacer mañana" o "Síntoma →
   causa probable" SHOULD usarse cuando aportan, y las adendas del proyecto declaran
   si alguna es obligatoria por capítulo. Algunos sectores (médico, veterinario) se
@@ -445,4 +474,4 @@ cumplimiento explícito antes de cerrarse.
 - La guía operativa de runtime para agentes (p.ej., `CLAUDE.md`, `AGENTS.md`)
   MUST citar esta constitución como fuente de verdad editorial.
 
-**Version**: 1.3.0 | **Ratified**: 2026-05-06 | **Last Amended**: 2026-06-20
+**Version**: 1.4.0 | **Ratified**: 2026-05-06 | **Last Amended**: 2026-06-21
