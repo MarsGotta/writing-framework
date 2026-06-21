@@ -35,3 +35,10 @@ con un modelo, revisión con otro.
 
 Para añadir un MCP: ver `docs/citation-contract.md` § Certificación. Para portar un
 agente: el contrato operativo está en `writeonmars/AGENTS.md`.
+
+> **Atribución por afirmación (feature 003)**: un MCP de contraste puede, además del
+> `CitationRecord` (nivel de fuente), emitir `ClaimRecord` (nivel de afirmación,
+> `contracts/claim-record.schema.json`) en la pasada 4: cada afirmación verificable
+> con su(s) cita(s) y el veredicto de relación (apoya/matiza/contradice/menciona).
+> Es opcional y aditivo; el método funciona igual sin él (la pasada 4 lo produce por
+> método). Habilita el índice de factualidad y el gate `quality_gates` de `status.py`.
