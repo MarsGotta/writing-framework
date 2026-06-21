@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://write-on-mars.dev/contracts/manifest/v1.0.json",
-  "$comment": "Mirror of specs/001-framework-architecture/contracts/manifest-schema.json. Re-run T010 to refresh.",
-  "title": "Write.OnMars Project Manifest v1.0",
+  "$id": "https://write-on-mars.dev/contracts/manifest/v1.1.json",
+  "$comment": "Mirror of specs/001-framework-architecture/contracts/manifest-schema.json. v1.1 (MINOR, feature 003-atribucion-factualidad): adds optional quality_gates. Keep both copies (contracts/ + writeonmars/contracts/) in sync.",
+  "title": "Write.OnMars Project Manifest v1.1",
   "description": "Manifest declared by every editorial project that uses the Write.OnMars harness. Produced by `writeonmars-install` (FR-001..FR-004) and updated when versions, signing matrix or operators change.",
   "type": "object",
   "required": [
@@ -121,6 +121,16 @@
       "properties": {
         "enabled": {"type": "boolean", "default": false},
         "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"}
+      }
+    },
+    "quality_gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Optional quality gates beyond criticals/signatures/completeness (feature 003-atribucion-factualidad). Cache de política, no fuente de verdad. Cuando se omite, status.py se comporta como en v1.0 (gates g1·g2·g3).",
+      "properties": {
+        "factuality_min": {"type": "number", "minimum": 0, "maximum": 1, "description": "Piso del índice de factualidad global para cerrar (g4)."},
+        "factuality_min_per_chapter": {"type": "number", "minimum": 0, "maximum": 1, "description": "Piso por capítulo medido (opcional)."},
+        "factuality_mode": {"type": "string", "enum": ["advisory", "blocking"], "default": "blocking", "description": "advisory = informa pero no bloquea closeable; blocking = g4 entra en closeable."}
       }
     }
   },

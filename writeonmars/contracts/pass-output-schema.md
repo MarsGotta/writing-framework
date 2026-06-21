@@ -1,9 +1,15 @@
 <!-- Mirror of specs/001-framework-architecture/contracts/pass-output-schema.md (single source of truth). Re-run T011 to refresh. -->
 
-# Pass Output Schema v1.0
+# Pass Output Schema v1.1
 
 **Status**: stable for Write.OnMars v1.
-**Cobertura de spec**: FR-018, FR-019, FR-020, FR-020a.
+**Cobertura de spec**: FR-018, FR-019, FR-020, FR-020a · feature 003 (FR-005, FR-008, FR-015).
+
+> **v1.1 (MINOR, feature 003-atribucion-factualidad)** — cambios solo aditivos: la pasada 4
+> emite, además del bloque de `findings.md`, el artefacto `claims.md` (`ClaimRecord` v1.0, ver
+> `claim-record.schema.json`), y sus findings pueden trazar el `claim_id` afectado. Un
+> `findings.md` v1.0 sigue siendo conforme; `status.py` tolera ambas versiones (v1.0 sin claims
+> → factualidad "no medida").
 
 Este contrato define el formato unificado que cada una de las cinco pasadas del Principio V produce. Toda skill `writeonmars-pasada-N` MUST emitir su salida bajo este esquema para que (a) la consolidación en `findings.md` sea automatizable, (b) el cierre del proyecto pueda evaluar la matriz de firmas declarada en el manifiesto, y (c) un mantenedor pueda auditar pasadas históricas sin reconstruir contexto.
 
@@ -65,7 +71,34 @@ Un único `findings.md` por proyecto editorial, ubicado en `specs/[###-feature]/
 | `reescritura_sugerida` | string | sí, salvo `severidad = bajo` con decisión de no reescribir | Versión propuesta o paso accionable. |
 | `estado` | enum | sí | `abierto` \| `resuelto` \| `desviacion_justificada`. |
 | `referencias_cita` | lista de `citation_id` | sí cuando `pasada = 4_precision` | Enlaces al `research.md` que sustentan o contradicen la afirmación. |
+| `claim_id` | string | no (v1.1; recomendado en `pasada = 4_precision`) | Trazabilidad al `ClaimRecord` de `claims.md` afectado por el hallazgo. Alternativa sin romper la tabla: listar `claim:<id>` en la columna `Citas`. |
 | `decision_humana` | string | si `estado = desviacion_justificada` | Razón firmada por un operador humano para no resolver. |
+
+---
+
+## Salida de claims de la pasada 4 (v1.1)
+
+Además del bloque de `findings.md`, la pasada 4 (`writeonmars-contraste`) emite/actualiza el
+artefacto `specs/[###-feature]/claims.md` con un `ClaimRecord` por **cada** afirmación
+verificable evaluada del capítulo (no solo las que fallan). El modelo de datos canónico es
+`claim-record.schema.json` v1.0; la estructura del fichero y el algoritmo de factualidad viven
+en `specs/003-atribucion-factualidad/data-model.md` § 1–3.
+
+- **Grano**: afirmación (no capítulo). Cada `ClaimRecord` ancla una `frase` literal del capítulo
+  a su evidencia (`evidencia[]`), donde cada arista lleva `citation_id`, `relacion`
+  (`apoya`/`matiza`/`contradice`/`menciona`) y, para `apoya`, el `cita_fragmento_soporte`.
+- **Veredicto**: el campo `soporte` (`soportado`/`parcial`/`sin_fuente`/`contradicho`/`pendiente`)
+  se deriva de `evidencia[]` y gobierna la severidad del finding asociado (ver tabla de severidad
+  en la skill `writeonmars-contraste` y FR-009 de la feature 003).
+- **Parseo de máquina**: cada bloque de capítulo en `claims.md` incluye un bloque ```json (fuente
+  de verdad para `status.py`) además de la tabla legible. `status.py` lee el JSON; si falta o no
+  parsea, ese capítulo cuenta como "no medido", no como 0.
+- **Idempotencia**: re-ejecutar la pasada 4 sobre un capítulo reemplaza en bloque sus
+  `ClaimRecord` sin duplicar ni tocar los de otros capítulos.
+- **Sin web**: para datos volátiles no verificables en vivo, `soporte = pendiente` (no se finge la
+  verificación); cuentan aparte y no como soportadas en el índice de factualidad.
+
+Los bloques de pasada 4 emitidos bajo esta versión llevan `<!-- pass-output-schema: v1.1 -->`.
 
 ---
 
@@ -113,7 +146,13 @@ El operador puede sobreescribir este mapeo en el manifiesto añadiendo un campo 
 - **MINOR** (v1.y): añadir campos opcionales, ampliar enums.
 - **PATCH** (v1.0.z): aclaraciones y ejemplos.
 
-Cada bloque de pasada en `findings.md` MUST incluir un comentario HTML con la versión del schema usada: `<!-- pass-output-schema: v1.0 -->`.
+Historial:
+- **v1.0** — esquema base de `findings.md` (5 pasadas, gates de críticos + firma).
+- **v1.1** (feature 003-atribucion-factualidad, MINOR, aditivo) — la pasada 4 emite también
+  `claims.md` (`ClaimRecord` v1.0); campo opcional `claim_id` de trazabilidad en findings de
+  pasada 4. Sin eliminar ni reordenar campos v1.0.
+
+Cada bloque de pasada en `findings.md` MUST incluir un comentario HTML con la versión del schema usada: `<!-- pass-output-schema: v1.0 -->` (o `v1.1` para bloques de pasada 4 que emiten claims).
 
 ---
 
