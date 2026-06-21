@@ -217,56 +217,75 @@ python3 writeonmars/scripts/index.py query "context window" --top 5
 La capa `paperclip/` envuelve el método en una **Company de Paperclip**: una casa
 editorial "Write.OnMars" (una sola, no una por guía) con un equipo de cuatro roles y
 un tablero de tareas. Cada guía es un **Project** con workspace **local**
-(`sourceType=local_path`: no necesita GitHub). Detalle completo en
-`paperclip/README.md`. La operación tiene cuatro tiempos.
+(`sourceType=local_path`: no necesita GitHub). El modelo de flujo es **una tarea por
+capítulo que se mueve por estados** (no una tarea por paso). La especificación
+detallada está en `paperclip/FLOW-CONTRACT.md`; el panorama, en `paperclip/README.md`.
 
 **1. Crea la guía (base ref).** Es el scaffold del Project: lo prepara
 `tools/new-guide.sh` (ver arriba), que deja el repo con el preset, la constitución
-núcleo y el commit inicial. Conecta ese repo a un Project nuevo en Paperclip como
-workspace local.
+núcleo y el commit inicial. Pon los materiales fuente en `<guía>/resources/` (uno por
+clase, numerados `01-`, `02-`…).
 
-**2. Monta la Company y el equipo (una vez).** Paperclip se opera por su CLI
-`paperclipai`. Crea la Company "Write.OnMars" y la Editora jefa (el orquestador),
-y luego contrata a los tres ejecutores:
+**2. Monta o sincroniza el equipo.** Paperclip se opera por su CLI `paperclipai`. La
+Company y la Editora jefa (orquestadora) se crean una vez (asistente de onboarding);
+los tres ejecutores se contratan —y sus bundles se (re)cargan— con:
 
 ```bash
 bash paperclip/hire-team.sh                # idempotente; modelos cruzados
 bash paperclip/hire-team.sh --no-headless  # modo seguro (sin saltar permisos)
 ```
 
-`hire-team.sh` contrata por el CLI a la **Documentalista** (research + pasada 4 de
-precisión; puede correr en Codex), la **Redactora** (`implement` + `revise`) y la
-**Editora de mesa** (pasadas, con un modelo **distinto** al de la Redactora, para que
-"escribe uno, revisa otro" se cumpla de verdad). Cada rol lleva su bundle de
-instrucciones en `paperclip/agents/<rol>/`. El equipo es permanente: persiste entre
-guías. Por defecto los agentes se crean headless (`dangerouslySkipPermissions:true`)
-para correr desatendidos; `--no-headless` los crea en modo seguro.
+Contrata a la **Documentalista** (research + pasada 4 de precisión + **decisión** del
+ciclo; puede correr en Codex), la **Redactora** (escribe y aplica revise) y la
+**Editora de mesa** (pasadas 1·2·3 + pasada 5, con un modelo **distinto** al de la
+Redactora). El equipo es **permanente**: persiste entre guías. Cada rol lleva su
+bundle en `paperclip/agents/<rol>/`. **Si actualizas el método**, recarga los bundles:
+`hire-team.sh` recarga los tres ejecutores; la **Editora jefa** se recarga aparte
+(`paperclipai agent instructions-file:put <jefa> --path HEARTBEAT.md --content-file
+paperclip/agents/editora-jefa/HEARTBEAT.md`, ídem `AGENTS.md`). La jefa lleva
+`maxConcurrentRuns:1` (evita el doble despacho).
 
-**3. El orquestador corre el ciclo.** La Editora jefa **no escribe prosa**: en cada
-heartbeat lee el estado desde disco y delega. Su brújula es el campo `next_step` de
+**3. Conecta el Project.** Crea el Project de la guía y conéctale el repo como
+workspace local; fija el goal.
 
-```bash
-python3 .specify/presets/writeonmars/scripts/status.py --project-dir . --json
+**4. Arranca: fan-out único.** Crea la **tarea padre** (el libro) asignada a la
+Editora jefa: eso la despierta sobre el Project. Ella avanza los pasos que son suyos
+—`constitution` → `specify` (**checkpoint 1**) → `research` → `plan`— y, con plan +
+research OK, hace el **fan-out ÚNICO**: **1 tarea padre + 1 hija por capítulo**
+(`in_progress`, asignadas a la Redactora). No crea una tarea por estado ni por pasada.
+
+**5. El ciclo por capítulo (peer-to-peer, sin la jefa).** Cada hija es el capítulo
+entero moviéndose por estados; los workers se la pasan entre ellos:
+
+```text
+Redactora (in_progress: escribe / aplica revise)
+  → in_review + Editora de mesa   (pasadas 1·2·3: estructura, utilidad, voz)
+    → in_review + Documentalista   (pasada 4: precisión) → DECIDE:
+        ≥1 accionable (crítico+medio) → in_progress + Redactora (revise)  ⟲
+        0 accionables                 → done  (capítulo APROBADO)
 ```
 
-que avanza `setup` → `constitution` → `specify` → `research` → `plan` → `implement`
-→ `review` → `revise` → `close`. Según el paso, crea o asigna la tarea al rol que
-toca (research → Documentalista, un `implement` por capítulo → Redactoras en worktrees
-aislados, cada `in_review` → mesa + precisión, etc.). El heartbeat es **event-driven**:
-los agentes se crean con `heartbeat.enabled:false` + `wakeOnDemand:true`, así que no
-hay polling ciego; cada cambio de estado de tarea despierta al rol siguiente.
+El relevo es cambiar `status` + `assigneeAgentId` (reasignar despierta al siguiente);
+el comentario de la tarea es un **puntero** a `findings.md` (la fuente de verdad), no
+una copia. Severidad: **crítico+medio fuerzan revise; bajo = aviso**. El estado real
+vive en disco: `python3 .../status.py --project-dir . --json` expone `by_chapter`
+(por capítulo: `drafted`, `passes_done`, `revise_pending`, `approved`) y
+`all_chapters_approved`.
 
-**4. Arranca el flujo.** Crea un **issue asignado a la Editora jefa**: eso la
-despierta sobre el Project y echa a andar la máquina de estados.
+**6. Etapas globales.** Cuando **todas** las hijas están `done`
+(`all_chapters_approved`), el que cierra la última despierta a la jefa (`agent wake`),
+que avanza: **pasada 5 global** (Mesa) → **export PDF** (`speckit.intro` + `export.py`)
+→ **checkpoint 2** (PDF anotado: el único revisor humano, una `approval` de board) →
+feedback → `close.py`.
 
-Los **dos checkpoints humanos** del método no cambian:
+Los **dos checkpoints humanos** no cambian: **checkpoint 1** = firmas el brief
+(`specify`); **checkpoint 2** = anotas el PDF (`feedback_intake.py` lo traduce y la
+Redactora aplica el re-despacho quirúrgico).
 
-- **Checkpoint 1** — el brief con preguntas (`specify`): lo firmas tú antes de soltar
-  la automatización. En Paperclip es la aprobación de estrategia.
-- **Checkpoint 2** — anotas el PDF; `feedback_intake.py` lo traduce y la Redactora
-  aplica los cambios (re-despacho quirúrgico).
-
-Para el cierre desatendido, usa `close.py`: solo exporta si los gates pasan.
+Todo es **event-driven**: los agentes se crean con `heartbeat.enabled:false` +
+`wakeOnDemand:true` (sin polling ciego; ningún heartbeat por timer). No se usan
+*routines* (no tienen trigger por evento) ni los campos "Reviewers/Approvers" del
+issue (son del board humano; reservados al checkpoint del PDF).
 
 ## Cómo autenticar un agente Codex con tu suscripción
 

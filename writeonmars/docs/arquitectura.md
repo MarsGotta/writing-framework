@@ -39,25 +39,42 @@ es justo el que preserva las reglas duras del método —escribe uno, revisa otr
 ahora a nivel de roles y modelos cruzados en vez de a nivel de pasada:
 
 - **Editora jefa** = el orquestador (el "CEO" de Paperclip). Posee `constitution`,
-  `specify`, `plan`, `intro`, los gates y `close`. **No escribe prosa**: decide el
-  siguiente paso y delega. Su heartbeat es event-driven —despierta cuando se le
-  asigna una tarea, no por reloj.
+  `specify`, `plan`, `intro`, los gates y `close`. **No escribe prosa**: hasta el
+  temario decide el siguiente paso y delega; con el temario listo hace **un único
+  fan-out** (1 tarea padre = el libro + 1 hija por capítulo) y luego solo vuelve a
+  actuar para las etapas globales, cuando la última hija `done` la despierta. Su
+  heartbeat es event-driven —despierta cuando se le asigna o reasigna una tarea, no
+  por reloj.
 - **Documentalista**: `research` (las `resources/` locales más web rigurosa de alta
   veracidad) y la pasada 4 (precisión). Puede correr en otro proveedor (p. ej. Codex)
   para reforzar la independencia frente a quien escribe.
 - **Redactora**: `implement` (capítulos, en paralelo) y `revise`.
 - **Editora de mesa**: pasadas 1/2/3/5, con un modelo **distinto** al de la Redactora.
 
+El reparto no es una tarea-por-paso ni una tarea-por-pasada (ese modelo perdía el
+hilo del capítulo entre relevos). Es **una tarea por capítulo que se mueve por
+estados**: la hija arranca `in_progress` con la Redactora, pasa a `in_review` con la
+Editora de mesa (pasadas 1·2·3), luego `in_review` con la Documentalista (pasada 4,
+que **decide**), y de ahí vuelve `in_progress` a la Redactora si hay accionables
+(revise) o cierra en `done` si no los hay. El ciclo es **peer-to-peer** entre los
+tres roles —cada relevo es un cambio de estado+asignado de la misma tarea—; la jefa
+no participa hasta que todos los capítulos quedan aprobados. Política de severidad:
+**crítico+medio fuerzan revise; bajo es aviso** y no bloquea.
+
 La pieza que hace todo esto barato es `status.py --json`. La Editora jefa no razona
-sobre prosa: en cada heartbeat lee el campo `next_step` (`setup` → `constitution` →
-`specify` → `research` → `plan` → `implement` → `review` → `revise` → `close`),
-calculado desde el estado en disco (el manifest, `chapters/` contra el temario,
-`findings.md`), y según el paso crea y asigna la tarea al rol que toca. Es la
-**brújula del heartbeat**: una máquina de estados sin memoria, que delega y vuelve a
-leer del disco en vez de acumular en su contexto el ruido de la redacción.
+sobre prosa: hasta el fan-out sigue `next_step` (`setup` → `constitution` →
+`specify` → `research` → `plan`), calculado desde el estado en disco (el manifest,
+`chapters/` contra el temario, `findings.md`). A partir del fan-out, el estado por
+capítulo lo expone `by_chapter` (`drafted`, `passes_done`, `revise_pending`,
+`approved`) —que también deja el ciclo seguible por un solo agente sin Paperclip—, y
+`all_chapters_approved` es la señal que despierta a la jefa para las globales. Es la
+**brújula del flujo**: una máquina de estados sin memoria, que delega y vuelve a leer
+del disco en vez de acumular en su contexto el ruido de la redacción.
 
 El detalle operativo —el modelo Company/Project completo, el flujo en actos, el grafo
-de tareas y el mapeo con Paperclip— vive en `paperclip/README.md`.
+de tareas y el mapeo con Paperclip— vive en `paperclip/README.md`, y la spec del
+flujo por capítulo (mapeo exacto a la API de Paperclip) en
+`paperclip/FLOW-CONTRACT.md`.
 
 ## Agente-agnóstico: la lógica en comandos, no en skills
 

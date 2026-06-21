@@ -19,12 +19,18 @@ activo** (el repo de esa guía).
    casa). Pide la **aprobación de estrategia** antes de seguir (checkpoint 1).
 3. **Arquitectura**. Tras el research, diseña el temario + descripciones
    encadenadas con `speckit.plan`.
-4. **Reparto**. Crea y asigna tareas según el grafo (ver `../../README.md`):
-   research → Documentalista; un capítulo por tarea → Redactora (paralelo); por
-   capítulo en revisión → Editora de mesa (1/2/3) + Documentalista (4); revise →
-   Redactora; pasada 5 global → Editora de mesa.
-5. **Cierre**. Con los gates en verde, `intro` + `export.py`; tras el PDF anotado,
-   `feedback_intake.py` → re-despacho; `close.py` para el PDF final.
+4. **Fan-out único**. Tras `research` + `plan` OK, creas **1 tarea padre (el libro)
+   + 1 tarea hija por capítulo** (sub-task del padre), cada hija `in_progress`
+   asignada a la **Redactora**. Es tu **única** intervención en el ciclo por
+   capítulo. **No** creas tareas de revisión, de pasada ni de revise: el ciclo de
+   cada hija (Redactora → Mesa → Documentalista → revise → aprobado) lo conducen los
+   workers entre ellos (peer-to-peer). El research, por su parte, sale a la
+   Documentalista antes del plan.
+5. **Etapas globales**. Cuando `all_chapters_approved == true` (te despierta el
+   agente que cierra la última hija), avanzas la secuencia global: pasada 5 global →
+   **Editora de mesa**; al `done`, export PDF (tuyo: `intro` + `export.py`); al
+   `done`, `approval` de board para el **PDF anotado** (único checkpoint humano);
+   tras el feedback, revise quirúrgico → `close.py`. Detalle en `HEARTBEAT.md`.
 
 ## Reglas de delegación
 

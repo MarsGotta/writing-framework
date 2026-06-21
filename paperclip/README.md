@@ -57,6 +57,14 @@ Reglas duras del método que el reparto respeta:
 
 ## El flujo, en actos
 
+El modelo es **una tarea por capítulo que se mueve por estados**, no una tarea por
+pasada. La Editora jefa hace **un único fan-out** (1 tarea padre = el libro, 1 tarea
+hija por capítulo) tras plan+research; a partir de ahí, cada hija recorre su ciclo de
+forma **peer-to-peer** entre Redactora, Editora de mesa y Documentalista, sin que la
+jefa vuelva a intervenir hasta las etapas globales. La spec detallada del flujo y el
+mapeo a la API de Paperclip está en [`FLOW-CONTRACT.md`](FLOW-CONTRACT.md) (fuente de
+verdad).
+
 Abres un **Project nuevo** en la Company (goal del Project = "guía sobre X"). Eso
 despierta a la **Editora jefa** sobre ese Project:
 
@@ -70,24 +78,44 @@ despierta a la **Editora jefa** sobre ese Project:
 2. **Documentación** — tarea → **Documentalista**: `research.md` con
    CitationRecord. Bloquea el plan.
 3. **Arquitectura** — con research, la Editora jefa diseña el temario (`plan`).
-4. **Redacción** — **una tarea por capítulo** → **Redactoras** en worktrees
-   aislados (paralelo real).
-5. **Mesa** (event-driven) — capítulo `in_review` despierta en paralelo, con otro
-   modelo: Editora de mesa (pasadas 1/2/3) + Documentalista (pasada 4). Hallazgos
-   → `findings.md`.
-6. **Corrección** — tarea `revise` por capítulo → la Redactora aplica solo lo
-   señalado.
-7. **Cierre de libro** — pasada 5 global → `status.py --gate` → `intro` +
-   `export.py` → PDF.
+4. **Fan-out único** — con el temario fijado, la Editora jefa crea **1 tarea padre**
+   (el libro) y **1 tarea hija por capítulo** (`in_progress`, asignada a la
+   Redactora). Es el único reparto que hace; no vuelve a crear tareas por capítulo.
+   Cada hija corre en un worktree aislado (paralelo real).
+5. **Ciclo de cada hija (peer-to-peer, event-driven)** — el capítulo entero vive en
+   **una** tarea que cambia de estado:
+   - **Redactora escribe** (DRAFTING) → al terminar, `in_review` y reasigna a la
+     **Editora de mesa**.
+   - **Mesa** corre las pasadas **1·2·3** → anota en `findings.md` → `in_review` y
+     reasigna a la **Documentalista**.
+   - **Documentalista** corre la pasada **4** y **DECIDE**: si hay accionables
+     abiertos (crítico+medio, de Mesa o suyos) → `in_progress` de vuelta a la
+     **Redactora** (revise quirúrgico, "ver `findings.md`"); si hay **0** → `done`
+     (APPROVED). Severidad: crítico+medio fuerzan revise; **bajo = aviso** (no
+     bloquea).
+   - La Redactora aplica el revise → `in_review` a Mesa otra vez (nueva ronda) hasta
+     que la hija quede `done`.
+6. **Despertar para las globales** — la Documentalista que marca la **última** hija
+   `done` despierta a la **Editora jefa** (`all_chapters_approved` en
+   `status.py --json`). No hay routine por evento: las etapas globales las avanza la
+   jefa al despertar.
+7. **Cierre de libro** — la jefa corre las etapas globales en orden: **pasada 5
+   global** (Mesa) → `status.py --gate` → `intro` + `export.py` → PDF.
 8. **Galeradas = checkpoint 2** — humano anota el PDF → webhook/routine →
    `feedback_intake.py` → re-despacho quirúrgico de tareas a la Redactora.
 9. **Imprenta** — `close.py` → gate + PDF final. Goal cumplido.
 
-Cada relevo es un cambio de **estado de tarea** que despierta al rol siguiente. El
-orquestador nunca acumula el ruido de la redacción: delega y lee el estado desde
-disco con `status.py --json`.
+Cada relevo dentro del ciclo es un cambio de **estado + asignado** de la **misma**
+tarea-capítulo, que despierta al rol siguiente (peer-to-peer); así no se pierde el
+hilo del capítulo. El orquestador nunca acumula el ruido de la redacción: hace el
+fan-out una vez y luego solo despierta para las globales, leyendo el estado desde
+disco con `status.py --json` (`by_chapter`, `all_chapters_approved`).
 
 ## El grafo de tareas (dependencias)
+
+Una tarea **padre** (el libro) y una **hija por capítulo**. La hija no se subdivide:
+es el capítulo entero moviéndose por estados (el ciclo peer-to-peer va dentro de la
+misma tarea, no en tareas hermanas).
 
 ```
 scaffold           (humano · tools/new-guide.sh)   [una vez, base ref]
@@ -95,34 +123,47 @@ scaffold           (humano · tools/new-guide.sh)   [una vez, base ref]
      └─ specify     (Editora jefa)        ── approval: estrategia ──┐
          └─ research (Documentalista)                               │
              └─ plan (Editora jefa)                                 │
-                 ├─ implement:cap-01 (Redactora · worktree) ─┐      │
-                 ├─ implement:cap-02 (Redactora · worktree)  │ paralelo
-                 └─ implement:cap-NN (Redactora · worktree) ─┘      │
-                      └─ por capítulo, al pasar a in_review:        │
-                          ├─ review:1-2-3 (Editora de mesa)         │
-                          └─ review:4     (Documentalista)          │
-                              └─ revise:cap-NN (Redactora)          │
-                                  └─ review:5 global (Mesa) ────────┘
-                                      └─ status --gate
-                                          └─ intro+export (Editora jefa)
-                                              └─ approval: PDF anotado (checkpoint 2)
-                                                  └─ feedback_intake → revise*
-                                                      └─ close (Editora jefa, job)
+                 └─ FAN-OUT ÚNICO (Editora jefa, una vez):          │
+                     padre = el libro                               │
+                      ├─ hija cap-01 (worktree) ─┐                  │
+                      ├─ hija cap-02 (worktree)  │ paralelo         │
+                      └─ hija cap-NN (worktree) ─┘                  │
+                           │   ciclo DENTRO de cada hija (1 tarea,  │
+                           │   cambia estado+asignado, peer-to-peer):
+                           │     in_progress → Redactora escribe    │
+                           │     in_review   → Mesa (pasadas 1·2·3) │
+                           │     in_review   → Doc (pasada 4·DECIDE)│
+                           │       ├─ accionables → in_progress     │
+                           │       │   (Redactora · revise) ↺ Mesa  │
+                           │       └─ 0 accionables → done (APPROVED)
+                           ▼                                        │
+                  última hija done → despierta a la Editora jefa ───┘
+                      └─ pasada 5 global (Mesa)
+                          └─ status --gate
+                              └─ intro+export (Editora jefa)
+                                  └─ approval: PDF anotado (checkpoint 2)
+                                      └─ feedback_intake → revise*
+                                          └─ close (Editora jefa, job)
 ```
 
 ## El heartbeat: cómo decide la Editora jefa
 
-El orquestador no razona sobre prosa: en cada heartbeat corre
+El orquestador no razona sobre prosa: cuando despierta corre
 
 ```bash
 python3 .specify/presets/writeonmars/scripts/status.py --project-dir . --json
 ```
 
-y lee el campo `next_step` (`setup` → `specify` → `research` → `plan` →
-`implement` → `review` → `revise` → `close`). Según el paso, crea/asigna la tarea
-al rol correspondiente. Todo el estado vive en disco (manifest, `chapters/` vs
-temario, `findings.md`); el orquestador es una máquina de estados sin memoria, por
-eso su contexto se mantiene sin ruido. Detalle en `agents/editora-jefa/HEARTBEAT.md`.
+y lee el estado desde disco. Hasta el fan-out, sigue `next_step` (`setup` →
+`specify` → `research` → `plan`) y, al llegar a `plan` OK, hace el **fan-out único**
+(padre + 1 hija por capítulo). A partir de ahí **no loopea por pasos**: el ciclo de
+cada capítulo es peer-to-peer entre los workers, y la jefa solo vuelve a actuar
+cuando la última hija `done` la despierta. Entonces lee `all_chapters_approved` (y el
+desglose `by_chapter`: `drafted`, `passes_done`, `revise_pending`, `approved`) y
+avanza las **etapas globales** en orden (pasada 5 → gate → intro+export → checkpoint
+→ close). Todo el estado vive en disco (manifest, `chapters/` vs temario,
+`findings.md`); la jefa es una máquina de estados sin memoria, por eso su contexto se
+mantiene sin ruido. Detalle en `agents/editora-jefa/HEARTBEAT.md`.
 
 ## Mapeo Paperclip ↔ Write.OnMars
 
@@ -132,8 +173,9 @@ eso su contexto se mantiene sin ruido. Detalle en `agents/editora-jefa/HEARTBEAT
 | Project / goal del Project | una guía / su brief |
 | Agent + adapter | rol editorial permanente + modelo (cross-model nativo) |
 | Bundle AGENTS/SOUL/HEARTBEAT | `writeonmars/AGENTS.md` + `references/voz` + estos bundles |
-| Task board (backlog→…→done) | capítulos + pasadas; `in_review` = pasada de revisión |
-| Comentarios de la tarea | `findings.md` |
+| Task board (backlog→…→done) | 1 tarea padre (libro) + 1 hija por capítulo; el estado de la hija (`in_progress`/`in_review`/`done`) = la fase del ciclo del capítulo |
+| Reasignar tarea (`assigneeAgentId`) | relevo peer-to-peer Redactora→Mesa→Doc→Redactora dentro de la misma tarea-capítulo |
+| Comentarios de la tarea | puntero corto a `findings.md` (la verdad vive en `findings.md`, no en el comentario) |
 | Workspace del Project (repo local o git) | el repo de la guía; worktrees para aislar capítulos en paralelo |
 | Runtime job (sin agente) | `status.py` / `close.py` / `export.py` / `feedback_intake.py` |
 | Strategy approval | checkpoint 1 (brief/temario) |
@@ -144,9 +186,14 @@ eso su contexto se mantiene sin ruido. Detalle en `agents/editora-jefa/HEARTBEAT
 
 Primer corte de la capa #3 del ROADMAP, montado y arrancado (2026-06-20).
 
+- **Modelo de flujo**: tarea-por-capítulo que se mueve por estados (fan-out único +
+  ciclo peer-to-peer + globales por wake), con `maxConcurrentRuns:1` en la jefa para
+  idempotencia estructural. La spec viva está en
+  [`FLOW-CONTRACT.md`](FLOW-CONTRACT.md).
 - **Construido en el repo**: el reparto de roles, los bundles de instrucciones,
-  `status.py --json` (la brújula del heartbeat), `tools/new-guide.sh` (scaffolding
-  de una guía en un comando) y `hire-team.sh` (contratar el equipo por CLI).
+  `status.py --json` (con `by_chapter` y `all_chapters_approved`, la brújula del
+  fan-out y de las globales), `tools/new-guide.sh` (scaffolding de una guía en un
+  comando) y `hire-team.sh` (contratar el equipo por CLI).
 - **Montado en Paperclip**: la Company "Write.OnMars", el equipo permanente de 4
   roles (Editora jefa en Claude/Opus; Documentalista en Codex; Redactora en Opus;
   Editora de mesa en Sonnet) y el primer Project (`guide-nlp`) con workspace local

@@ -155,9 +155,102 @@ def count_temario(spec_dir: Path) -> int:
 INVALID_ACTORS = {"", "—", "pendiente", "tbd", "{id}", "actor"}
 
 
+def _cap_sort_key(cap: str):
+    """Ordena capítulos: numéricos primero (1, 2, …), etiquetas (global) al final."""
+    return (0, int(cap)) if cap.isdigit() else (1, cap)
+
+
+def _norm_cap(cap: str) -> str:
+    """Normaliza la etiqueta de capítulo igual que el resto del módulo:
+    quita corchetes y espacios. '1', '[1]', 'global' → '1', '1', 'global'."""
+    return (cap or "").strip().strip("[]").strip()
+
+
+def _drafted_ordinals(chapters: list[str]) -> set[int]:
+    """Ordinales con fichero chapters/NN-*.md presente. Mapea ordinal→fichero por
+    el prefijo numérico del nombre (p. ej. '03-intro.md' → 3)."""
+    out: set[int] = set()
+    for name in chapters:
+        m = re.match(r"\s*(\d+)", name)
+        if m:
+            out.add(int(m.group(1)))
+    return out
+
+
+def _passes_by_chapter(blocks: list[dict]) -> dict[str, set[int]]:
+    """Pasadas (1·2·3·4) que cubren cada capítulo, leídas del campo
+    'Capítulos cubiertos' de cada bloque de pasada en findings.md.
+
+    El campo es texto libre ('1, 2 y 3', 'global', 'caps. 1-3', etc.): se extraen
+    los enteros y, si aparece 'global', se atribuye a la clave 'global'. La pasada 5
+    es formato global y no participa del approved por capítulo (solo 1-4)."""
+    out: dict[str, set[int]] = {}
+    for b in blocks:
+        num = b["num"]
+        if num not in (1, 2, 3, 4):
+            continue
+        caps_raw = b.get("capitulos") or ""
+        for token in re.findall(r"\d+|global", caps_raw, re.I):
+            key = "global" if token.lower() == "global" else str(int(token))
+            out.setdefault(key, set()).add(num)
+    return out
+
+
+def _build_by_chapter(
+    expected: int,
+    chapters: list[str],
+    blocks: list[dict],
+    revise_by_chapter: dict[str, int],
+    advisory_by_chapter: dict[str, int],
+) -> tuple[dict[str, dict], bool]:
+    """Construye el objeto `by_chapter` (contrato FLOW-CONTRACT §3.7) y la señal
+    global `all_chapters_approved`.
+
+    Keyado por ordinal del temario en string ('1'..'N') más 'global' si hay
+    hallazgos o cobertura globales. approved = drafted AND {1,2,3,4} ⊆ passes_done
+    AND revise_pending == 0."""
+    drafted = _drafted_ordinals(chapters)
+    passes = _passes_by_chapter(blocks)
+
+    # Claves: 1..expected (temario) + cualquier ordinal con fichero/hallazgo/pasada
+    # fuera de rango + 'global' si aparece en hallazgos o cobertura.
+    keys: set[str] = {str(n) for n in range(1, expected + 1)}
+    keys |= {str(n) for n in drafted}
+    keys |= set(revise_by_chapter) | set(advisory_by_chapter) | set(passes)
+
+    by_chapter: dict[str, dict] = {}
+    for key in keys:
+        is_num = key.isdigit()
+        is_drafted = bool(is_num and int(key) in drafted)
+        passes_done = sorted(passes.get(key, set()))
+        revise_pending = revise_by_chapter.get(key, 0)
+        approved = (
+            is_drafted
+            and {1, 2, 3, 4}.issubset(set(passes_done))
+            and revise_pending == 0
+        )
+        by_chapter[key] = {
+            "drafted": is_drafted,
+            "passes_done": passes_done,
+            "revise_pending": revise_pending,
+            "advisory": advisory_by_chapter.get(key, 0),
+            "approved": approved,
+        }
+
+    # all_chapters_approved: todos los capítulos del temario (1..expected) aprobados.
+    # Sin temario (expected == 0) no hay condición global que cumplir → False.
+    all_approved = expected > 0 and all(
+        by_chapter.get(str(n), {}).get("approved", False)
+        for n in range(1, expected + 1)
+    )
+    return by_chapter, all_approved
+
+
 def _next_step(project: Path, spec_dir: Path, manifest: dict | None,
                blocks: list, chapters: list, expected: int,
-               closeable: bool, crit_open: int, sign_violations: list) -> tuple[str, str]:
+               closeable: bool, crit_open: int, sign_violations: list,
+               revise_pending: int = 0, revise_by_chapter: dict | None = None,
+               advisory_open: int = 0) -> tuple[str, str]:
     """Deriva el siguiente paso del ciclo para el orquestador (Editora jefa).
 
     Es el corazón del heartbeat: con esto el orquestador decide a qué rol
@@ -177,10 +270,22 @@ def _next_step(project: Path, spec_dir: Path, manifest: dict | None,
     pendientes = expected - len(chapters)
     if pendientes > 0:
         return "implement", f"faltan {pendientes} capítulo(s): delegar a Redactora (paralelo en worktrees)"
-    if crit_open > 0:
-        return "revise", f"{crit_open} hallazgo(s) crítico(s) abierto(s): re-despachar a Redactora"
     if not blocks:
         return "review", "capítulos completos sin findings.md: lanzar pasadas (Mesa + Documentalista)"
+    if revise_pending > 0:
+        # Política: crítico + medio fuerzan revise (detector ≠ corrector); 'bajo' es
+        # aviso y NO bloquea ni fuerza. Enumera los capítulos accionables para que el
+        # orquestador haga un BARRIDO —una tarea revise por capítulo a la Redactora—,
+        # no un one-off que deja el resto sin corregir.
+        caps = sorted((revise_by_chapter or {}), key=_cap_sort_key)
+        detalle_crit = f", {crit_open} crítico(s)" if crit_open else ""
+        aviso = f"; {advisory_open} aviso(s) 'bajo' aparte (no bloquean)" if advisory_open else ""
+        etiqueta = ", ".join(caps) if caps else "—"
+        return "revise", (
+            f"{revise_pending} hallazgo(s) accionable(s) (crítico+medio{detalle_crit}) en "
+            f"{len(caps)} capítulo(s) [{etiqueta}]: una tarea revise POR CAPÍTULO a la "
+            f"Redactora (barrido completo, no one-off){aviso}"
+        )
     if sign_violations:
         return "review", "faltan firmas humanas exigidas por el manifest"
     if closeable:
@@ -204,15 +309,27 @@ def evaluate(project: Path, spec_dir: Path) -> dict:
     crit_open = 0
     sign_violations: list[str] = []
     total_open = 0
+    advisory_open = 0                         # 'bajo' abiertos: avisan, no fuerzan revise
+    revise_by_chapter: dict[str, int] = {}    # crítico+medio abiertos por capítulo
+    advisory_by_chapter: dict[str, int] = {}  # 'bajo' abiertos por capítulo (avisos)
     for b in blocks:
         sev = {"critico": 0, "medio": 0, "bajo": 0}
         open_here = 0
         for h in b["hallazgos"]:
-            sev[h["severidad"]] = sev.get(h["severidad"], 0) + 1
-            if h["estado"] == "abierto":
-                open_here += 1
-                if h["severidad"] == "critico":
-                    crit_open += 1
+            s = h["severidad"]
+            sev[s] = sev.get(s, 0) + 1
+            if h["estado"] != "abierto":
+                continue
+            open_here += 1
+            if s == "critico":
+                crit_open += 1
+            cap = _norm_cap(h.get("capitulo") or "") or "—"
+            if s == "bajo":
+                advisory_open += 1            # aviso: no fuerza revise ni bloquea
+                advisory_by_chapter[cap] = advisory_by_chapter.get(cap, 0) + 1
+            else:
+                # crítico, medio o etiqueta desconocida → accionable (nunca perder un hallazgo)
+                revise_by_chapter[cap] = revise_by_chapter.get(cap, 0) + 1
         total_open += open_here
         # Gate de firma: una pasada que el manifest exige `human` solo cuenta como
         # firmada si tiene tipo human Y un actor real (no vacío ni "pendiente").
@@ -240,9 +357,14 @@ def evaluate(project: Path, spec_dir: Path) -> dict:
     g2 = not sign_violations
     g3 = (expected == 0) or (len(chapters) >= expected)
     closeable = g1 and g2 and g3
+    revise_pending = sum(revise_by_chapter.values())
+    by_chapter, all_chapters_approved = _build_by_chapter(
+        expected, chapters, blocks, revise_by_chapter, advisory_by_chapter,
+    )
     next_step, next_detail = _next_step(
         project, spec_dir, manifest, blocks, chapters, expected,
         closeable, crit_open, sign_violations,
+        revise_pending, revise_by_chapter, advisory_open,
     )
     return {
         "spec": spec_dir.name if spec_dir else "(sin spec todavía)",
@@ -252,6 +374,11 @@ def evaluate(project: Path, spec_dir: Path) -> dict:
         "passes": passes,
         "criticals_open": crit_open,
         "open_findings_total": total_open,
+        "revise_pending": revise_pending,
+        "revise_by_chapter": revise_by_chapter,
+        "advisory_open_bajo": advisory_open,
+        "by_chapter": by_chapter,
+        "all_chapters_approved": all_chapters_approved,
         "sign_violations": sign_violations,
         "gates": {
             "no_open_criticals": g1,
@@ -285,6 +412,17 @@ def print_dashboard(state: dict) -> None:
         hl = f"crit {sev['critico']} · med {sev['medio']} · baj {sev['bajo']} · abiertos {p['abiertos']}"
         label = f"{p['num']} {p['name']}"
         print(f" {bar(label)}{bar(p['estado'],22)}{bar(p['firma_disp'],14)}{hl}")
+    bc = state.get("by_chapter") or {}
+    if bc:
+        print("-" * 64)
+        print(" Capítulos (ciclo por capítulo)")
+        for key in sorted(bc, key=_cap_sort_key):
+            c = bc[key]
+            estado = "APPROVED" if c["approved"] else ("draft" if c["drafted"] else "pendiente")
+            pasadas = "·".join(str(n) for n in c["passes_done"]) or "—"
+            print(f"   cap {key:<6} {bar(estado,12)} pasadas {bar(pasadas,10)}"
+                  f" revise {c['revise_pending']} · avisos {c['advisory']}")
+        print(f"   Todos los capítulos aprobados: {'sí' if state.get('all_chapters_approved') else 'no'}")
     print("-" * 64)
     print(" Gates de cierre")
     g = state["gates"]
