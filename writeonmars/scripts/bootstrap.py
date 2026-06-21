@@ -24,7 +24,7 @@ import sys
 from pathlib import Path
 
 PRESET = Path(__file__).resolve().parent.parent  # .../presets/writeonmars
-CONSTITUTION_VERSION = "1.3.0"
+CONSTITUTION_VERSION = "1.4.0"
 FRAMEWORK_VERSION = "0.1.0"
 # Centinela que separa el núcleo de la capa por guía. Es una marca única que NO
 # aparece en el núcleo (a diferencia del título "## Adendas del proyecto", que el
