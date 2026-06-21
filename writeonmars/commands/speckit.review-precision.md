@@ -23,8 +23,9 @@ Capítulo(s) a revisar. Sin argumento: todos.
 - El/los capítulo(s) en `chapters/`.
 - `specs/<###-feature>/research.md` con los `CitationRecord` (cada uno trae su `url`).
 - **Acceso a búsqueda web / `fetch` / context7** para abrir las fuentes.
-- Contrato y detalle: `.specify/presets/writeonmars/contracts/citation-contract.md`
-  y `.specify/presets/writeonmars/references/metodo/writeonmars-contraste/SKILL.md`.
+- Contrato y detalle: `.specify/presets/writeonmars/contracts/citation-contract.md`,
+  `.specify/presets/writeonmars/contracts/claim-record.schema.json` y
+  `.specify/presets/writeonmars/references/metodo/writeonmars-contraste/SKILL.md`.
 
 ## Qué verificas
 
@@ -43,12 +44,18 @@ Capítulo(s) a revisar. Sin argumento: todos.
 
 Si **no** tienes acceso a web, contrasta solo contra `research.md`, marca los datos
 volátiles como "no verificado en vivo" (`medio`) y dilo — **no finjas** la
-verificación.
+verificación. En `claims.md` esos datos quedan con `soporte: pendiente` (no `sin_fuente`).
 
 ## Salida
 
-Añade a `findings.md` un bloque `## Pasada 4 — Precisión` conforme a
-`.specify/presets/writeonmars/contracts/pass-output-schema.md`. Cada hallazgo
-incluye `referencias_cita` (y la URL verificada cuando hiciste check en vivo). Un
-dato sin fuente, o contradicho por la fuente actual, es `critico` y **bloquea el
-cierre**.
+Produces **dos** salidas (pass-output-schema v1.1):
+
+1. **`findings.md`** — un bloque `## Pasada 4 — Precisión` con los hallazgos
+   accionables. Cada hallazgo incluye `referencias_cita` (y la URL verificada cuando
+   hiciste check en vivo) y, en v1.1, el `claim_id` afectado. Un dato sin fuente, o
+   contradicho por la fuente actual, es `critico` y **bloquea el cierre**.
+2. **`claims.md`** — un `ClaimRecord` por **cada** afirmación verificable evaluada (no
+   solo las que fallan), con la **relación** de cada cita (`apoya`/`matiza`/
+   `contradice`/`menciona`), el fragmento de soporte y el veredicto `soporte`. Idempotente
+   por capítulo (reemplaza el bloque del capítulo, no duplica). La derivación de
+   `soporte` y el mapeo veredicto→severidad están en la skill `writeonmars-contraste`.
