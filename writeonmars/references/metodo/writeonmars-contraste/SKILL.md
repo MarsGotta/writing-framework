@@ -97,9 +97,13 @@ Reglas: una arista `apoya` exige `cita_fragmento_soporte` no vacío. Si un
 reporta (no se inventan fuentes). Trazabilidad: el finding de pasada 4 referencia el
 `claim_id` afectado (campo `claim_id` o `claim:<id>` en la columna `Citas`).
 
-**Idempotencia por capítulo (FR-007)**: re-ejecutar la pasada 4 sobre un capítulo
-**reemplaza en bloque** sus `ClaimRecord` en `claims.md`; no duplica ni toca los de
-otros capítulos.
+**Escritura con fusión + idempotencia por capítulo (FR-007)**: `claims.md` es un
+archivo **compartido** por todos los capítulos. Para escribir, **lee primero el
+`claims.md` existente** y **fusiona**: reemplaza en bloque **solo** tu sección
+`## Claims — Capítulo N` (o añádela al final si no existe) y **conserva intactas las
+secciones de los demás capítulos**. NUNCA reescribas el archivo con solo tu capítulo
+(borrarías los `ClaimRecord` de los otros). Misma disciplina que el *append* de
+`findings.md`. Re-ejecutar sobre un capítulo no duplica: reemplaza su sección.
 
 ## Inputs
 
@@ -136,8 +140,10 @@ otros capítulos.
    el `ClaimRecord` (ver § "Atribución por afirmación"). Generar el finding con la
    severidad de la **tabla de severidad (FR-009)** de esa sección.
 6. Componer el bloque markdown de findings según el esquema de pasada y añadirlo al
-   final de `findings.md` sin sobreescribir bloques previos; escribir/reemplazar el
-   bloque del capítulo en `claims.md` (idempotente por capítulo).
+   final de `findings.md` sin sobreescribir bloques previos. Para `claims.md`: **leer
+   el archivo existente y fusionar** — reemplazar solo la sección `## Claims —
+   Capítulo N` (o añadirla), conservando los demás capítulos; nunca reescribir el
+   archivo con solo el capítulo actual.
 7. Reportar al operador: total de afirmaciones evaluadas, soportadas, parciales,
    sin fuente, contradichas, pendientes y críticas.
 

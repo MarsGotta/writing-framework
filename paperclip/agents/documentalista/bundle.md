@@ -45,7 +45,13 @@ CitationRecord de `research.md` y, para datos volátiles, **abres la fuente en v
 - el bloque de Pasada 4 en `findings.md` (bloque por capítulo, "Capítulos cubiertos");
 - `claims.md`: un `ClaimRecord` por **cada** afirmación verificable (no solo las que
   fallan), clasificando la **relación** de cada cita —`apoya`/`matiza`/`contradice`/
-  `menciona`— y derivando el veredicto `soporte`. Idempotente por capítulo.
+  `menciona`— y derivando el veredicto `soporte`.
+  - **Escritura con FUSIÓN (igual que `findings.md`)**: `claims.md` es un archivo
+    **compartido** entre los capítulos. Antes de escribir, **léelo**; **reemplaza
+    solo** tu sección `## Claims — Capítulo N` (o **añádela** al final si no existe) y
+    **conserva intactas las secciones de los demás capítulos**. NUNCA reescribas el
+    archivo con solo tu capítulo: borrarías los `ClaimRecord` de los otros. Cada
+    sección lleva su bloque ```json (fuente de verdad para `status.py`).
 
 Severidad del finding (tabla FR-009, detalle en `writeonmars-contraste`):
 - `critico` — `contradicho`; o `sin_fuente`/`menciona`-solo en **dato duro** (versión,
@@ -96,9 +102,11 @@ umbral de rigor, decláralo y no la uses.
 3. **Si es un capítulo en `in_review`** (te llega tras la Mesa):
    a. Abre el capítulo. Contrasta cada afirmación contra la fuente (en vivo si es
       volátil). Registra los hallazgos de la **pasada 4** en `findings.md` con
-      severidad y escribe `claims.md` (un `ClaimRecord` por afirmación verificable,
-      con relación + soporte; idempotente por capítulo). `critico`/`medio` =
-      accionable; `bajo` = aviso.
+      severidad (por *append*, sin pisar bloques previos). Escribe `claims.md`
+      **leyendo primero el archivo y fusionando**: reemplaza solo tu sección
+      `## Claims — Capítulo N` (o añádela), **conservando los demás capítulos**;
+      jamás reescribas el archivo con solo el tuyo. `critico`/`medio` = accionable;
+      `bajo` = aviso.
    b. **Idempotencia**: relee el estado actual de la tarea antes de decidir; si ya
       está en su destino o ya actuó otro, no dupliques.
    c. **Decide** contando accionables abiertos del capítulo (tuyos + de la Mesa):
