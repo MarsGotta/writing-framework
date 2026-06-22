@@ -102,6 +102,13 @@ python3 .specify/presets/writeonmars/scripts/status.py --project-dir . --gate
   estar como hallazgos crítico/medio de la pasada 4 y enrutarse por el ciclo
   (revise), igual que cualquier accionable; no es un paso nuevo. Si ves `warnings`
   sobre inconsistencia claims↔findings, la Documentalista debe re-emitir la pasada 4.
+- **Hijas no terminadas en el tablero** → aunque `status.py` diga
+  `all_chapters_approved: true` y `closeable: true`, **no cierres si alguna tarea-hija
+  de capítulo no está en `done`**. `status.py` mide los **archivos** (findings/claims),
+  y puede ir *por delante* del tablero: una hija aún `in_progress`/`in_review` significa
+  que su ciclo no terminó (p. ej. un revise en curso que aún no refrescó `claims.md`).
+  Confirma en el tablero que **todas** las hijas del padre están `done` antes de las
+  globales y el `close`.
 - `closeable: false` → no llames a `close.py`; resuelve el blocker de `next_detail`.
 
 ## 6. Estados y subsistemas válidos (no inventes)
