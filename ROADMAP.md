@@ -263,17 +263,16 @@ sin avisos. Confirma SC-001/SC-004 (0 tipos/estados/routines nuevos de Paperclip
   (commit en la rama)*: bundle Documentalista + skill `writeonmars-contraste` exigen
   **leer y FUSIONAR** (`reemplaza solo "## Claims — Capítulo N", conserva las demás`),
   espejo del append de findings. Validado: los 3 capítulos conviven tras el fix.
-- **Pendiente menor #1 — refresco de claims tras revise**: cuando un revise resuelve un
-  finding, el `ClaimRecord` no se re-evalúa en el acto → `claims.md` mantiene un
-  `contradicho`/`parcial` *stale* y la factualidad queda pesimista. En esta corrida se
-  **autocorrigió en el pase global** (la factualidad acabó 1.0), pero conviene que el
-  ciclo re-corra la pasada 4 (o refresque los claims tocados) **antes** de aprobar el
-  capítulo, no solo en globales.
-- **Pendiente menor #2 — `status.py` va por delante del tablero**: `all_chapters_approved`
-  se calcula desde `findings.md` (4 pasadas + 0 accionables), no desde el estado de la
-  tarea Paperclip; hay una ventana donde `status.py` dice "aprobado/closeable" mientras la
-  hija sigue `in_progress`. No causó cierre prematuro (la jefa corre globales primero),
-  pero la jefa NO debería `close` mientras queden hijas no-`done`.
+- **Pendiente menor #1 — refresco de claims tras revise**: ✅ arreglado (instrucción,
+  bundle Documentalista). La Doc re-ejecuta la pasada 4 sobre el texto **actual** cada
+  vez que recibe el capítulo (incluido tras un revise) y **no aprueba con un `claims.md`
+  desfasado**; así la factualidad no queda pesimista por un `contradicho`/`parcial` ya
+  corregido. (Antes se autocorregía solo en el pase global.)
+- **Pendiente menor #2 — `status.py` va por delante del tablero**: ✅ arreglado
+  (instrucción, HEARTBEAT jefa §5). `all_chapters_approved`/`closeable` se calculan desde
+  los archivos y pueden adelantar al tablero; la jefa ahora **no cierra mientras alguna
+  hija de capítulo no esté `done`**, aunque `status.py` diga que sí. `status.py` (capa
+  agnóstica) se mantiene sin cambios; el guardarraíl vive en el orquestador.
 
 ## Deuda y cosas honestas a saber
 
