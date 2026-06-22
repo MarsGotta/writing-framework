@@ -11,9 +11,13 @@ verifica cada afirmación verificable del capítulo contra al menos un
 `CitationRecord` de `research.md` Y, para lo volátil, contra la **fuente real
 abierta en vivo** (la `url` de la cita o búsqueda web). No basta con que el
 capítulo coincida con `research.md`: pudo citar mal o la fuente pudo cambiar.
-Materializa FR-016 y FR-017.
-Emite el bloque "Pasada 4" en `findings.md` conforme a
-`contracts/pass-output-schema.md` v1.0.
+Materializa FR-016 y FR-017 (+ feature 003: FR-005, FR-006, FR-007, FR-009).
+
+Emite **dos** salidas (pass-output-schema v1.1):
+- el bloque "Pasada 4" en `findings.md` (los hallazgos accionables), y
+- el artefacto durable `claims.md` con un `ClaimRecord` por **cada** afirmación
+  verificable evaluada (no solo las que fallan), clasificando la **relación** de
+  cada cita con la afirmación (atribución por afirmación, grano de frase).
 
 ## Cuándo dispararse
 
@@ -31,13 +35,16 @@ Emite el bloque "Pasada 4" en `findings.md` conforme a
 2. Extrae afirmaciones verificables del capítulo (heurística: oraciones
    con datos cuantitativos, versiones, comandos, precios, citas a
    estándares, fechas, nombres de productos).
-3. Para cada afirmación, busca al menos un `CitationRecord` que la
-   sustente. Marca el resultado como:
-   - `verificado` cuando hay ≥ 1 cita compatible.
-   - `pendiente` cuando no encuentra cita y el dato es verificable
-     (genera finding `severidad: medio`).
-   - `desviacion_justificada` cuando el operador firma una decisión
-     editorial declarada en `Complexity Tracking` del plan.
+3. Para cada afirmación, busca los `CitationRecord` candidatos y, **tras abrir la
+   fuente**, clasifica la **relación** de cada cita con la afirmación (no basta con
+   que exista la cita):
+   - `apoya` — la fuente *implica/sostiene* la afirmación (registra el fragmento
+     exacto de la fuente en `cita_fragmento_soporte`, obligatorio).
+   - `matiza` — la sostiene **con caveats** (cierto en parte / con condiciones).
+   - `contradice` — la fuente abierta **contradice** la afirmación.
+   - `menciona` — la fuente es solo *temática*: toca el tema pero no sostiene el dato.
+   De la relación se deriva el veredicto `soporte` del `ClaimRecord` (ver § "Atribución
+   por afirmación"), que a su vez gobierna la severidad del finding.
 4. **Verificación en vivo**: para datos volátiles (versiones, paquetes,
    comandos, precios, APIs; citas `volatil: true` o afirmaciones `[VERIFICAR]`),
    abre la `url` del `CitationRecord` (o busca la fuente en la web) y confirma el
@@ -49,6 +56,54 @@ Emite el bloque "Pasada 4" en `findings.md` conforme a
    afirmación no verificada y `referencias_cita` por afirmación
    verificada (campo obligatorio en pasada 4 según
    pass-output-schema § Finding).
+6. Persiste/actualiza `claims.md` con un `ClaimRecord` por **cada** afirmación
+   verificable evaluada (las que pasan también), reusando la misma detección de
+   afirmaciones del paso 2 como denominador.
+
+## Atribución por afirmación (claims.md)
+
+Contrato: `claim-record.schema.json` v1.0 · estructura del fichero y algoritmo de
+factualidad en `specs/003-atribucion-factualidad/data-model.md` § 1–3. `claims.md`
+vive junto a `findings.md` en `specs/[###-feature]/`, agrupado por capítulo, con un
+bloque ```json por capítulo (fuente de verdad de máquina para `status.py`) más una
+tabla legible.
+
+**Derivación de `soporte`** (peor relación presente, modulada por `tipo_afirmacion`):
+
+```
+alguna arista contradice            → contradicho
+sin evidencia                       → sin_fuente
+toda arista es 'menciona'           → sin_fuente si dato_duro, parcial si blanda
+la mejor arista es 'matiza'         → parcial
+existe al menos una 'apoya'         → soportado
+dato volátil sin poder abrir fuente → pendiente   (sin web; NO se finge la verificación)
+```
+
+`pendiente` (no medible en vivo) ≠ `sin_fuente` (medible y sin respaldo).
+
+**Mapeo de severidad del finding (FR-009)** — se enchufa al revise existente
+(crítico+medio = accionable; bajo = aviso):
+
+| Veredicto | Severidad |
+|---|---|
+| `contradicho` (cualquier afirmación) | `critico` |
+| `sin_fuente` o `menciona`-solo en **dato duro** (versión, comando, precio, estándar, estadística, fecha, endpoint, paquete) | `critico` |
+| `parcial` / `matiza`, o `sin_fuente` en afirmación blanda verificable | `medio` |
+| dato volátil `pendiente` por falta de web | `medio` ("no verificado en vivo") |
+| ambigüedad de mapeo afirmación↔cita | `bajo` (aviso) |
+
+Reglas: una arista `apoya` exige `cita_fragmento_soporte` no vacío. Si un
+`citation_id` candidato no resuelve en `research.md`, **no se emite la arista** y se
+reporta (no se inventan fuentes). Trazabilidad: el finding de pasada 4 referencia el
+`claim_id` afectado (campo `claim_id` o `claim:<id>` en la columna `Citas`).
+
+**Escritura con fusión + idempotencia por capítulo (FR-007)**: `claims.md` es un
+archivo **compartido** por todos los capítulos. Para escribir, **lee primero el
+`claims.md` existente** y **fusiona**: reemplaza en bloque **solo** tu sección
+`## Claims — Capítulo N` (o añádela al final si no existe) y **conserva intactas las
+secciones de los demás capítulos**. NUNCA reescribas el archivo con solo tu capítulo
+(borrarías los `ClaimRecord` de los otros). Misma disciplina que el *append* de
+`findings.md`. Re-ejecutar sobre un capítulo no duplica: reemplaza su sección.
 
 ## Inputs
 
@@ -56,13 +111,18 @@ Emite el bloque "Pasada 4" en `findings.md` conforme a
 - `specs/[###-feature]/research.md`.
 - `specs/[###-feature]/findings.md` (existente; se añaden bloques al
   final).
-- `contracts/pass-output-schema.md` v1.0.
+- `specs/[###-feature]/claims.md` (existente o nuevo; se reemplaza por capítulo).
+- `contracts/pass-output-schema.md` v1.1.
+- `contracts/claim-record.schema.json` v1.0.
 
 ## Outputs
 
 - Bloque "Pasada 4 — Precisión" añadido a
   `specs/[###-feature]/findings.md`, con `pasada: 4_precision` y la
   tabla de hallazgos completa.
+- `specs/[###-feature]/claims.md` con un `ClaimRecord` por afirmación verificable
+  del capítulo (relación + soporte + fragmento de soporte), reemplazado en bloque
+  por capítulo (idempotente).
 
 ## Procedimiento
 
@@ -76,17 +136,16 @@ Emite el bloque "Pasada 4" en `findings.md` conforme a
    - Para datos `volatil`/`[VERIFICAR]`: **abrir la fuente en vivo** y confirmar
      el dato contra la fuente actual (no basta `fecha_consulta`); registrar la URL.
    - `motor` no es `unknown`.
-5. Generar findings:
-   - `severidad: critico` si la afirmación contradice una cita oficial o la
-     fuente abierta en vivo; o si un dato duro (versión, comando, precio,
-     estándar, estadística) carece de toda fuente.
-   - `severidad: medio` si una afirmación verificable más blanda carece de cita,
-     o si un dato volátil no se pudo verificar en vivo (sin web).
-   - `severidad: bajo` si solo es ambigua.
-6. Componer el bloque markdown según el esquema de pasada y añadirlo al
-   final de `findings.md` sin sobreescribir bloques previos.
-7. Reportar al operador: total de afirmaciones evaluadas, verificadas,
-   pendientes y críticas.
+5. Para cada afirmación, fijar `relacion` por arista, derivar `soporte` y registrar
+   el `ClaimRecord` (ver § "Atribución por afirmación"). Generar el finding con la
+   severidad de la **tabla de severidad (FR-009)** de esa sección.
+6. Componer el bloque markdown de findings según el esquema de pasada y añadirlo al
+   final de `findings.md` sin sobreescribir bloques previos. Para `claims.md`: **leer
+   el archivo existente y fusionar** — reemplazar solo la sección `## Claims —
+   Capítulo N` (o añadirla), conservando los demás capítulos; nunca reescribir el
+   archivo con solo el capítulo actual.
+7. Reportar al operador: total de afirmaciones evaluadas, soportadas, parciales,
+   sin fuente, contradichas, pendientes y críticas.
 
 ## Errores comunes
 
@@ -115,11 +174,12 @@ quiere revisión sincrónica capítulo a capítulo.
    - Mensaje inicial: payload con el capítulo objetivo, el `research.md`
      completo (todos los CitationRecord) y el bloque "Pasada 4" del
      `findings.md` actual (vacío en la primera ejecución).
-3. Cada sub-agente devuelve un fragmento markdown con su bloque
-   "Pasada 4 — Capítulo N" siguiendo `pass-output-schema.md` v1.0.
+3. Cada sub-agente devuelve **dos** fragmentos: su bloque "Pasada 4 — Capítulo N"
+   (findings, `pass-output-schema.md` v1.1) y su bloque de `claims.md` del capítulo
+   (los `ClaimRecord` del capítulo, `claim-record.schema.json` v1.0).
 4. El orquestador NO permite que los sub-agentes escriban directamente
-   a `findings.md` (evita race conditions). Cada sub-agente devuelve el
-   fragmento y el orquestador consolida.
+   a `findings.md` ni a `claims.md` (evita race conditions). Cada sub-agente devuelve
+   los fragmentos y el orquestador consolida.
 
 ### Consolidación
 
@@ -127,7 +187,8 @@ Tras la última tanda:
 
 1. Concatena los bloques "Pasada 4 — Capítulo N" en un único bloque
    "Pasada 4 — Precisión" en `findings.md`, ordenado por número de
-   capítulo.
+   capítulo. En paralelo, escribe en `claims.md` el bloque "## Claims — Capítulo N"
+   de cada capítulo (reemplazo en bloque por capítulo, sin duplicar ni tocar otros).
 2. Detecta conflictos de citación: si dos capítulos citan la misma
    fuente (`citation_id` idéntico) con interpretaciones divergentes
    (campo `interpretacion` o glosa que diverge en cualquier dimensión
@@ -164,9 +225,16 @@ Documentación operativa en `docs/parallel-execution.md`.
   serial o paralelo).
 - FR-017 (datos volátiles marcados [VERIFICAR] y verificados en vivo contra la
   fuente cuando hay acceso a web).
+- Feature 003 — FR-005 (un `ClaimRecord` por afirmación verificable), FR-006
+  (clasificar `relacion` tras abrir la fuente; sin web → `pendiente`), FR-007
+  (idempotencia por capítulo), FR-009 (mapeo veredicto→severidad).
 
 ## Versión
 
+v0.4.0 — 2026-06-21 (feature 003): atribución por afirmación. Emite `claims.md`
+(`ClaimRecord` v1.0) con la **relación** de cada cita (apoya/matiza/contradice/
+menciona) y el veredicto `soporte`; la severidad del finding se deriva de la tabla
+FR-009. pass-output-schema → v1.1. Idempotente por capítulo (serial y paralelo).
 v0.3.0 — 2026-06-14: la pasada de precisión verifica los datos volátiles abriendo
 la fuente real en vivo (web), no solo contra research.md.
 v0.2.0-mvp-2026-05-06 — añade dispatch paralelo por capítulo (T063).

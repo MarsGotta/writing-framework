@@ -196,6 +196,110 @@ def _passes_by_chapter(blocks: list[dict]) -> dict[str, set[int]]:
     return out
 
 
+# --- Factualidad (feature 003): atribución por afirmación + índice determinista ---
+# El JUICIO (relación apoya/matiza/contradice/menciona y soporte) lo produce la
+# pasada 4 y vive en claims.md; aquí solo se CUENTA (Principio VI). Determinista,
+# sin LLM. claims.md vive junto a findings.md en specs/<feature>/.
+
+# soporte que cuenta en el denominador del índice (excluye 'pendiente': no se midió).
+SOPORTE_VERIFICABLE = {"soportado", "parcial", "sin_fuente", "contradicho"}
+
+
+def parse_claims(claims_md: Path) -> tuple[dict[str, list[dict]], set[str]]:
+    """Parsea claims.md (esquema claim-record v1.0). Gemelo conceptual de
+    parse_findings, pero la fuente de verdad de máquina es el bloque ```json de
+    cada sección de capítulo (data-model §2), no una tabla markdown.
+
+    Devuelve (parsed, malformed):
+      - parsed:    {capitulo_str: [ClaimRecord, ...]} por sección con json válido.
+      - malformed: {capitulo_str} cuyo bloque ```json falta o no parsea.
+    Tolerante: nunca lanza (claims ausente → ({}, set()))."""
+    parsed: dict[str, list[dict]] = {}
+    malformed: set[str] = set()
+    if not claims_md.exists():
+        return parsed, malformed
+    text = claims_md.read_text(encoding="utf-8")
+    headers = list(re.finditer(
+        r"^##\s+Claims\s*[—–-]\s*(?:Cap(?:[íi]tulo|\.)?\s*)?(\d+|global)\b",
+        text, re.M | re.I))
+    if not headers:
+        # Sin secciones por capítulo: agrupa todo ClaimRecord por su campo 'capitulo'.
+        for blk in re.findall(r"```json\s*(.+?)```", text, re.S):
+            try:
+                data = json.loads(blk)
+            except json.JSONDecodeError:
+                continue
+            for rec in (data if isinstance(data, list) else [data]):
+                if isinstance(rec, dict):
+                    key = _norm_cap(str(rec.get("capitulo", ""))) or "—"
+                    parsed.setdefault(key, []).append(rec)
+        return parsed, malformed
+    for i, h in enumerate(headers):
+        raw = h.group(1)
+        key = _norm_cap("global" if raw.lower() == "global" else str(int(raw)))
+        start, end = h.end(), (headers[i + 1].start() if i + 1 < len(headers) else len(text))
+        body = text[start:end]
+        m = re.search(r"```json\s*(.+?)```", body, re.S)
+        if not m:
+            malformed.add(key)
+            continue
+        try:
+            data = json.loads(m.group(1))
+        except json.JSONDecodeError:
+            malformed.add(key)
+            continue
+        recs = data if isinstance(data, list) else [data]
+        parsed.setdefault(key, []).extend(r for r in recs if isinstance(r, dict))
+    return parsed, malformed
+
+
+def compute_factuality(
+    parsed: dict[str, list[dict]],
+    malformed: set[str],
+    expected: int,
+    fill_absent: bool,
+) -> dict:
+    """Índice de factualidad determinista (data-model §3.1). Sin LLM.
+
+    factuality(c) = soportadas(c) / verificables(c); None si verificables == 0.
+    Global = micro-promedio (Σ soportadas / Σ verificables). 'parcial' NO cuenta
+    como soportada; 'pendiente' se excluye del denominador y se reporta aparte.
+
+    fill_absent: si True (claims.md existe), los capítulos del temario sin sección
+    se marcan 'no medidos' (None + unmeasured); si False (feature inactiva), no se
+    inventan capítulos → salida mínima e inerte (retrocompat, SC-003)."""
+    by_chapter: dict[str, float | None] = {}
+    pending: dict[str, int] = {}
+    sum_sop = sum_ver = 0
+    for key, recs in parsed.items():
+        ver = sum(1 for r in recs if r.get("soporte") in SOPORTE_VERIFICABLE)
+        sop = sum(1 for r in recs if r.get("soporte") == "soportado")
+        pen = sum(1 for r in recs if r.get("soporte") == "pendiente")
+        if pen:
+            pending[key] = pen
+        if ver > 0:
+            by_chapter[key] = round(sop / ver, 4)
+            sum_sop += sop
+            sum_ver += ver
+        else:
+            by_chapter[key] = None  # tiene claims pero 0 verificables → no medido
+    for key in malformed:
+        by_chapter.setdefault(key, None)  # bloque no parseable → no medido (null)
+    unmeasured = set(malformed)
+    if fill_absent:
+        for n in range(1, expected + 1):
+            k = str(n)
+            if k not in parsed and k not in malformed:
+                unmeasured.add(k)
+                by_chapter.setdefault(k, None)
+    return {
+        "factuality_global": (round(sum_sop / sum_ver, 4) if sum_ver > 0 else None),
+        "factuality_by_chapter": dict(sorted(by_chapter.items(), key=lambda kv: _cap_sort_key(kv[0]))),
+        "factuality_unmeasured": sorted(unmeasured, key=_cap_sort_key),
+        "factuality_pending": dict(sorted(pending.items(), key=lambda kv: _cap_sort_key(kv[0]))),
+    }
+
+
 def _build_by_chapter(
     expected: int,
     chapters: list[str],
@@ -250,7 +354,7 @@ def _next_step(project: Path, spec_dir: Path, manifest: dict | None,
                blocks: list, chapters: list, expected: int,
                closeable: bool, crit_open: int, sign_violations: list,
                revise_pending: int = 0, revise_by_chapter: dict | None = None,
-               advisory_open: int = 0) -> tuple[str, str]:
+               advisory_open: int = 0, fact_block: bool = False) -> tuple[str, str]:
     """Deriva el siguiente paso del ciclo para el orquestador (Editora jefa).
 
     Es el corazón del heartbeat: con esto el orquestador decide a qué rol
@@ -288,6 +392,15 @@ def _next_step(project: Path, spec_dir: Path, manifest: dict | None,
         )
     if sign_violations:
         return "review", "faltan firmas humanas exigidas por el manifest"
+    if fact_block:
+        # g4 (blocking) en rojo: NO es un paso nuevo. El déficit debe estar como
+        # hallazgos crítico/medio de la pasada 4 → revise. Si no lo está, es señal
+        # de inconsistencia claims.md↔findings.md (ver warnings).
+        return "review", (
+            "déficit de factualidad bajo umbral (gate g4): debe expresarse como "
+            "hallazgos crítico/medio en la pasada 4 y enrutarse por revise; revisa "
+            "coherencia claims.md↔findings.md"
+        )
     if closeable:
         return "close", "gates en verde: intro + export + close (PDF final, Editora jefa)"
     return "review", "revisión en curso: hallazgos abiertos sin resolver"
@@ -356,15 +469,48 @@ def evaluate(project: Path, spec_dir: Path) -> dict:
     g1 = crit_open == 0
     g2 = not sign_violations
     g3 = (expected == 0) or (len(chapters) >= expected)
-    closeable = g1 and g2 and g3
+    base_closeable = g1 and g2 and g3
     revise_pending = sum(revise_by_chapter.values())
+
+    # --- Gate g4: factualidad (feature 003), aditivo y opcional ---
+    # g4 solo se EVALÚA si el manifest declara quality_gates.factuality_min.
+    # Sin umbral → gates.factuality = None y closeable = g1·g2·g3 (idéntico a v1.0).
+    claims_exists = bool(spec_dir and (spec_dir / "claims.md").exists())
+    qg = (manifest or {}).get("quality_gates") or {}
+    parsed_claims, malformed_claims = (
+        parse_claims(spec_dir / "claims.md") if spec_dir else ({}, set())
+    )
+    fact = compute_factuality(parsed_claims, malformed_claims, expected, fill_absent=claims_exists)
+    fmin = qg.get("factuality_min")
+    fmin_cap = qg.get("factuality_min_per_chapter")
+    fmode = qg.get("factuality_mode", "blocking")
+    warnings: list[str] = []
+    if fmin is None:
+        g4 = None
+    else:
+        fg = fact["factuality_global"]
+        g4_global = fg is not None and fg >= fmin
+        g4_caps = (fmin_cap is None) or all(
+            v >= fmin_cap for v in fact["factuality_by_chapter"].values() if v is not None
+        )
+        g4 = bool(g4_global and g4_caps)
+    # g4 informa siempre (bool) cuando hay umbral; solo BLOQUEA en modo blocking.
+    fact_blocks = g4 is False and fmode == "blocking"
+    closeable = base_closeable and (not fact_blocks)
+    if fact_blocks and revise_pending == 0:
+        warnings.append(
+            "factualidad bajo umbral pero sin hallazgos accionables abiertos: posible "
+            "inconsistencia claims.md↔findings.md (la pasada 4 debe emitir crítico/medio "
+            "por cada déficit, FR-009)"
+        )
+
     by_chapter, all_chapters_approved = _build_by_chapter(
         expected, chapters, blocks, revise_by_chapter, advisory_by_chapter,
     )
     next_step, next_detail = _next_step(
         project, spec_dir, manifest, blocks, chapters, expected,
         closeable, crit_open, sign_violations,
-        revise_pending, revise_by_chapter, advisory_open,
+        revise_pending, revise_by_chapter, advisory_open, fact_blocks,
     )
     return {
         "spec": spec_dir.name if spec_dir else "(sin spec todavía)",
@@ -380,10 +526,17 @@ def evaluate(project: Path, spec_dir: Path) -> dict:
         "by_chapter": by_chapter,
         "all_chapters_approved": all_chapters_approved,
         "sign_violations": sign_violations,
+        "factuality_global": fact["factuality_global"],
+        "factuality_by_chapter": fact["factuality_by_chapter"],
+        "factuality_unmeasured": fact["factuality_unmeasured"],
+        "factuality_pending": fact["factuality_pending"],
+        "factuality_mode": (fmode if fmin is not None else None),
+        "warnings": warnings,
         "gates": {
             "no_open_criticals": g1,
             "human_signatures": g2,
             "guide_complete": g3,
+            "factuality": g4,
         },
         "closeable": closeable,
         "has_manifest": manifest is not None,
@@ -423,6 +576,25 @@ def print_dashboard(state: dict) -> None:
             print(f"   cap {key:<6} {bar(estado,12)} pasadas {bar(pasadas,10)}"
                   f" revise {c['revise_pending']} · avisos {c['advisory']}")
         print(f"   Todos los capítulos aprobados: {'sí' if state.get('all_chapters_approved') else 'no'}")
+    fg = state.get("factuality_global")
+    gfact = state["gates"].get("factuality")
+    # Bloque de factualidad: se muestra solo si la feature está activa (algo medido o
+    # umbral declarado). Inactiva → no se imprime nada → dashboard idéntico a v1.0 (SC-003).
+    if fg is not None or gfact is not None or state.get("factuality_unmeasured"):
+        pct_g = f"{fg*100:.0f}%" if fg is not None else "no medida"
+        print("-" * 64)
+        print(f" Factualidad (afirmaciones con evidencia plena): {pct_g}")
+        fbc = state.get("factuality_by_chapter") or {}
+        for key in sorted(fbc, key=_cap_sort_key):
+            v = fbc[key]
+            vtxt = f"{v*100:.0f}%" if v is not None else "no medido"
+            pen = (state.get("factuality_pending") or {}).get(key, 0)
+            print(f"   cap {key:<6} {vtxt}{f' · pendientes {pen}' if pen else ''}")
+        unm = state.get("factuality_unmeasured") or []
+        if unm:
+            print(f"   sin claims (no medidos): {', '.join(unm)}")
+    for w in state.get("warnings") or []:
+        print(f"   ⚠ {w}")
     print("-" * 64)
     print(" Gates de cierre")
     g = state["gates"]
@@ -435,6 +607,12 @@ def print_dashboard(state: dict) -> None:
         print(f"   [OK] Guía completa   ({state['chapters_written']}/{state['chapters_expected'] or state['chapters_written']} capítulos)")
     else:
         print(f"   [X] Guía incompleta   ({state['chapters_written']}/{state['chapters_expected']} capítulos del temario)")
+    if g.get("factuality") is not None:
+        fgg = state.get("factuality_global")
+        pctg = f"{fgg*100:.0f}%" if fgg is not None else "no medida"
+        mode = state.get("factuality_mode") or "blocking"
+        tag = "" if mode == "blocking" else "   (modo aviso: no bloquea)"
+        print(f"   [{'OK' if g['factuality'] else 'X'}] Factualidad sobre umbral (g4)   (global: {pctg}){tag}")
     print("-" * 64)
     print(f" CIERRE: {'PROYECTO CERRABLE' if state['closeable'] else 'BLOQUEADO'}"
           f"  (hallazgos abiertos totales: {state['open_findings_total']})")

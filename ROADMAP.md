@@ -245,6 +245,36 @@ tareas en vuelo).
      de `wakeOnDemand`, para que un evento perdido no congele el flujo. El
      `next_step` de `status.py` es la condición de parada natural del watchdog.
 
+## Feature 003 (atribución por afirmación + factualidad) — e2e validado (2026-06-21)
+
+Rama `003-atribucion-factualidad` (spec de claude cowork, revisada e implementada por
+fases) **probada end-to-end** en una guía fresca orquestada (`usar-biome`, "cómo usar
+Biome"). El pipeline completo corrió solo: constitution → brief+checkpoint 1 → research
+(22 citas, 24 volátiles) → temario (3 caps) → fan-out (1 hija/cap, sin duplicados) →
+ciclo por capítulo con `claims.md`/factualidad → pasada 5 global → revise global →
+export PDF. **La feature cazó deuda factual real de Biome** (config `quickfix.biome`
+inexistente, comandos `migrate` sin fuente, narración de `diff`/semicolons contradicha
+por `@biomejs/biome@2.5.0`) y el ciclo la corrigió. Factualidad final 1.0; export D1-A
+sin avisos. Confirma SC-001/SC-004 (0 tipos/estados/routines nuevos de Paperclip).
+
+- **Bug encontrado y ARREGLADO en caliente**: con una tarea por capítulo, la pasada 4
+  **reescribía `claims.md` entero** con su capítulo y borraba los demás (cap1 perdido al
+  medir cap2). `findings.md` se acumulaba bien (append) pero `claims.md` no. *Fix
+  (commit en la rama)*: bundle Documentalista + skill `writeonmars-contraste` exigen
+  **leer y FUSIONAR** (`reemplaza solo "## Claims — Capítulo N", conserva las demás`),
+  espejo del append de findings. Validado: los 3 capítulos conviven tras el fix.
+- **Pendiente menor #1 — refresco de claims tras revise**: cuando un revise resuelve un
+  finding, el `ClaimRecord` no se re-evalúa en el acto → `claims.md` mantiene un
+  `contradicho`/`parcial` *stale* y la factualidad queda pesimista. En esta corrida se
+  **autocorrigió en el pase global** (la factualidad acabó 1.0), pero conviene que el
+  ciclo re-corra la pasada 4 (o refresque los claims tocados) **antes** de aprobar el
+  capítulo, no solo en globales.
+- **Pendiente menor #2 — `status.py` va por delante del tablero**: `all_chapters_approved`
+  se calcula desde `findings.md` (4 pasadas + 0 accionables), no desde el estado de la
+  tarea Paperclip; hay una ventana donde `status.py` dice "aprobado/closeable" mientras la
+  hija sigue `in_progress`. No causó cierre prematuro (la jefa corre globales primero),
+  pero la jefa NO debería `close` mientras queden hijas no-`done`.
+
 ## Deuda y cosas honestas a saber
 
 - **Docs**: `writeonmars/docs/` es la fuente canónica de uso. Los docs raíz

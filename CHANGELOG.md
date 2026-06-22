@@ -42,6 +42,17 @@ trayectorias paralelas: framework (`vX.Y.Z` del repo) y constitución
   sector; `replaces` el core), plantilla `adendas-template`, y **bases de sector**
   en `references/sectores/` (hoy `tecnologia`, ampliable creando un archivo).
 - Campo `sector` en el manifiesto del proyecto.
+- **Atribución por afirmación y gate de factualidad (feature 003)**: la pasada 4
+  emite, además de `findings.md`, el artefacto `claims.md` con un `ClaimRecord`
+  (`contracts/claim-record.schema.json` v1.0) por cada afirmación verificable,
+  clasificando la **relación** de cada cita (apoya/matiza/contradice/menciona). De
+  ahí `status.py` deriva un **índice de factualidad** determinista (por capítulo y
+  global) y un cuarto gate de cierre opcional (`manifest.quality_gates.factuality_*`,
+  modo `advisory`/`blocking`). Cambios de contrato aditivos: `pass-output-schema`
+  → **v1.1**, `manifest-schema` → MINOR, **constitución v1.3.0 → v1.4.0**. Todo
+  retrocompatible: sin `quality_gates` ni `claims.md`, `status.py` se comporta como
+  antes (dashboard byte-idéntico). Helpers: `tests/lib/validate-claim.sh`,
+  `tests/smoke/test-factuality.sh`.
 - Documentación de uso en `writeonmars/docs/` (Diátaxis) y `writeonmars/AGENTS.md`.
 
 ### Eliminado (limpieza de docs legacy)

@@ -41,11 +41,24 @@ del capítulo te llega en `in_review` **después** de la Editora de mesa (pasada
 
 **a) Pasada 4 · precisión.** Verificas cada afirmación del capítulo contra los
 CitationRecord de `research.md` y, para datos volátiles, **abres la fuente en vivo**
-(URL/web) y contrastas. Escribes el bloque de Pasada 4 en `findings.md` (esquema
-pass-output v1.0; bloque por capítulo, "Capítulos cubiertos"). Severidad:
-- `critico` — dato sin respaldo o que la fuente contradice. **Accionable.**
-- `medio` — afirmación débil, fuente floja, cita que no sostiene del todo. **Accionable.**
-- `bajo` — aviso; no bloquea.
+(URL/web) y contrastas. Escribes **dos** salidas (pass-output-schema v1.1):
+- el bloque de Pasada 4 en `findings.md` (bloque por capítulo, "Capítulos cubiertos");
+- `claims.md`: un `ClaimRecord` por **cada** afirmación verificable (no solo las que
+  fallan), clasificando la **relación** de cada cita —`apoya`/`matiza`/`contradice`/
+  `menciona`— y derivando el veredicto `soporte`.
+  - **Escritura con FUSIÓN (igual que `findings.md`)**: `claims.md` es un archivo
+    **compartido** entre los capítulos. Antes de escribir, **léelo**; **reemplaza
+    solo** tu sección `## Claims — Capítulo N` (o **añádela** al final si no existe) y
+    **conserva intactas las secciones de los demás capítulos**. NUNCA reescribas el
+    archivo con solo tu capítulo: borrarías los `ClaimRecord` de los otros. Cada
+    sección lleva su bloque ```json (fuente de verdad para `status.py`).
+
+Severidad del finding (tabla FR-009, detalle en `writeonmars-contraste`):
+- `critico` — `contradicho`; o `sin_fuente`/`menciona`-solo en **dato duro** (versión,
+  comando, precio, estándar, estadística, fecha, endpoint, paquete). **Accionable.**
+- `medio` — `parcial`/`matiza`, `sin_fuente` en afirmación blanda, o dato volátil
+  `pendiente` por falta de web ("no verificado en vivo"). **Accionable.**
+- `bajo` — ambigüedad de mapeo afirmación↔cita; aviso, no bloquea.
 
 No reescribes el capítulo: eso es de la Redactora vía `revise`. Detector ≠ corrector.
 
@@ -89,7 +102,11 @@ umbral de rigor, decláralo y no la uses.
 3. **Si es un capítulo en `in_review`** (te llega tras la Mesa):
    a. Abre el capítulo. Contrasta cada afirmación contra la fuente (en vivo si es
       volátil). Registra los hallazgos de la **pasada 4** en `findings.md` con
-      severidad. `critico`/`medio` = accionable; `bajo` = aviso.
+      severidad (por *append*, sin pisar bloques previos). Escribe `claims.md`
+      **leyendo primero el archivo y fusionando**: reemplaza solo tu sección
+      `## Claims — Capítulo N` (o añádela), **conservando los demás capítulos**;
+      jamás reescribas el archivo con solo el tuyo. `critico`/`medio` = accionable;
+      `bajo` = aviso.
    b. **Idempotencia**: relee el estado actual de la tarea antes de decidir; si ya
       está en su destino o ya actuó otro, no dupliques.
    c. **Decide** contando accionables abiertos del capítulo (tuyos + de la Mesa):

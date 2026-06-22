@@ -12,6 +12,7 @@ tests=(
     "install-on-empty-repo.sh"
     "install-preserves-claudemd.sh"
     "specify-after-install.sh"
+    "test-factuality.sh"
 )
 
 declare -A results=()
