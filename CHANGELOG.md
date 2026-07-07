@@ -10,6 +10,27 @@ trayectorias paralelas: framework (`vX.Y.Z` del repo) y constitución
 
 ## [Unreleased] — refactor a preset agente-agnóstico
 
+### Constitución v1.6.0 (2026-07-07, modos de proyecto + ejecutores del método)
+
+- **MINOR 1.5.0 → 1.6.0**: nueva sección "Modos de proyecto" — todo proyecto
+  declara `mode` en el manifiesto: `produccion` (la IA redacta anclada en
+  fuentes; atribución y factualidad obligatorias) o `estudio` (el humano
+  escribe; la IA MUST NOT redactar prosa del manuscrito y toda corrección
+  exige aceptación humana). Cambio de modo solo por acción humana explícita,
+  registrado y con consecuencias de procedencia declaradas.
+- Nueva subsección "Ejecutores del método" (§ Arquitectura): la verdad del
+  estado vive en archivos, `status.py` la computa, y el método corre íntegro
+  con cualquier ejecutor; reglas duras de relevos codificadas
+  (escribe-uno-revisa-otro, voz ≠ precisión, detector ≠ corrector). Contexto:
+  **Vivarium** (Rust+Tauri, monorepo `vivarium/`) pasa a ser el ejecutor
+  orquestado de referencia; Paperclip queda archivado como referencia con sus
+  lecciones en `paperclip/FLOW-CONTRACT.md`. Sync impact report en la cabecera
+  de la constitución.
+- Constitution Check de `plan-template.md` (preset y copia instalada) ampliado
+  a los seis principios + fila "Modo de proyecto"; corregida la referencia de
+  versión fósil (v1.2.0/v1.3.0 → v1.6.0). Pendiente (spec 004): campo `mode`
+  en `manifest-schema.json`; su ausencia se interpreta como `produccion`.
+
 ### Mantenimiento (2026-07-04, auditoría de estructura del repo)
 
 - **Versionado a prueba de fósiles**: `bootstrap.py` deriva la versión de la

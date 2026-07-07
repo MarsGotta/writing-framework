@@ -7,8 +7,8 @@
 condicional según `project_type` (ver `.writeonmars-manifest.json`):
 
 - `editorial`: las secciones "Temario" y "Descripciones encadenadas" son
-  obligatorias (FR-010); el "Constitution Check" verifica los cinco principios
-  editoriales.
+  obligatorias (FR-010); el "Constitution Check" verifica los seis principios
+  editoriales y el modo del proyecto.
 - `software` (default Spec Kit): omite las secciones editoriales; el
   "Constitution Check" verifica los principios técnicos del proyecto.
 - `mixed`: rellena ambas zonas.
@@ -41,8 +41,8 @@ investigación.]
 design.*
 
 <!--
-  La tabla siguiente verifica conformidad con los cinco principios editoriales
-  (constitución v1.2.0). Cuando `project_type=software`, sustituye o amplía
+  La tabla siguiente verifica conformidad con los seis principios editoriales
+  (constitución v1.6.0). Cuando `project_type=software`, sustituye o amplía
   esta tabla con los principios técnicos del proyecto.
 -->
 
@@ -53,6 +53,8 @@ design.*
 | **III. Brief obligatorio** (NO NEGOCIABLE) | [pasa / desviación justificada] | [Brief de nueve campos archivado en `specs/[###-feature]/spec.md` y citado en este plan. Confirmar campos críticos sin `[NEEDS CLARIFICATION]`.] |
 | **IV. Precisión léxica y arquitectura sintáctica** | [pasa / desviación justificada] | [Glosario inicial, anglicismos justificados, univocidad terminológica garantizada en las descripciones encadenadas.] |
 | **V. Revisión multi-pasada** (NO NEGOCIABLE) | [pasa / desviación justificada] | [Cinco pasadas declaradas como tareas en `tasks.md`; matriz de firmas alineada con `.writeonmars-manifest.json`.] |
+| **VI. Neutralidad de agente y modelo** (NO NEGOCIABLE) | [pasa / desviación justificada] | [La lógica nueva vive en comandos/referencias/scripts del preset, no en skills de un proveedor ni en el ejecutor (§ Ejecutores del método).] |
+| **Modo de proyecto** (§ Modos de proyecto) | [pasa / desviación justificada] | [Modo declarado en el manifiesto (`produccion`/`estudio`; ausencia = `produccion`). En modo estudio, ninguna tarea del plan redacta prosa del manuscrito.] |
 
 Cualquier desviación MUST registrarse en `Complexity Tracking` con justificación
 operativa (FR-011).

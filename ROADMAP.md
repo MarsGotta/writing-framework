@@ -111,7 +111,9 @@ Y, ya en Paperclip:
 - Comandos editoriales **reemplazan** (`replaces`) a los core → sin ambigüedad.
 - Sin `wom` CLI (lo cubren `status.py` / `close.py`); spec `002-wom-cli` superseded.
 - `speckit-setup` para lo que el preset no puede instalar (constitución, manifest).
-- Constitución **v1.3.0** (Principio V 3+1; Principio VI neutralidad de modelo).
+- Constitución **v1.6.0** (Principio V 3+1; Principio VI neutralidad de modelo;
+  desde v1.6.0: modos de proyecto `produccion`/`estudio` y § Ejecutores del
+  método — Vivarium reemplaza a Paperclip como ejecutor orquestado).
 
 ## Pendiente (orden sugerido)
 

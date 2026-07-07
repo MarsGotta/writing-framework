@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
 **Foco actual**: el preset agente-agnóstico `writeonmars/`
 **Preset**: writeonmars/preset.yml · **Contrato del agente**: writeonmars/AGENTS.md
-**Constitution**: .specify/memory/constitution.md (v1.5.0)
+**Constitution**: .specify/memory/constitution.md (v1.6.0)
 
 Write.OnMars se distribuye y ejecuta como un preset de Spec Kit. La lógica vive en
 comandos (`writeonmars/commands/speckit.*`) y las reglas en referencias
