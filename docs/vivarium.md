@@ -96,10 +96,12 @@ Vivarium es la capa visual de un método que ya existe y funciona (repo
 - **Reglas duras del método:** escribe uno, revisa otro · detector ≠ corrector (quien
   revisa anota en `findings.md`, quien corrige es la Redactora) · voz y precisión
   separadas · severidad crítico/medio fuerza revisión, bajo solo avisa.
-- **Dos ejecutores, un método:** a mano con un solo agente, u orquestado (capa Paperclip:
-  Company "Write.OnMars", heartbeats event-driven, fan-out único por libro, ciclo
-  peer-to-peer por capítulo en worktrees paralelos, checkpoints humanos en brief y
-  galeradas).
+- **Dos ejecutores, un método:** a mano con un solo agente, u orquestado. Desde
+  2026-07-07 el ejecutor orquestado es **Vivarium mismo** (constitución v1.6.0
+  § Ejecutores del método): la capa Paperclip queda archivada como referencia y
+  sus reglas (fan-out único por libro, ciclo peer-to-peer por capítulo,
+  checkpoints humanos en brief y galeradas) se conservan en
+  `paperclip/FLOW-CONTRACT.md`, que Vivarium implementa.
 
 El flujo por unidad de contenido: la Redactora escribe → la Mesa pasa sus lentes y anota
 findings → la Documentalista verifica y decide (accionables abiertos → revisión
@@ -265,9 +267,15 @@ del Tree de otra persona (fuente citable = estatus).
 
 ## 13. Estado y orden de construcción
 
-- **Estado:** diseño / pre-MVP. El motor editorial (writeonmars + Paperclip) montado y
-  funcionando en el repo `writing-framework`. La app no existe aún; irá en repo propio.
-- **MVP v1 (sin orquestación):** abrir un Tree, árbol de Branches, editor Notion-lite,
+- **Estado:** pre-MVP, backend primero. El motor editorial (preset writeonmars)
+  montado y validado en el repo `writing-framework`. La app vive **por ahora como
+  monorepo** en `vivarium/` de ese repo (frontera dura documentada en su README;
+  extraíble a repo propio después). Paperclip queda archivado como referencia.
+- **Cambio de secuencia (2026-07-07):** se construye primero el núcleo headless
+  (spec 004: contrato del ejecutor + bootstrap de proyecto + runner por estados +
+  campo `mode` del manifiesto), validable por CLI sin interfaz. El editor visual
+  (antes "MVP v1") pasa a construirse sobre ese núcleo.
+- **MVP v1 (editor, sin orquestación):** abrir un Tree, árbol de Branches, editor Notion-lite,
   Leaves CriticMarkup con prioridad, modo foco, export PDF manual, historial git visible.
 - **Etapa 2 (inyectar el proceso):** nuevo proyecto desde la app (sin terminal), captura
   guiada del Zeed + constitución, RAG externo (Roots vía MCP), revisión de consistencia
@@ -410,3 +418,4 @@ al oficio editorial.
 | Zeeds, dos negocios | **Zeeds Enterprise** (Forests privados B2B + Vivarium Pro por asiento + compliance de procedencia) = el dinero; Zeeds red (social/descubrimiento) = marketing y moat, nunca ingresos principales |
 | Experiencia | Principios zen; gamificación botánica; sin métricas de wordcount |
 | Anclaje | PENDIENTE (el Core, foundational) |
+| Ejecutor orquestado | Vivarium (monorepo `vivarium/`, backend primero); Paperclip archivado como referencia (2026-07-07); constitución v1.6.0 codifica modos y ejecutores |

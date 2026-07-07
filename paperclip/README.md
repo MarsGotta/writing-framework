@@ -1,5 +1,12 @@
 # Capa de orquestación — Write.OnMars sobre Paperclip
 
+> **ARCHIVADO como ejecutor de referencia (2026-07-07).** Vivarium (`vivarium/`)
+> sustituye a Paperclip como ejecutor orquestado del método (constitución
+> v1.6.0 § Ejecutores del método). Esta carpeta no se mantiene, pero no se
+> borra: es la única orquestación validada de punta a punta (guide-nlp,
+> usar-biome) y `FLOW-CONTRACT.md` —cuyas §§ 0-2 son agnósticas del ejecutor—
+> sigue siendo la fuente del contrato que Vivarium implementa.
+
 Esta carpeta envuelve el método editorial (el preset `writeonmars/`) en una
 **Company de Paperclip**: una organización AI autocontenida con un goal, un equipo
 de agentes, un tablero de tareas y un presupuesto. No reescribe el método —lo

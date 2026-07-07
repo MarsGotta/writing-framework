@@ -16,8 +16,11 @@ checkpoint del PDF, los presupuestos y pulir la distribución.
 
 - **Método** — el preset `writeonmars/`, que corre *dentro* de un agente (Claude,
   Codex, Gemini…) vía comandos `speckit.*`.
-- **Orquestación** — Paperclip, **primer corte en `paperclip/`**: el "ejecutor
-  orquestado" concreto. UNA sola Company "Write.OnMars" (la casa, equipo
+- **Orquestación** — **desde 2026-07-07: Vivarium** (`vivarium/`, Rust+Tauri,
+  backend primero) es el ejecutor orquestado de referencia; Paperclip queda
+  **archivado** en `paperclip/` (su FLOW-CONTRACT §§ 0-2 es el contrato que
+  Vivarium implementa). Lo que sigue describe ese primer corte, hoy histórico:
+  el "ejecutor orquestado" concreto sobre Paperclip. UNA sola Company "Write.OnMars" (la casa, equipo
   permanente); cada guía = un **Project** de Paperclip (su goal, workspace y
   tablero); el workspace es el repo local (`sourceType=local_path`, sin GitHub).
   Roster de 4 roles por oficio: **Editora jefa** (orquestador / "CEO":
