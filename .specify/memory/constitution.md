@@ -1,6 +1,59 @@
 <!--
 SYNC IMPACT REPORT
 ==================
+Version change: 1.5.0 → 1.6.0
+Bump rationale: MINOR — nueva sección normativa "Modos de proyecto" (estudio /
+producción: quién redacta la prosa, qué garantías de procedencia ofrece el
+proyecto, cambio de modo explícito) y nueva subsección "Ejecutores del método"
+en Arquitectura (el estado vive en archivos; el método corre íntegro con
+cualquier ejecutor; reglas duras de los relevos). Ningún principio se redefine
+ni se invalida ninguna guía publicada: toda guía existente opera en modo
+producción (valor implícito hasta que el manifest-schema incorpore `mode`).
+
+Contexto: Vivarium (app Rust+Tauri, en `vivarium/` del repo del framework)
+pasa a ser el ejecutor orquestado del método; Paperclip queda archivado como
+ejecutor de referencia. La enmienda codifica lo que esa transición NO puede
+romper: el método no se acopla a ningún ejecutor (Principio VI).
+
+Added sections:
+- "Modos de proyecto" — modo declarado en el manifiesto; producción (la IA
+  redacta anclada en fuentes) vs estudio (el humano escribe; la IA MUST NOT
+  redactar prosa del manuscrito); defaults por tipo sin candados; cambio de
+  modo explícito, registrado y con consecuencias de procedencia declaradas.
+- "Arquitectura del framework § Ejecutores del método" — estado en archivos,
+  scripts deterministas como brújula (`status.py`), ejecutor-agnosticismo
+  (extiende el Principio VI) y reglas duras: escribe-uno-revisa-otro,
+  voz ≠ precisión, detector ≠ corrector.
+
+Modified principles: ninguno (el Principio VI se extiende por referencia desde
+la nueva subsección, sin cambiar su texto).
+
+Trazabilidad (§ Arquitectura, "Trazabilidad documental"): decisión propia del
+proyecto, fundada en `docs/vivarium.md` (§§ 2, 4-6: los dos modos, la línea
+"la IA te edita ≠ la IA escribe por ti", el motor editorial),
+`paperclip/FLOW-CONTRACT.md` § 0 (principio rector agnóstico, validado con los
+bugs de orquestación de guide-nlp, 2026-06-20/21) y
+`resources/write-onmars-editor-app-local-first.pdf` (diseño del editor
+local-first).
+
+Templates:
+- ✅ updated  writeonmars/templates/plan-template.md y
+  .specify/templates/plan-template.md — Constitution Check ampliado a los seis
+  principios + fila "Modo de proyecto"; referencia de versión corregida a
+  v1.6.0 (arrastraba v1.2.0/v1.3.0).
+- ⚠ pending  writeonmars/contracts/manifest-schema.json — el campo `mode`
+  (`produccion` | `estudio`, default `produccion`) se define en la spec del
+  núcleo de Vivarium; hasta entonces la ausencia del campo se interpreta como
+  `produccion`.
+
+Follow-up TODOs:
+- Spec 004 (Vivarium core): campo `mode` + registro del cambio de modo en el
+  manifiesto; contrato del ejecutor promovido desde FLOW-CONTRACT §§ 0-2.
+- Spec 005: pipeline del modo estudio en el preset (pasadas sobre texto
+  humano, consistencia contra las fuentes del proyecto).
+
+Historial previo
+----------------
 Version change: 1.4.0 → 1.5.0
 Bump rationale: MINOR — expansión material del Principio I (nuevo MUST de
 cohesión: fragmentos sin verbo no deliberados y arranques en frío) e inversión
@@ -397,6 +450,50 @@ Restricciones materiales aplicables a todo artefacto del framework:
   (citas, fragmentos de código, términos técnicos sin equivalente) MUST
   declararse en el brief.
 
+## Modos de proyecto
+
+Todo proyecto editorial MUST declarar su modo de trabajo en el manifiesto
+(`.writeonmars-manifest.json`, campo `mode`; mientras el manifest-schema no
+incorpore el campo, su ausencia se interpreta como `produccion`). El modo
+determina quién redacta la prosa y qué garantía de procedencia ofrece el
+proyecto; no cambia los principios, cambia su lente de aplicación.
+
+- **Modo producción** (`mode: produccion`): la IA redacta anclada en fuentes
+  bajo dirección humana. Default para guías técnicas, tutoriales,
+  documentación y no-ficción fundamentada. La atribución por afirmación y el
+  índice de factualidad (Estándares editoriales) son obligatorios. El pipeline
+  del preset (research → temario → redacción → pasadas → cierre) materializa
+  este modo.
+- **Modo estudio** (`mode: estudio`): el humano escribe; la IA revisa,
+  verifica la consistencia contra las fuentes del proyecto y acompaña. Default
+  para narrativa, relato, poesía, guion y escritura académica personal. En
+  este modo la IA MUST NOT redactar prosa del manuscrito: su salida son
+  hallazgos, sugerencias y anotaciones (findings, comentarios), nunca texto
+  final. El proyecto MUST poder demostrar la autoría humana del texto a partir
+  del historial del repositorio. Que el preset aún no implemente las pasadas
+  de este modo no habilita a ningún agente a redactar en un proyecto declarado
+  `estudio`.
+
+Reglas comunes a ambos modos:
+
+- Los defaults por tipo de proyecto son opinados, no candados: cambiar de modo
+  MUST ser una acción explícita del humano operador, nunca de un agente.
+- El cambio de modo MUST registrarse en el manifiesto (modo nuevo y fecha) y
+  MUST declararse antes de aplicarse su consecuencia de procedencia: un
+  proyecto que pasa a `produccion` deja de poder demostrar autoría humana para
+  todo lo que la IA redacte desde ese momento.
+- Los Principios I–VI aplican en ambos modos. En modo estudio, las pasadas del
+  Principio V operan sobre texto humano y "detector ≠ corrector" se convierte
+  en "la IA detecta y propone; el humano dispone": ninguna corrección MUST
+  aplicarse al manuscrito sin aceptación humana explícita.
+
+**Razón**: los dos modos sirven a garantías distintas — producción, velocidad
+con verificación factual; estudio, acompañamiento con autoría humana
+demostrable —. Declarar el modo en el manifiesto hace la garantía auditable, y
+el cambio explícito evita que una obra pierda su elegibilidad de autoría
+humana por un descuido. Decisión propia del proyecto (`docs/vivarium.md`
+§§ 2, 4-5; `resources/write-onmars-editor-app-local-first.pdf`).
+
 ## Flujo de producción editorial con Spec Kit
 
 Este framework reutiliza el ciclo Spec Kit (`/speckit-specify`, `/speckit-plan`,
@@ -478,6 +575,31 @@ que sostienen los cinco principios.
   formato de hooks) MUST aislarse en archivos claramente identificados por
   agente y no contaminar las skills de redacción.
 
+**Ejecutores del método**:
+
+- La verdad del estado de un proyecto editorial MUST vivir en los archivos del
+  repositorio (manifiesto, `specs/`, `chapters/`, `findings.md`, `claims.md`).
+  Los scripts deterministas (`status.py`) computan el estado desde disco;
+  ningún estado de negocio MUST existir solo en la memoria, el tablero o la
+  base de datos de un ejecutor.
+- Un **ejecutor** es quien materializa los relevos del método: un agente único
+  en sesión interactiva, o un orquestador (aplicación o servicio) que lanza
+  agentes por paso. El método MUST poder ejecutarse íntegro con cualquier
+  ejecutor: ninguna lógica de negocio (qué revisar, cuándo un capítulo está
+  aprobado, cuándo cerrar) MUST vivir solo en el ejecutor, y retirarlo MUST
+  NOT perder nada del método.
+- Todo ejecutor MUST preservar las reglas duras de los relevos:
+  **escribe-uno-revisa-otro** (quien redacta una unidad de contenido no la
+  revisa), **voz ≠ precisión** (pasadas separadas, idealmente con modelos
+  distintos) y **detector ≠ corrector** (quien revisa anota en `findings.md`;
+  quien corrige es quien redacta).
+- El ejecutor orquestado de referencia es **Vivarium** (en desarrollo, en
+  `vivarium/` del repo del framework); Paperclip queda archivado como ejecutor
+  de referencia y sus lecciones se conservan en el contrato de flujo
+  (`paperclip/FLOW-CONTRACT.md`, cuyas §§ 0-2 son agnósticas). Nombrar aquí el
+  ejecutor vigente es informativo, no normativo: acoplar el método a un
+  ejecutor concreto viola el Principio VI.
+
 **Memoria externa**:
 
 - El framework MAY apoyarse en una memoria externa vectorizada para conservar
@@ -535,4 +657,4 @@ cumplimiento explícito antes de cerrarse.
 - La guía operativa de runtime para agentes (p.ej., `CLAUDE.md`, `AGENTS.md`)
   MUST citar esta constitución como fuente de verdad editorial.
 
-**Version**: 1.5.0 | **Ratified**: 2026-05-06 | **Last Amended**: 2026-07-04
+**Version**: 1.6.0 | **Ratified**: 2026-05-06 | **Last Amended**: 2026-07-07
