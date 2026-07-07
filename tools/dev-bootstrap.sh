@@ -98,8 +98,8 @@ verifica_jq() {
 }
 
 # verifica_ajv
-# ajv valida JSON Schemas (contracts/manifest-schema.json,
-# contracts/citation-record.schema.json). Se ejecuta vía npx para no
+# ajv valida JSON Schemas (writeonmars/contracts/manifest-schema.json,
+# writeonmars/contracts/citation-record.schema.json). Se ejecuta vía npx para no
 # exigir instalación global.
 verifica_ajv() {
     if ! command -v npx >/dev/null 2>&1; then

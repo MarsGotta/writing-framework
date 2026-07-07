@@ -21,7 +21,10 @@ Opcional. `--refresh` para regenerar respetando ediciones manuales marcadas.
 - Brief: `specs/<###-feature>/spec.md` (audiencia, problema, resultado esperado,
   nivel, tono, ejemplo recurrente, conceptos obligatorios).
 - Temario: `specs/<###-feature>/plan.md` (para "qué vas a aprender").
-- Voz: `.specify/presets/writeonmars/references/voz/SKILL.md`. Didáctica:
+- Prosa-base: `.specify/presets/writeonmars/references/prosa/SKILL.md`. Registro:
+  `.specify/presets/writeonmars/references/registros/<registro>/SKILL.md` (del
+  manifiesto o default del sector). Voz:
+  `.specify/presets/writeonmars/references/voz/SKILL.md`. Didáctica:
   `.specify/presets/writeonmars/references/didactica/SKILL.md`.
 
 ## Qué haces

@@ -1,13 +1,15 @@
 ---
 name: writeonmars-pasada-3
-description: Pasada 3 (naturalidad) sobre un capítulo. Envuelve /marcela-prose y aplica los anti-patterns de constitución § I. Firma humana obligatoria por defecto. Trigger cuando la persona diga "pasada 3", "revisa la naturalidad", "limpia voz LLM", "review de prosa".
+description: Pasada 3 (naturalidad) sobre un capítulo. Envuelve /prosa-base (fluidez y cohesión, playbook de cosido), el registro del manifiesto (capa 2, deriva de género) y /marcela-prose (voz), y aplica los anti-patterns de constitución § I. Firma humana obligatoria por defecto. Trigger cuando la persona diga "pasada 3", "revisa la naturalidad", "limpia voz LLM", "review de prosa", "el texto suena cortado".
 allowed-tools: Bash, Read, Write, Edit, Skill, Agent
 ---
 
 # writeonmars-pasada-3
 
 Skill que materializa la pasada 3 (naturalidad) del Principio V.3 y los
-anti-patterns del Principio I. Envuelve `/marcela-prose`. Firma humana
+anti-patterns del Principio I. Envuelve `/prosa-base` (capa 1: hilo,
+cohesión, playbook de cosido), el registro del manifiesto (capa 2: deriva
+académica / casual / de folleto) y `/marcela-prose` (capa 3: voz). Firma humana
 obligatoria por defecto (`signing_matrix.pasada_3_naturalidad: human`),
 fundamento de FR-020a.
 
@@ -23,7 +25,8 @@ fundamento de FR-020a.
 
 1. Despacha un sub-agente con
    `agents/claude/prompts/pasada-3.md`.
-2. El sub-agente invoca `/marcela-prose` con la lente de § I y § V.3.
+2. El sub-agente invoca `/prosa-base` (playbook de cosido) y
+   `/marcela-prose` con la lente de § I y § V.3.
 3. Emite bloque "Pasada 3 — Naturalidad" en `findings.md` con
    `pasada: 3_naturalidad` y checklist firmable en
    `checklists/[###-feature]/pasada-3.md`.
@@ -56,6 +59,9 @@ fundamento de FR-020a.
 
 ## Lente específica (constitución § I + § V.3)
 
+- Fragmentos sin verbo y enumeraciones huérfanas tras punto; párrafos que
+  no sobreviven al test del barajado; arranques en frío sin eco del párrafo
+  anterior; staccato (`/prosa-base`).
 - Frases comprimidas que obligan a reconstruir la intención.
 - "No es X: es Y" más de una vez por capítulo.
 - Pronombres vagos sin referente explícito en la frase anterior.

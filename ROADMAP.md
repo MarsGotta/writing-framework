@@ -276,9 +276,11 @@ sin avisos. Confirma SC-001/SC-004 (0 tipos/estados/routines nuevos de Paperclip
 
 ## Deuda y cosas honestas a saber
 
-- **Docs**: `writeonmars/docs/` es la fuente canónica de uso. Los docs raíz
-  (`docs/`) llevan banner y quedan como referencia interna; algunos aún describen
-  el mundo viejo (skills + install.sh) en el cuerpo.
+- **Docs**: `writeonmars/docs/` es la fuente canónica de uso. En `docs/` conviven
+  dos familias (índice en `docs/README.md`): los docs de producto de **Vivarium**
+  (`docs/vivarium.md` es su fuente de verdad) y lo transversal del framework;
+  `docs/citation-contract.md` y `docs/manifest-schema.md` son punteros a
+  `writeonmars/contracts/` (fuente única de contratos desde 2026-07-04).
 - **Invocación**: para Claude los comandos se registran como skills **con guion**
   (`/speckit-specify`), aunque el nombre canónico lleva **punto** (`speckit.specify`).
   Los docs mezclan ambas formas; pendiente de unificar.

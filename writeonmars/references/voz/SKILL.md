@@ -655,7 +655,9 @@ La calibración se actualiza cuando Marcela edita material nuevo. Si un capítul
 
 ## Interacción con otras skills
 
-Esta skill es autónoma. No invoques `humanizer`, `spanish-prose-craft` ni `technical-guide-design` además de esta para el mismo material; duplicarías reglas y la voz se diluye.
+Esta skill es la **capa 3 (voz)** de la pirámide de prosa. Debajo está siempre `../prosa/SKILL.md` (`prosa-base`, capa 1): fluidez, cohesión, frases completas, progresión conocido → nuevo. Esta skill decide el color (léxico, humor, aperturas, cierres, firma); la base decide la costura. En conflicto gana esta voz, salvo los dos innegociables de la base: frases completas y progresión conocido → nuevo. Ojo con el sesgo staccato: las reglas de frase corta de esta skill ("la corta cierra y golpea", cierres lapidarios) presuponen el ritmo de crucero de la base; sin él degeneran en fichas sueltas. La capa 2 (registro por género) vive en `../registros/` y se declara en las adendas y el manifiesto; para guías técnicas, `tecnico-divulgativo`. En conflicto de sabor gana esta voz; en formalidad y densidad globales, el registro.
+
+Esta skill es autónoma respecto a sus fuentes históricas. No invoques `humanizer`, `spanish-prose-craft` ni `technical-guide-design` además de esta para el mismo material; duplicarías reglas y la voz se diluye.
 
 Casos en los que sí conviene la otra skill por separado:
 

@@ -20,13 +20,27 @@ Capítulo(s) a revisar. Sin argumento: todos.
 ## Inputs
 
 - El/los capítulo(s) en `chapters/`.
-- **Voz**: `.specify/presets/writeonmars/references/voz/SKILL.md` (+ su carpeta
+- **Prosa-base (capa 1)**: `.specify/presets/writeonmars/references/prosa/SKILL.md`.
+  Aplica su playbook de cosido y su checklist.
+- **Registro (capa 2)**:
+  `.specify/presets/writeonmars/references/registros/<registro>/SKILL.md`
+  (`registro` del manifiesto; si falta, el default del sector). Aplica su
+  checklist de registro y sus síntomas de deriva.
+- **Voz (capa 3)**: `.specify/presets/writeonmars/references/voz/SKILL.md` (+ su carpeta
   `references/`). Aplica sus reglas y su checklist de edición. No dependas de
   ninguna skill externa del agente.
 
 ## Qué verificas
 
-- Voz natural y sobria: sin frases comprimidas, sin eslóganes, sin moralina, sin
+- Hilo y cohesión (`references/prosa`): sin fragmentos sin verbo no deliberados
+  ni enumeraciones huérfanas tras punto; cada frase recoge algo de la anterior
+  y cada párrafo abre con eco del previo (test del barajado); transiciones con
+  porqué; sin staccato de tres frases cortas seguidas.
+- Registro del género (`references/registros/<registro>`): sin deriva académica
+  (nominalizaciones, impersonal sostenido, abstracción sin artefacto), casual
+  (hipérbole, colegueo, afirmación sin alcance) ni de folleto (adjetivos de
+  producto). Cita el dial violado en el hallazgo.
+- Voz natural: sin frases comprimidas, sin eslóganes, sin moralina, sin
   metáforas mezcladas, plural inclusivo dominante (constitución § I).
 - Transiciones explicadas, referentes claros, aperturas concretas, cierres bajos.
 - Limpieza de patrones LLM (ver `references/voz`: prohibiciones y antipatrones).

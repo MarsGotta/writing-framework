@@ -30,8 +30,19 @@ empezar.
 
 - Brief, sección Temario, la descripción encadenada del capítulo objetivo y de
   los contiguos, glosario vigente, ejemplo recurrente.
-- **Voz**: `.specify/presets/writeonmars/references/voz/SKILL.md` (+ su `.specify/presets/writeonmars/references/`). Aplícala; no dependas de
-  ninguna skill externa.
+- **Prosa-base (capa 1, SIEMPRE, antes que la voz)**:
+  `.specify/presets/writeonmars/references/prosa/SKILL.md`. Fluidez y cohesión:
+  frases completas, progresión conocido → nuevo, eco entre párrafos,
+  transiciones con porqué, ritmo de crucero. Redacta con su checklist de
+  generación activo; sus dos innegociables no los deroga ninguna otra capa.
+- **Registro (capa 2)**:
+  `.specify/presets/writeonmars/references/registros/<registro>/SKILL.md`, con
+  `<registro>` del manifiesto (`registro`); si falta, el default del sector
+  (sección "Registro por defecto" de su base). Fija formalidad, densidad,
+  figuras, humor y aserción del género.
+- **Voz (capa 3)**: `.specify/presets/writeonmars/references/voz/SKILL.md` (+ su `.specify/presets/writeonmars/references/`). Aplícala; no dependas de
+  ninguna skill externa. En conflicto de sabor gana la voz; en formalidad y
+  densidad globales, el registro; los innegociables de prosa-base, nadie.
 - **Didáctica**: `.specify/presets/writeonmars/references/didactica/SKILL.md`.
 - Detalle del método: `.specify/presets/writeonmars/references/metodo/writeonmars-redaccion/SKILL.md`.
 
@@ -39,7 +50,9 @@ empezar.
 
 1. Escribe `chapters/<NN>-titulo.md` con la estructura de capítulo que fije la
    **base del sector** (`.specify/presets/writeonmars/references/sectores/<sector>.md`,
-   sector en el manifiesto) y la voz de `.specify/presets/writeonmars/references/voz`.
+   sector en el manifiesto), el hilo de `.specify/presets/writeonmars/references/prosa`,
+   el registro de `.specify/presets/writeonmars/references/registros/<registro>`
+   y la voz de `.specify/presets/writeonmars/references/voz`.
    Usa el ejemplo recurrente real, no inventado.
 2. **Cierra el capítulo con una sección `## Fuentes`** (obligatoria, Estándares
    editoriales): nombre, enlace y fecha de cada fuente citada en ESE capítulo. No

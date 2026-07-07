@@ -1,6 +1,54 @@
 <!--
 SYNC IMPACT REPORT
 ==================
+Version change: 1.4.0 → 1.5.0
+Bump rationale: MINOR — expansión material del Principio I (nuevo MUST de
+cohesión: fragmentos sin verbo no deliberados y arranques en frío) e inversión
+de dos SHOULD del Principio IV que empujaban a prosa comprimida (preferencia
+por nominalizaciones/construcciones absolutas y por pasiva refleja). No
+invalida guías publicadas: los SHOULD previos eran recomendaciones, no MUST.
+Motivación: fallo observado en guías generadas (prosa "de frases pegadas",
+enumeraciones huérfanas, arranques en frío); diagnóstico 2026-07-04.
+
+Added standards:
+- Capa prosa-base (`writeonmars/references/prosa/SKILL.md`) como referencia
+  normativa de cohesión citada por §§ I y IV. La cargan siempre la redacción
+  y la pasada 3 (pirámide de prosa: base → registro → voz).
+
+Modified principles:
+- I. Voz natural y sobria — añade MUST contra fragmentos sin verbo no
+  deliberados (enumeración huérfana tras punto) y arranques en frío.
+- IV. Precisión léxica — retitulado "Precisión léxica y sintaxis al servicio
+  de la cohesión". Verbos plenos y sujeto concreto sustituyen a la preferencia
+  por nominalizaciones y pasiva refleja; la densidad se construye encadenando
+  frases (conocido → nuevo), no comprimiendo sintagmas. El rigor terminológico
+  (Cabré, RAE, Fundéu, AENOR) permanece intacto.
+
+Trazabilidad (§ Arquitectura, "Trazabilidad documental"): decisión propia del
+proyecto motivada por fallo observado, con fundamento externo en Williams
+(*Style*, known → new), Cassany (*La cocina de la escritura*), Pinker (*The
+Sense of Style*) y la perspectiva funcional de la oración (escuela de Praga),
+recogidos en la referencia prosa-base. Se aparta deliberadamente del "estilo
+integrado (ciceroniano)" del Manual Maestro (resources/) en sus cláusulas
+sintácticas; su rigor léxico se conserva.
+
+Templates:
+- ✅ updated  agents/claude/prompts/redaccion.md (v1.1) — pautas § IV
+  reescritas, /prosa-base autorizada, anti-patterns de cohesión.
+- ✅ updated  agents/claude/prompts/pasada-3.md (v1.1) — carga /prosa-base.
+- ✅ updated  writeonmars/references/metodo/writeonmars-redaccion/SKILL.md y
+  writeonmars-pasada-3/SKILL.md.
+- ✅ updated  writeonmars/references/voz/SKILL.md § Interacción (pirámide).
+- ✅ updated  agents/codex/prompts/redaccion.md y pasada-3.md (2026-07-04):
+  adaptadores Codex reales, contrato compartido con el prompt canónico y
+  pirámide de prosa resuelta como referencias por ruta (§ VI).
+
+Follow-up TODOs:
+- Crear skills de capa 2 (registro por género: académico, narrativo, poético)
+  cuando el cimiento quede validado con una guía real.
+
+Historial previo
+----------------
 Version change: 1.3.0 → 1.4.0
 Bump rationale: MINOR — añade un requisito (atribución por afirmación + índice de
 factualidad derivado) sin invalidar guías ni redefinir principios. Refuerza IV y V;
@@ -145,6 +193,12 @@ Reglas obligatorias:
 - MUST evitar transiciones secas ("Vamos a verlo", "Pasemos al siguiente punto",
   "Quedan tres categorías") y reemplazarlas por transiciones que expliquen por
   qué cambia el tema.
+- MUST evitar fragmentos sin verbo no deliberados, en especial la enumeración
+  huérfana tras punto (ej.: "Ese trecho tiene pasos con nombre. Convertir el
+  texto, elegir cómo representarlo."), y los arranques en frío: cada frase
+  recoge algo de la anterior y cada párrafo abre con eco del previo
+  (progresión de lo conocido a lo nuevo; referencia
+  `writeonmars/references/prosa/SKILL.md`).
 - MUST evitar entusiasmo artificial, lenguaje promocional y metáforas mezcladas.
 
 **Razón**: la voz es el principio fundacional del framework. Si el texto suena a
@@ -199,10 +253,11 @@ y MUST citarse en el plan y en las tareas.
 genérico. El brief es la traducción editorial del "Constitution Check" del flujo
 Spec Kit.
 
-### IV. Precisión léxica y arquitectura sintáctica integrada
+### IV. Precisión léxica y sintaxis al servicio de la cohesión
 
-El framework adopta el rigor terminológico de Cabré, RAE, Fundéu y AENOR, y el
-estilo integrado (ciceroniano) para textos de alta especialización.
+El framework adopta el rigor terminológico de Cabré, RAE, Fundéu y AENOR. La
+especialización del texto no se gana comprimiendo la sintaxis sino encadenando
+frases completas: la densidad es del argumento, no del sintagma.
 
 Reglas obligatorias:
 
@@ -218,10 +273,16 @@ Reglas obligatorias:
   *system prompt*, *tool use*, *context window*) cuando no exista equivalente
   preciso o cuando el dominio profesional los use sin ambigüedad. Esta excepción
   MUST justificarse en el glosario de la guía.
-- SHOULD favorecer la pasiva refleja sobre la pasiva perifrástica
-  ("Se introducen los conceptos" frente a "Los conceptos son introducidos").
-- SHOULD usar nominalizaciones, aposiciones y construcciones absolutas para
-  ganar densidad informativa sin atomizar el pensamiento.
+- SHOULD preferir verbos plenos y sujeto concreto (plural inclusivo o el
+  artefacto como sujeto) sobre nominalizaciones sostenidas y pasiva como
+  registro dominante ("introducimos los conceptos" o "el capítulo introduce
+  los conceptos" frente a "se introducen los conceptos"). La pasiva refleja
+  queda para cuando el agente es irrelevante; la perifrástica, casi nunca.
+- MUST construir la densidad informativa encadenando frases completas con
+  progresión de lo conocido a lo nuevo (referencia
+  `writeonmars/references/prosa/SKILL.md`), no comprimiendo varias ideas en
+  sintagmas sin verbo. Las enumeraciones de infinitivos se enganchan con dos
+  puntos o verbo matriz; el fragmento deliberado se limita a uno por sección.
 
 **Razón**: la autoridad profesional del texto depende de la coherencia entre
 forma y significado. Un anglicismo gratuito o una sigla mal escrita erosiona la
@@ -474,4 +535,4 @@ cumplimiento explícito antes de cerrarse.
 - La guía operativa de runtime para agentes (p.ej., `CLAUDE.md`, `AGENTS.md`)
   MUST citar esta constitución como fuente de verdad editorial.
 
-**Version**: 1.4.0 | **Ratified**: 2026-05-06 | **Last Amended**: 2026-06-21
+**Version**: 1.5.0 | **Ratified**: 2026-05-06 | **Last Amended**: 2026-07-04

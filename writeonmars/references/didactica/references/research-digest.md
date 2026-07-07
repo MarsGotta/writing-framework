@@ -1,5 +1,11 @@
 # Research Digest
 
+> **Nota (2026-07-04)**: este documento se conserva en inglés a propósito. Es
+> material de consulta con las fuentes originales, no una referencia operativa
+> del pipeline: la skill (`../SKILL.md`) y el catálogo de defectos
+> (`prose-pitfalls.md`) ya están en español y son lo que los agentes cargan al
+> redactar y revisar.
+
 Full research synthesis behind the `technical-guide-design` skill. Based on 3 Opus research reports + a Perplexity base report on e-learning best practices.
 
 ---

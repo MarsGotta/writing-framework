@@ -81,8 +81,13 @@ flujo por capítulo (mapeo exacto a la API de Paperclip) en
 El pipeline lo lanzan distintos agentes con distintos modelos, no solo Claude. Por
 eso la lógica NO vive en skills de Claude (que se autodisparan y son de un
 proveedor), sino en **comandos** del preset (`speckit.*`) y **referencias**
-neutrales (`references/voz`, `references/didactica`, `references/metodo`) que
-cualquier modelo lee y aplica. Es el modelo del preset de ficción, que no usa
+neutrales (`references/prosa`, `references/registros`, `references/voz`,
+`references/didactica`, `references/metodo`) que cualquier modelo lee y
+aplica. La prosa forma una pirámide de tres capas: `references/prosa` es la
+base (cohesión y fluidez, siempre activa), `references/registros/<slug>` es
+la capa 2 (el contrato del género, declarado en manifiesto y adendas;
+disponible `tecnico-divulgativo`) y `references/voz` es la cúspide (voz de
+la autora). Es el modelo del preset de ficción, que no usa
 skills. El contrato para el agente está en `AGENTS.md`.
 
 Reparto:

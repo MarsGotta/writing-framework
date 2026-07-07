@@ -1,352 +1,518 @@
 ---
 name: technical-guide-design
 description: >
-  Design, review, restructure or micro-edit technical guides, manuals, tutorials,
-  workshops and engineering playbooks for professional developers. Combines
-  evidence-based teaching (Diátaxis, andragogy, cognitive load theory, worked
-  examples) AND prose-level microstyle. Trigger for structural work: "diseña una
-  guía", "revisa este temario", "mejora el material de este taller", "estructura
-  este tutorial", "cómo enseñar X", "crea un workshop sobre Y". Trigger for
-  microedition: "haz que suene menos robótica", "frases comprimidas", "hazlo más
-  natural", "mejora la prosa de la guía", "limpia el tono plano", "frases inconexas",
-  "tono de eslogan". Also when evaluating existing docs/guides for teaching
-  effectiveness or operational utility.
+  Diseña, revisa, reestructura o microedita guías técnicas, manuales,
+  tutoriales, talleres y playbooks de ingeniería para desarrolladores
+  profesionales. Combina enseñanza basada en evidencia (Diátaxis,
+  andragogía, teoría de la carga cognitiva, worked examples) con el
+  catálogo de microestilo de prosa. Trigger para trabajo estructural:
+  "diseña una guía", "revisa este temario", "mejora el material de este
+  taller", "estructura este tutorial", "cómo enseñar X", "crea un
+  workshop sobre Y". Trigger para microedición: "haz que suene menos
+  robótica", "frases comprimidas", "hazlo más natural", "mejora la
+  prosa de la guía", "limpia el tono plano", "frases inconexas", "tono
+  de eslogan". También al evaluar docs o guías existentes por eficacia
+  didáctica o utilidad operativa.
 user-invocable: true
 ---
 
-# Technical Guide Design
+# Technical Guide Design (diseño de guías técnicas)
 
-Evidence-based playbook for designing, reviewing and restructuring technical learning material aimed at **professional developers** (not university students, not absolute beginners). Synthesizes Diátaxis, andragogy (Knowles), cognitive load theory (Sweller), worked examples (Renkl & Atkinson) and documentation style guides (Google, Write the Docs).
+Playbook basado en evidencia para diseñar, revisar y reestructurar material
+técnico de aprendizaje dirigido a **desarrolladores profesionales** (no
+estudiantes universitarios, no principiantes absolutos). Sintetiza Diátaxis,
+andragogía (Knowles), teoría de la carga cognitiva (Sweller), worked examples
+(Renkl y Atkinson) y guías de estilo de documentación (Google, Write the
+Docs).
 
-The skill covers two layers, in this order of impact:
+La skill cubre dos capas, en este orden de impacto:
 
-1. **Structural** — modalities, cognitive load, exercises, file organization. Most of this document.
-2. **Microstyle** — prose-level prose pitfalls that make a structurally sound guide feel mechanical or robotic. Catalogue with concrete before/after examples in `./references/prose-pitfalls.md`.
+1. **Estructural**: modalidades, carga cognitiva, ejercicios, organización de
+   archivos. Es la mayor parte de este documento.
+2. **Microestilo**: los defectos de prosa que hacen que una guía
+   estructuralmente sólida suene mecánica o robótica. Catálogo con ejemplos
+   antes/después en `./references/prose-pitfalls.md`.
 
-A guide that fails structurally will not be saved by good prose; a guide that gets the structure right will still feel artificial if the prose-level rules are ignored.
+Una guía que falla en estructura no se salva con buena prosa; una guía con
+la estructura bien resuelta seguirá sonando artificial si se ignoran las
+reglas de prosa.
 
-Use this skill when:
+Usa esta skill cuando:
 
-- Creating a new guide, tutorial, workshop or technical documentation set.
-- Reviewing existing material for pedagogical soundness.
-- Restructuring a mixed-modality document that has become hard to navigate.
-- Designing the complement between a live session and async written material.
-- Editing prose in a guide that is structurally sound but reads as compressed, robotic or template-driven (jump directly to `./references/prose-pitfalls.md`).
+- Creas una guía, tutorial, taller o conjunto de documentación técnica nuevo.
+- Revisas material existente por solidez pedagógica.
+- Reestructuras un documento de modalidades mezcladas que se ha vuelto
+  difícil de navegar.
+- Diseñas el complemento entre una sesión en vivo y material escrito
+  asíncrono.
+- Editas prosa de una guía estructuralmente sólida que se lee comprimida,
+  robótica o de plantilla (salta directamente a
+  `./references/prose-pitfalls.md`).
 
-## Core principle: separate modalities (Diátaxis)
+## Principio central: separar modalidades (Diátaxis)
 
-Every piece of technical learning content serves **one dominant** purpose. Mixing modalities equally in the same document is the #1 cause of poor guides.
+Cada pieza de contenido técnico de aprendizaje sirve a **un propósito
+dominante**. Mezclar modalidades a partes iguales en el mismo documento es la
+causa número uno de las guías flojas.
 
-| Modality | Orientation | Reader state | Example |
+| Modalidad | Orientación | Estado del lector | Ejemplo |
 |---|---|---|---|
-| **Tutorial** | Learning by doing | "I'm new, take me by the hand" | Your first test with Vitest |
-| **How-to** | Task-oriented | "I have problem X, how do I solve it" | How to mock an HTTP service |
-| **Reference** | Information lookup | "What's the exact syntax of X" | Table of Jasmine→Vitest equivalences |
-| **Explanation** | Understanding | "Why does X work this way" | Why mutation testing vs coverage |
-
-Two orthogonal axes underneath:
-
-- **Practice (action) ↔ Theory (cognition)**
-- **Acquisition (learning) ↔ Application (working)**
-
-**Rule.** Label each file/section with **one dominant modality** in its frontmatter. Splitting is the default when modalities mix.
-
-**Permitted hybrid.** A dominant modality can host a **micro-section of another modality** at the closing of the file when it directly serves the dominant one. Typical case: a chapter of *explanation* about a concept ending with a small *reference* block ("Where each tool implements this") so the reader does not have to leave context for the operational detail. Mark the micro-section visually (own H2, table, or callout) so the reader can skim or skip it.
-
-What still does not work: equal-weight mixing (a tutorial half-built as reference table). If the file does two modalities in equal measure, split.
-
-## Pedagogical principles for adult devs (andragogy)
-
-Professional developers are adult learners. They:
-
-1. **Need to know why** before what — open each section with the pain/problem, not theory.
-2. **Value autonomy** — offer paths ("quick path" vs "deep dive"), never a single forced order.
-3. **Bring prior experience** — reference what they already know ("if you come from Jest, vi.fn feels familiar").
-4. **Are problem-centered, not subject-centered** — organize by "how do I test an async form" not by "chapter 3: matchers".
-5. **Have internal motivation** — connect to real KPIs (fewer prod bugs, faster PRs, less flakiness).
-6. **Learn just-in-time, not just-in-case** — content hits when they'll apply it this week.
-7. **Welcome reader-orientation cues** — explicit signposts like "quédate con esta idea", "no necesitas memorizar X", "el síntoma típico es Y", "si solo lees esta sección, lee esto" lower cognitive load without being condescending. Use them at the close of dense paragraphs.
-
-**Never do** with professionals: paternalistic tone, "what is a function", blocking solutions "so they think", emoji-rich cheer, explaining the terminal.
-
-## Cognitive load: the three loads
-
-- **Intrinsic**: inherent complexity — irreducible, only sequence it.
-- **Extraneous**: bad design choices that add friction — minimize aggressively.
-- **Germane**: the useful effort of building mental schemas — maximize via worked examples + fading.
-
-Key effects to know:
-
-- **Worked example effect** (Sweller & Cooper 1985): studying a fully-solved example is more efficient than solving from scratch, for novices.
-- **Expertise reversal effect** (Kalyuga 2003): the SAME worked examples confuse experts. Provide "if you already know X, skip to challenge Y".
-- **Backward fading** (Renkl & Atkinson 2003): step 1 complete → step 2 partial → step 3 blank. Graduate scaffolding.
-
-## Code example design
-
-Rules for every code snippet:
-
-1. **MVCE** (Minimum Viable Code Example): runnable, complete, representative, nothing extra.
-2. **Self-contained**: imports visible (or declared once as chapter convention). Reader should not infer >3 lines.
-3. **Progressive disclosure**: first snippet trivial, add layers one at a time. Never open with the "realistic final".
-4. **Single domain across the guide** (e.g. "CartApp") — reusing the domain reduces load.
-5. **Real names vs placeholders**: `user/cart/order` when showing applied patterns, `foo/bar` only for pure syntax.
-6. **Length**: 5–15 lines ideal, 30 max. Longer → split or link to runnable repo.
-7. **Explicit over clever**: `const r = add(2,3); expect(r).toBe(5);` beats `expect(add(2,3)).toBe(5)` on first appearance.
-8. **Contiguity**: explanation adjacent to code, not after. Inline comments `// ← this is the key line` beat paragraphs.
-9. **Versioned**: header each chapter with stack versions + validation date ("Validated 2026-04 with Vitest 4.x").
-10. **No compiling failures**: include every import. Validate snippets in CI if possible.
-
-### Before/after pattern
-
-Use when showing anti-patterns common in the audience:
-
-- Mark the bad with visual flags: `// ❌ fragile` / `// ✅ resilient`.
-- Never leave an anti-pattern on a page without its fix.
-- Risk: familiarity effect — readers memorize the bad version. Mitigate with visual distinction.
-
-## Durability: stable principles vs versioned facts
-
-Technical guides age. Prices change, model versions move, command lists are rewritten between releases. The body of the guide should outlive most of those changes; the dated facts should be quarantined so they can be updated without rewriting the prose.
-
-**Rule.** Separate stable principles from versioned facts.
-
-- **Body of the guide.** Principles that change slowly (asymmetry of input/output cost, attention is non-uniform, memory ≠ context). These are what the reader should remember years later.
-- **Versioned facts.** Specific prices, version numbers, exact command names, dates of feature releases. These belong in:
-  - **Inline callouts** with a verification date: `> Verificado el 2026-05-06. Confirmar contra docs antes de publicar.`
-  - **A dedicated "Sources" or "Versioned data" block at the end of each chapter**, so a future reviewer can update one block instead of hunting through prose.
-  - **An anexo** for command tables and quick references.
-
-The cost of confusing the two: a guide with concrete prices in every paragraph reads as an "informe temporal", not as a manual. A guide with no concrete data at all reads as vague. The discipline is principles inside, dated specifics flagged.
-
-## Guide structure template
-
-Apply to every major file:
-
-1. **Title + one-line purpose** (who this is for, what they'll be able to do after).
-2. **Prerequisites** (links to previous material or external resources).
-3. **Time estimate**.
-4. **Context / motivation** — why this matters (the pain without this knowledge).
-5. **Body** — small sections, each with: explanation → example → micro-exercise or self-check question.
-6. **Synthesis** — see "Synthesis tactics" below; pick a concrete format, not a vague summary paragraph.
-7. **Consolidation exercise** — more open, applied problem.
-8. **References** — deeper links, official docs.
-
-### Optional but high-impact: appendix of reusable templates
-
-For guides aimed at teams that will *operate* with the material (not just read it), add a final appendix collecting the templates that the body has shown in pieces:
-
-- `AGENTS.md` / `CLAUDE.md` / config skeletons.
-- _Spec_ template.
-- Operational _prompts_ ready to copy.
-- Review _checklists_ (PR, audit, deployment).
-- Decision tables.
-
-The appendix is the single most reused part of an operational guide. The body explains the why; the appendix provides what the team will paste into their repo on Monday.
-
-Consistent structure across files = predictability = lower cognitive load. Combine with **varied wording** in titles and section headers (see prose-pitfalls #7) so predictable bones do not produce template skin.
-
-## Synthesis tactics
-
-Point 6 of the structure template ("synthesis") is too often executed as a generic summary paragraph. Pick instead one of these formats, in this order of usefulness for adult devs:
-
-- **Decision table.** "Síntoma → causa probable → capítulo donde se trata". The single most reused piece of an operational guide.
-- **Comparative table.** Option A vs B vs C, columns for "when to use", "when not to use", "what it costs". Beats discursive comparison.
-- **Operational checklist.** 5-9 items. Use for "before merging a PR", "before deploying", "before publishing".
-- **Self-evaluation form.** Short questions the reader answers; reveals gaps in their own understanding.
-
-A "summary paragraph" rarely earns its place. If the synthesis can be expressed as a table or a checklist, it should be.
-
-## Sync + async blending
-
-When material accompanies a live session:
-
-- **Live session**: motivation, debate, collective Q&A, shared energy. Best for *tutorial* and *explanation* modalities live.
-- **Async guide**: depth, self-pace, rereading, just-in-time lookup. Best for *how-to* and *reference* modalities written.
-- **Rule**: async guide must be *self-sufficient* (someone who missed the live can follow) AND *complementary* (adds what live can't deliver: depth, edge cases, reference tables).
-- The live session should explicitly point to async files: "when you hit case X, go to file Y".
-
-## Voice and prose style
-
-**Central rule for prose-level editing:** every paragraph that explains something should follow the pattern **situation → explanation → practical consequence**. Compressed lines that fuse the three steps into a single aphorism manufacture the "internal note" feel that fails technical guides for adults. The pattern applies whether designing fresh prose or rewriting tight notes.
-
-Style rules in technical writing are language-dependent. Apply them by audience and language, not by inertia from English style guides.
-
-**Voice.** Pick a stable voice for the audience and the language and stay consistent.
-
-- *English Google-style*: second person "you" reads peer-to-peer.
-- *Spanish technical writing for adult devs*: plural inclusive (vía conjugation: "vemos", "tenemos", "hilamos") often reads more peer-to-peer than imperative `tú`. The plural inclusive carries author and reader together without sounding paternalistic.
-- *Whatever you pick*: do not switch mid-document.
-
-**Sentence length.** Two failure modes, opposite directions:
-
-- *Too long*: sentences over ~25 words that mix more than two ideas should be split.
-- *Too compressed*: sentences so short and aphoristic that the reader has to reconstruct intent. The remedy is **situación → explicación → consecuencia práctica**.
-
-**Style rules to apply:**
-
-- [ ] Task-based titles with verbs ("Configure Jest", not "Jest configuration").
-- [ ] Present tense, active voice.
-- [ ] Numbered steps when order matters, bullets otherwise.
-- [ ] Consistent terminology — one concept = one term, always. Keep a glossary.
-- [ ] Headings form a scannable outline.
-- [ ] Predictable structure across files; **varied wording** in titles and section headers (so structure does not become template).
-- [ ] One aphoristic phrase per chapter at most. The rest of the punchy lines turn into explanations with subject + cause.
-- [ ] Pronouns (`lo / eso / esto`) only when the referent is unambiguous; replace with the noun the first time.
-- [ ] One metaphor per concept, only if it clarifies. No mixed metaphors.
-- [ ] Anglicisms only when canonical (`harness`, `MCP`, `tool use`, `system prompt`, `prompt`); otherwise translate.
-
-**Concrete catalogue of prose-level pitfalls** (compressed sentences, vague pronouns, aphorism chains, mixed metaphors, unnecessary anglicisms, dry transitions, mechanical recurring titles, absolute claims) with examples and rewrite rules: `./references/prose-pitfalls.md`.
-
-## Review checklist
-
-When reviewing an existing guide, check each file for:
-
-**Structure**
-- [ ] Has a declared dominant modality (tutorial / how-to / reference / explanation).
-- [ ] Doesn't equal-mix modalities — micro-sections of another modality only at the close, marked.
-- [ ] Opens with why-this-matters, not with theory.
-- [ ] Has explicit learning objectives at the top.
-- [ ] Has an estimated time.
-
-**Cognitive load**
-- [ ] No section introduces more than one new concept.
-- [ ] Examples use consistent domain across files.
-- [ ] Code snippets are self-contained (imports visible).
-- [ ] Scaffolding fades across exercises.
-- [ ] Worked examples present before autonomous exercises.
-- [ ] Reader-orientation cues at the close of dense paragraphs.
-
-**Adult learner respect**
-- [ ] Tone is peer-to-peer, not parental.
-- [ ] References reader's prior experience.
-- [ ] Offers alternative paths (fast / deep).
-- [ ] Solutions available (not blocked "so they think").
-- [ ] Exercises tied to real-world tasks, not toy problems.
-
-**Code examples**
-- [ ] Minimum viable, runnable, self-contained.
-- [ ] Single domain across the guide.
-- [ ] Real names unless pure-syntax context.
-- [ ] ≤ 30 lines per snippet.
-- [ ] Inline annotations over paragraph prose.
-- [ ] Versions + validation date in header.
-- [ ] Anti-patterns marked visually and followed by fix.
-
-**Durability**
-- [ ] Body of prose talks in stable principles.
-- [ ] Dated facts (prices, versions, commands) live in callouts, sources block or appendix.
-- [ ] Each versioned block has a verification date.
-
-**Synthesis**
-- [ ] Synthesis section uses a concrete format (decision table, comparative table, checklist, self-evaluation), not a generic summary paragraph.
-- [ ] If the guide is operational, an appendix of reusable templates exists.
-
-**Microstyle (prose level)**
-
-Run the prose pitfalls catalogue (`./references/prose-pitfalls.md`) in the order recommended at the bottom of that file. Quick check:
-
-- [ ] No vague pronouns without clear referent.
-- [ ] No sentences mixing more than two ideas.
-- [ ] At most one aphoristic phrase per chapter.
-- [ ] Section titles vary across the guide (no five chapters with the same closing-section name).
-- [ ] Entries to the recurring example vary (no five chapters opening with "Volvamos a…").
-- [ ] Transitions explain why-now, not just "vamos a verlo".
-- [ ] No mixed metaphors.
-- [ ] Anglicisms only where canonical.
-
-**Navigation**
-- [ ] Consistent structure across files.
-- [ ] Each file links to related files (tutorial → how-to for advanced, how-to → reference for details).
-- [ ] Index file routes by reader intent ("I want to learn" / "I want to solve X" / "I want to look up").
-- [ ] Nothing important found only by search.
-
-## Common anti-patterns to flag
-
-### Structural
-
-1. **Mixed modalities** — tutorial with exhaustive reference table embedded as equal partner.
-2. **Theory before pain** — 3 paragraphs defining terms before any code or example.
-3. **Wall of text** — >5-line paragraphs, no H2/H3, no callouts.
-4. **Frankenstein examples** — `User` test that suddenly renders `<ProductList>`.
-5. **Inconsistent terminology** — "test", "spec", "case" used interchangeably.
-6. **Broken code snippets** — missing imports, wrong types.
-7. **Outdated versions unmarked** — no stack version header, no validation date.
-8. **Blocked solutions** — exercises with no accessible answer (professional-hostile).
-9. **Condescending tone** — "Let's learn together what a function is".
-10. **Unlinked cross-references** — "as seen earlier" with no link.
-11. **Dated data in body prose** — prices, versions, exact commands sprinkled inline instead of in callouts or appendix.
-12. **Generic summary paragraphs** — synthesis sections that could be a decision table but are prose.
-
-### Prose-level
-
-Catalogue with examples in `./references/prose-pitfalls.md`. Headlines:
-
-13. **Compressed sentences** — concept + metaphor + conclusion in one line.
-14. **Vague pronouns** — `lo / eso / esto` without clear referent.
-15. **Aphorism chains** — "no es X: es Y" repeated section after section.
-16. **Mixed metaphors** — incompatible images stacked.
-17. **Unnecessary anglicisms** — `mental model`, `scope`, `baseline`, `inline` where Spanish reads cleaner.
-18. **Dry transitions** — "Vamos a verlo", "Quedan tres categorías" with no why-now.
-19. **Mechanical recurring titles** — "La trampa común…" five chapters in a row; "Volvamos al…" as every entry to the recurring example.
-20. **Absolute claims** — universal-sounding statements that a senior reader can puncture.
-
-## Process for designing a new guide
-
-1. **Define learning outcomes** with Bloom verbs: "By the end, you will be able to [apply/configure/migrate/evaluate] X".
-2. **Identify audience state**: what they already know, their stack, their daily pain.
-3. **Pick modalities**: usually tutorial + how-to + reference + explanation, each in separate files. One dominant per file.
-4. **Pick a single domain** for all examples.
-5. **Outline per file**: title, purpose, prerequisites, time, sections.
-6. **Decide synthesis format per file** (decision table / comparative table / checklist / self-evaluation) before writing.
-7. **Plan the appendix** if the guide is operational: which templates the team will copy.
-8. **Design exercises with fading**: guided → semi-guided → autonomous.
-9. **Write one file end-to-end first** to calibrate tone and depth.
-10. **Microstyle pass** with `./references/prose-pitfalls.md` before piloting.
-11. **Pilot with 2-3 real users**, collect friction points (time vs estimate, repeated doubts, frequent errors).
-12. **Iterate incrementally**, don't rewrite.
-
-## Process for reviewing existing material
-
-1. Map each file to a dominant modality. Flag files that equal-mix more than one.
-2. Check the index file: does it route by reader intent? Does it offer fast / deep paths?
-3. Check durability: dated data in body or in callouts/appendix?
-4. Run the structural review checklist on each file.
-5. Run the prose-pitfalls catalogue on each file in the order at the bottom of `./references/prose-pitfalls.md`. Single-rule passes, not "humanize everything at once".
-6. Score: how many principles does each file satisfy?
-7. Prioritize fixes: structural first (modality split, missing index, dated data leaking everywhere), then synthesis format, then prose microstyle, then polish (terminology, links).
-8. Produce a punch list with file + issue + proposed fix, not a full rewrite.
-
-## Process for microediting prose only
-
-When the user's request is microedition (the structure is sound; the prose reads compressed, robotic, template-driven, slogan-like), do not touch structure. Run only the prose pass.
-
-Deliver three things, in this order:
-
-1. **Diagnosis.** Which of the eight pitfalls in `./references/prose-pitfalls.md` apply, with the file/line of two or three concrete examples each. Not a generic "the prose feels off".
-2. **Priorities.** Which pitfalls to fix first in this guide (typically vague pronouns first, compressed sentences second, aphorism chains third). Justify by impact on this specific text.
-3. **Concrete rewrites.** Before/after for each priority, drawn from the actual file. Not generic templates.
-
-Constraints during a microedit pass:
-
-- **No structural changes.** Do not split files, reorder sections, or add anexos. If those are needed, flag them but do not execute them in this pass.
-- **No new content.** Do not add boxes, _callouts_ or sections that were not there.
-- **One rule at a time.** Each edit applies one of the eight rules. A pass that mixes "fix vague pronouns + add reader-orientation cues + translate anglicisms" loses voice; passes are sequential.
-- **Preserve voice.** If the guide has a stable voice (plural inclusive in Spanish, second person in English, etc.), keep it. The microedit fixes prose, not register.
-
-Closing of a microedit pass: list which rules were applied, on how many sentences, and which were intentionally left untouched (and why). The user should be able to validate the diff against the rule, not against taste.
-
-## References
-
-Full research digest with citations: `./references/research-digest.md`.
-
-Prose-level pitfalls catalogue with examples: `./references/prose-pitfalls.md`.
-
-Key sources:
-
-- Diátaxis framework — https://diataxis.fr/
-- Knowles, *The Adult Learner* — https://www.sciencedirect.com/book/9780128117583
-- Sweller, Cognitive Load Theory — https://link.springer.com/article/10.1007/s10648-019-09465-5
-- Google Developer Style — https://developers.google.com/style
-- Write the Docs — https://www.writethedocs.org/guide/
-- Mayer, *Multimedia Learning* — https://www.cambridge.org/core/books/multimedia-learning/
-- Kent C. Dodds, *Common mistakes with React Testing Library* — https://kentcdodds.com/blog/common-mistakes-with-react-testing-library
+| **Tutorial** | Aprender haciendo | "Soy nuevo, llévame de la mano" | Tu primer test con Vitest |
+| **How-to** | Orientado a tarea | "Tengo el problema X, cómo lo resuelvo" | Cómo mockear un servicio HTTP |
+| **Reference** | Consulta de información | "Cuál es la sintaxis exacta de X" | Tabla de equivalencias Jasmine → Vitest |
+| **Explanation** | Comprensión | "Por qué X funciona así" | Por qué mutation testing y no cobertura |
+
+Debajo hay dos ejes ortogonales:
+
+- **Práctica (acción) ↔ Teoría (cognición)**
+- **Adquisición (aprender) ↔ Aplicación (trabajar)**
+
+**Regla.** Etiqueta cada archivo o sección con **una modalidad dominante** en
+su front-matter. Ante la mezcla, partir es el default.
+
+**Híbrido permitido.** Una modalidad dominante puede alojar una
+**micro-sección de otra modalidad** al cierre del archivo cuando sirve
+directamente a la dominante. Caso típico: un capítulo de *explanation* sobre
+un concepto que cierra con un bloque pequeño de *reference* ("dónde implementa
+esto cada herramienta") para que el lector no salga de contexto a buscar el
+detalle operativo. Marca la micro-sección visualmente (H2 propio, tabla o
+callout) para que se pueda escanear o saltar.
+
+Lo que sigue sin funcionar: la mezcla a partes iguales (un tutorial montado a
+medias como tabla de referencia). Si el archivo hace dos modalidades a partes
+iguales, parte en dos.
+
+## Principios pedagógicos para devs adultos (andragogía)
+
+Los desarrolladores profesionales son aprendices adultos:
+
+1. **Necesitan el porqué** antes del qué: abre cada sección con el dolor o el
+   problema, no con teoría.
+2. **Valoran la autonomía**: ofrece rutas ("camino rápido" y "a fondo"),
+   nunca un único orden forzado.
+3. **Traen experiencia previa**: apóyate en lo que ya saben ("si vienes de
+   Jest, `vi.fn` te resultará familiar").
+4. **Piensan en problemas, no en temarios**: organiza por "cómo testeo un
+   formulario asíncrono", no por "capítulo 3: matchers".
+5. **Tienen motivación interna**: conecta con KPIs reales (menos bugs en
+   producción, PRs más rápidas, menos flakiness).
+6. **Aprenden just-in-time, no just-in-case**: el contenido llega cuando lo
+   van a aplicar esta semana.
+7. **Agradecen las señales de orientación**: indicaciones explícitas como
+   "quédate con esta idea", "no necesitas memorizar X", "el síntoma típico es
+   Y", "si solo lees una sección, lee esta" bajan la carga cognitiva sin
+   resultar condescendientes. Úsalas al cierre de párrafos densos.
+
+**Nunca** con profesionales: tono paternalista, "qué es una función",
+soluciones bloqueadas "para que piensen", ánimo con emojis, explicar la
+terminal.
+
+## Carga cognitiva: las tres cargas
+
+- **Intrínseca**: complejidad inherente al tema. Irreducible; solo se
+  secuencia.
+- **Extrínseca**: fricción añadida por malas decisiones de diseño. Minimízala
+  con agresividad.
+- **Pertinente**: el esfuerzo útil de construir esquemas mentales. Maximízala
+  con worked examples y fading.
+
+Efectos que conviene conocer:
+
+- **Worked example effect** (Sweller y Cooper, 1985): estudiar un ejemplo
+  totalmente resuelto es más eficiente que resolver desde cero, para novatos.
+- **Expertise reversal effect** (Kalyuga, 2003): los MISMOS worked examples
+  confunden a los expertos. Ofrece "si ya sabes X, salta al reto Y".
+- **Backward fading** (Renkl y Atkinson, 2003): paso 1 completo → paso 2
+  parcial → paso 3 en blanco. Andamiaje gradual.
+
+## Diseño de ejemplos de código
+
+Reglas para todo fragmento de código:
+
+1. **MVCE** (ejemplo mínimo viable): ejecutable, completo, representativo,
+   sin nada de más.
+2. **Autocontenido**: imports visibles (o declarados una vez como convención
+   del capítulo). El lector no debería inferir más de 3 líneas.
+3. **Revelado progresivo**: el primer fragmento, trivial; añade capas de una
+   en una. Nunca abras con el "final realista".
+4. **Un solo dominio en toda la guía** (p. ej. "CartApp"): reutilizar el
+   dominio reduce carga.
+5. **Nombres reales frente a placeholders**: `user/cart/order` al mostrar
+   patrones aplicados; `foo/bar` solo para sintaxis pura.
+6. **Longitud**: 5 a 15 líneas ideal, 30 como máximo. Más largo: parte o
+   enlaza a un repo ejecutable.
+7. **Explícito antes que ingenioso**: `const r = add(2,3);
+   expect(r).toBe(5);` gana a `expect(add(2,3)).toBe(5)` en primera
+   aparición.
+8. **Contigüidad**: la explicación pegada al código, no después. Los
+   comentarios inline `// ← esta es la línea clave` ganan a los párrafos.
+9. **Versionado**: encabeza cada capítulo con versiones del stack y fecha de
+   validación ("Validado 2026-04 con Vitest 4.x").
+10. **Sin fallos de compilación**: incluye todos los imports. Valida los
+    fragmentos en CI si es posible.
+
+### Patrón antes/después
+
+Úsalo al mostrar anti-patterns comunes en la audiencia:
+
+- Marca lo malo con señales visuales: `// ❌ frágil` / `// ✅ resiliente`.
+- Nunca dejes un anti-pattern en una página sin su corrección.
+- Riesgo: efecto de familiaridad (el lector memoriza la versión mala).
+  Mitiga con distinción visual.
+
+## Durabilidad: principios estables frente a datos versionados
+
+Las guías técnicas envejecen. Los precios cambian, las versiones de modelo se
+mueven, las listas de comandos se reescriben entre releases. El cuerpo de la
+guía debería sobrevivir a la mayoría de esos cambios; los datos fechados se
+ponen en cuarentena para poder actualizarlos sin reescribir la prosa.
+
+**Regla.** Separa principios estables de datos versionados.
+
+- **Cuerpo de la guía.** Principios que cambian despacio (la asimetría de
+  coste input/output, la atención no uniforme, memoria ≠ contexto). Es lo que
+  el lector debería recordar dentro de unos años.
+- **Datos versionados.** Precios concretos, números de versión, nombres
+  exactos de comandos, fechas de lanzamiento de features. Viven en:
+  - **Callouts inline** con fecha de verificación: `> Verificado el
+    2026-05-06. Confirmar contra docs antes de publicar.`
+  - **Un bloque "Fuentes" o "Datos versionados" al final de cada capítulo**,
+    para que quien revise en el futuro actualice un bloque en vez de rastrear
+    la prosa.
+  - **Un anexo** para tablas de comandos y referencias rápidas.
+
+El coste de confundir ambos: una guía con precios concretos en cada párrafo
+se lee como un informe temporal, no como un manual. Una guía sin ningún dato
+concreto se lee vaga. La disciplina: principios dentro, datos fechados y
+señalizados.
+
+## Plantilla de estructura de guía
+
+Aplícala a cada archivo mayor:
+
+1. **Título + propósito en una línea** (para quién es, qué sabrá hacer
+   después).
+2. **Prerrequisitos** (enlaces a material previo o recursos externos).
+3. **Estimación de tiempo**.
+4. **Contexto / motivación**: por qué importa (el dolor sin este
+   conocimiento).
+5. **Cuerpo**: secciones pequeñas, cada una con explicación → ejemplo →
+   micro-ejercicio o pregunta de autochequeo.
+6. **Síntesis**: ver "Tácticas de síntesis" abajo; elige un formato concreto,
+   no un párrafo-resumen vago.
+7. **Ejercicio de consolidación**: problema aplicado, más abierto.
+8. **Referencias**: enlaces de profundización, docs oficiales.
+
+### Opcional de alto impacto: anexo de plantillas reutilizables
+
+Para guías dirigidas a equipos que van a *operar* con el material (no solo
+leerlo), añade un anexo final que reúna las plantillas que el cuerpo mostró
+por piezas:
+
+- Esqueletos de `AGENTS.md` / `CLAUDE.md` / configuración.
+- Plantilla de *spec*.
+- *Prompts* operativos listos para copiar.
+- *Checklists* de revisión (PR, auditoría, despliegue).
+- Tablas de decisión.
+
+El anexo es la pieza más reutilizada de una guía operativa. El cuerpo explica
+el porqué; el anexo da lo que el equipo pegará en su repo el lunes.
+
+Estructura consistente entre archivos = previsibilidad = menos carga
+cognitiva. Combínala con **redacción variada** en títulos y encabezados (ver
+prose-pitfalls, entrada 7) para que el esqueleto previsible no produzca piel
+de plantilla.
+
+## Tácticas de síntesis
+
+El punto 6 de la plantilla ("síntesis") se ejecuta demasiado a menudo como
+párrafo-resumen genérico. Elige en su lugar uno de estos formatos, en este
+orden de utilidad para devs adultos:
+
+- **Tabla de decisión.** "Síntoma → causa probable → capítulo donde se
+  trata". La pieza más reutilizada de una guía operativa.
+- **Tabla comparativa.** Opción A frente a B frente a C, con columnas "cuándo
+  usar", "cuándo no", "qué cuesta". Gana a la comparación discursiva.
+- **Checklist operativa.** De 5 a 9 ítems. Para "antes de mergear una PR",
+  "antes de desplegar", "antes de publicar".
+- **Formulario de autoevaluación.** Preguntas cortas que el lector responde;
+  revela huecos en su propia comprensión.
+
+Un "párrafo de resumen" rara vez se gana el sitio. Si la síntesis puede
+expresarse como tabla o checklist, debería serlo.
+
+## Combinar sesión en vivo y material asíncrono
+
+Cuando el material acompaña a una sesión en vivo:
+
+- **Sesión en vivo**: motivación, debate, preguntas colectivas, energía
+  compartida. Lo mejor en vivo: *tutorial* y *explanation*.
+- **Guía asíncrona**: profundidad, ritmo propio, relectura, consulta
+  just-in-time. Lo mejor por escrito: *how-to* y *reference*.
+- **Regla**: la guía asíncrona debe ser *autosuficiente* (quien faltó a la
+  sesión puede seguirla) Y *complementaria* (añade lo que el directo no da:
+  profundidad, casos límite, tablas de referencia).
+- La sesión en vivo señala explícitamente los archivos asíncronos: "cuando te
+  encuentres el caso X, ve al archivo Y".
+
+## Voz y estilo de prosa
+
+**Esta skill es dueña de la estructura, no de la prosa.** En el pipeline
+writeonmars las reglas de prosa viven en la pirámide de prosa y se cargan por
+separado; no las reapliques desde aquí o el texto tendrá tres jefes:
+
+- **Capa 1, cohesión y fluidez**: `../prosa/SKILL.md` (`prosa-base`): frases
+  completas, progresión conocido → nuevo, eco entre párrafos, transiciones
+  con porqué, ritmo de crucero.
+- **Capa 2, registro del género**: `../registros/<slug>/SKILL.md` (para
+  guías técnicas: `tecnico-divulgativo`): formalidad, densidad, presupuesto
+  de figuras, aserción con alcance, persona del género.
+- **Capa 3, voz del autor**: `../voz/SKILL.md` (`marcela-prose`): léxico,
+  humor, aperturas, cierres, limpieza de patrones LLM.
+
+**Regla central que esta skill conserva** (es estructural, constitución
+§ II): cada párrafo que explica algo sigue **situación → explicación →
+consecuencia práctica**. Una línea comprimida que funde los tres pasos se lee
+como nota interna, no como guía.
+
+**Reglas de estilo de nivel estructural que se quedan aquí:**
+
+- [ ] Títulos de tarea con verbo ("Configura Jest", no "Configuración de
+  Jest").
+- [ ] Pasos numerados cuando el orden importa; viñetas cuando no.
+- [ ] Los encabezados forman un esquema escaneable.
+- [ ] Estructura previsible entre archivos; **redacción variada** en títulos
+  y encabezados (que la estructura no se vuelva plantilla).
+- [ ] Terminología consistente: un concepto = un término, siempre. Mantén
+  glosario. (El registro y el sector fijan la cadencia de definición y los
+  anglicismos admitidos.)
+
+**Catálogo concreto de defectos de prosa** con ejemplos y reglas de
+reescritura: `./references/prose-pitfalls.md`. Sigue siendo la fuente
+histórica de varias reglas de la pirámide (prosa-base lo acredita); al editar
+prosa dentro del pipeline, usa las capas de la pirámide.
+
+## Checklist de revisión
+
+Al revisar una guía existente, comprueba en cada archivo:
+
+**Estructura**
+
+- [ ] Tiene una modalidad dominante declarada (tutorial / how-to / reference
+  / explanation).
+- [ ] No mezcla modalidades a partes iguales; micro-secciones de otra
+  modalidad solo al cierre, marcadas.
+- [ ] Abre con el porqué importa, no con teoría.
+- [ ] Tiene objetivos de aprendizaje explícitos arriba.
+- [ ] Tiene tiempo estimado.
+
+**Carga cognitiva**
+
+- [ ] Ninguna sección introduce más de un concepto nuevo.
+- [ ] Los ejemplos usan un dominio consistente entre archivos.
+- [ ] Los fragmentos de código son autocontenidos (imports visibles).
+- [ ] El andamiaje se desvanece a lo largo de los ejercicios.
+- [ ] Hay worked examples antes de los ejercicios autónomos.
+- [ ] Señales de orientación al cierre de párrafos densos.
+
+**Respeto al aprendiz adulto**
+
+- [ ] El tono es de par a par, no parental.
+- [ ] Se apoya en la experiencia previa del lector.
+- [ ] Ofrece rutas alternativas (rápida / a fondo).
+- [ ] Las soluciones están disponibles (no bloqueadas "para que piensen").
+- [ ] Los ejercicios se atan a tareas reales, no a problemas de juguete.
+
+**Ejemplos de código**
+
+- [ ] Mínimos viables, ejecutables, autocontenidos.
+- [ ] Un solo dominio en toda la guía.
+- [ ] Nombres reales salvo contexto de sintaxis pura.
+- [ ] ≤ 30 líneas por fragmento.
+- [ ] Anotaciones inline antes que párrafos.
+- [ ] Versiones + fecha de validación en el encabezado.
+- [ ] Anti-patterns marcados visualmente y seguidos de su corrección.
+
+**Durabilidad**
+
+- [ ] El cuerpo habla en principios estables.
+- [ ] Los datos fechados (precios, versiones, comandos) viven en callouts,
+  bloque de fuentes o anexo.
+- [ ] Cada bloque versionado tiene fecha de verificación.
+
+**Síntesis**
+
+- [ ] La sección de síntesis usa un formato concreto (tabla de decisión,
+  comparativa, checklist, autoevaluación), no un resumen genérico.
+- [ ] Si la guía es operativa, existe el anexo de plantillas reutilizables.
+
+**Microestilo (nivel prosa)**
+
+Pasa el catálogo (`./references/prose-pitfalls.md`) en el orden recomendado
+al final de ese archivo. Chequeo rápido:
+
+- [ ] Sin pronombres vagos sin referente claro.
+- [ ] Sin frases que mezclen más de dos ideas.
+- [ ] Como mucho una frase aforística por capítulo.
+- [ ] Los títulos de sección varían a lo largo de la guía (no cinco capítulos
+  con la misma sección de cierre).
+- [ ] Las entradas al ejemplo recurrente varían (no cinco capítulos abriendo
+  con "Volvamos a…").
+- [ ] Las transiciones explican el porqué-ahora, no solo "vamos a verlo".
+- [ ] Sin metáforas mezcladas.
+- [ ] Anglicismos solo donde son canónicos.
+
+**Navegación**
+
+- [ ] Estructura consistente entre archivos.
+- [ ] Cada archivo enlaza a los relacionados (tutorial → how-to para
+  avanzado, how-to → reference para detalle).
+- [ ] El índice enruta por intención del lector ("quiero aprender" / "quiero
+  resolver X" / "quiero consultar").
+- [ ] Nada importante se encuentra solo buscando.
+
+## Anti-patterns comunes a señalar
+
+### Estructurales
+
+1. **Modalidades mezcladas**: tutorial con tabla de referencia exhaustiva
+   incrustada como socio a partes iguales.
+2. **Teoría antes del dolor**: 3 párrafos definiendo términos antes de
+   cualquier código o ejemplo.
+3. **Muro de texto**: párrafos de más de 5 líneas, sin H2/H3, sin callouts.
+4. **Ejemplos Frankenstein**: un test de `User` que de repente renderiza
+   `<ProductList>`.
+5. **Terminología inconsistente**: "test", "spec", "caso" usados como
+   sinónimos.
+6. **Fragmentos rotos**: imports que faltan, tipos incorrectos.
+7. **Versiones desactualizadas sin marcar**: sin encabezado de versión de
+   stack, sin fecha de validación.
+8. **Soluciones bloqueadas**: ejercicios sin respuesta accesible (hostil con
+   profesionales).
+9. **Tono condescendiente**: "Aprendamos juntos qué es una función".
+10. **Referencias cruzadas sin enlace**: "como vimos antes" sin link.
+11. **Datos fechados en la prosa del cuerpo**: precios, versiones y comandos
+    exactos espolvoreados inline en vez de en callouts o anexo.
+12. **Párrafos de resumen genéricos**: secciones de síntesis que podrían ser
+    una tabla de decisión y son prosa.
+
+### De nivel prosa
+
+Catálogo con ejemplos en `./references/prose-pitfalls.md`. Titulares:
+
+13. **Frases comprimidas**: concepto + metáfora + conclusión en una línea.
+14. **Pronombres vagos**: `lo / eso / esto` sin referente claro.
+15. **Cadenas de aforismos**: "no es X: es Y" repetido sección tras sección.
+16. **Metáforas mezcladas**: imágenes incompatibles apiladas.
+17. **Anglicismos innecesarios**: `mental model`, `scope`, `baseline`,
+    `inline` donde el español se lee más limpio.
+18. **Transiciones secas**: "Vamos a verlo", "Quedan tres categorías" sin
+    porqué-ahora.
+19. **Títulos recurrentes mecánicos**: "La trampa común…" cinco capítulos
+    seguidos; "Volvamos al…" como única entrada al ejemplo recurrente.
+20. **Afirmaciones absolutas**: enunciados de sonido universal que un lector
+    senior puede pinchar.
+
+## Proceso para diseñar una guía nueva
+
+1. **Define resultados de aprendizaje** con verbos de Bloom: "Al terminar
+   sabrás [aplicar/configurar/migrar/evaluar] X".
+2. **Identifica el estado de la audiencia**: qué sabe ya, su stack, su dolor
+   diario.
+3. **Elige modalidades**: normalmente tutorial + how-to + reference +
+   explanation, cada una en archivo propio. Una dominante por archivo.
+4. **Elige un único dominio** para todos los ejemplos.
+5. **Esquema por archivo**: título, propósito, prerrequisitos, tiempo,
+   secciones.
+6. **Decide el formato de síntesis por archivo** (tabla de decisión /
+   comparativa / checklist / autoevaluación) antes de escribir.
+7. **Planifica el anexo** si la guía es operativa: qué plantillas copiará el
+   equipo.
+8. **Diseña ejercicios con fading**: guiado → semi-guiado → autónomo.
+9. **Escribe un archivo de punta a punta primero** para calibrar tono y
+   profundidad.
+10. **Pasada de microestilo** con `./references/prose-pitfalls.md` antes de
+    pilotar.
+11. **Pilota con 2 o 3 usuarios reales** y recoge puntos de fricción (tiempo
+    frente a estimación, dudas repetidas, errores frecuentes).
+12. **Itera incrementalmente**, no reescribas.
+
+## Proceso para revisar material existente
+
+1. Mapea cada archivo a una modalidad dominante. Señala los que mezclan a
+   partes iguales.
+2. Revisa el índice: ¿enruta por intención del lector? ¿Ofrece rutas rápida y
+   a fondo?
+3. Revisa durabilidad: ¿datos fechados en el cuerpo o en callouts/anexo?
+4. Pasa la checklist estructural en cada archivo.
+5. Pasa el catálogo de prose-pitfalls en cada archivo, en el orden del final
+   de ese documento. Pasadas de una sola regla, no "humanizar todo a la vez".
+6. Puntúa: ¿cuántos principios satisface cada archivo?
+7. Prioriza arreglos: estructural primero (separar modalidades, índice que
+   falta, datos fechados por todas partes), después formato de síntesis,
+   después microestilo, después pulido (terminología, enlaces).
+8. Entrega una lista de tareas con archivo + problema + arreglo propuesto,
+   no una reescritura completa.
+
+## Proceso para microeditar solo prosa
+
+**En el pipeline writeonmars este trabajo es de la pasada 3** (naturalidad),
+que carga la pirámide de prosa (`prosa-base` → registro → `marcela-prose`);
+usa este proceso solo para material suelto fuera del pipeline.
+
+Cuando la petición es microedición (la estructura es sólida; la prosa se lee
+comprimida, robótica, de plantilla o de eslogan), no toques la estructura.
+Pasa solo la revisión de prosa.
+
+Entrega tres cosas, en este orden:
+
+1. **Diagnóstico.** Cuáles de los ocho defectos de
+   `./references/prose-pitfalls.md` aplican, con archivo y línea de dos o
+   tres ejemplos concretos cada uno. No un genérico "la prosa suena rara".
+2. **Prioridades.** Qué defectos arreglar primero en esta guía (típicamente
+   pronombres vagos, después frases comprimidas, después cadenas de
+   aforismos). Justifica por impacto en este texto concreto.
+3. **Reescrituras concretas.** Antes/después de cada prioridad, sacados del
+   archivo real. No plantillas genéricas.
+
+Restricciones durante una pasada de microedición:
+
+- **Sin cambios estructurales.** No partas archivos, no reordenes secciones,
+  no añadas anexos. Si hacen falta, señálalo pero no lo ejecutes en esta
+  pasada.
+- **Sin contenido nuevo.** No añadas cajas, *callouts* ni secciones que no
+  estaban.
+- **Una regla por pasada.** Cada edición aplica una de las ocho reglas. Una
+  pasada que mezcla "arreglar pronombres + añadir señales de orientación +
+  traducir anglicismos" pierde la voz; las pasadas son secuenciales.
+- **Preserva la voz.** Si la guía tiene voz estable (plural inclusivo en
+  español, segunda persona en inglés…), mantenla. La microedición arregla
+  prosa, no registro.
+
+Cierre de una pasada de microedición: lista qué reglas se aplicaron, sobre
+cuántas frases, y cuáles se dejaron intactas a propósito (y por qué). La
+persona debe poder validar el diff contra la regla, no contra el gusto.
+
+## Referencias
+
+Digest completo de investigación con citas: `./references/research-digest.md`
+(se conserva en inglés: es material de consulta con fuentes originales).
+
+Catálogo de defectos de prosa con ejemplos: `./references/prose-pitfalls.md`.
+
+Fuentes clave:
+
+- Diátaxis framework: https://diataxis.fr/
+- Knowles, *The Adult Learner*: https://www.sciencedirect.com/book/9780128117583
+- Sweller, Cognitive Load Theory: https://link.springer.com/article/10.1007/s10648-019-09465-5
+- Google Developer Style: https://developers.google.com/style
+- Write the Docs: https://www.writethedocs.org/guide/
+- Mayer, *Multimedia Learning*: https://www.cambridge.org/core/books/multimedia-learning/
+- Kent C. Dodds, *Common mistakes with React Testing Library*: https://kentcdodds.com/blog/common-mistakes-with-react-testing-library
+
+---
+
+Traducción al español: 2026-07-04 (el original nació en inglés; el pipeline
+es en español y las referencias operativas deben leerse en el idioma en que
+se escribe). El id `technical-guide-design` se conserva: lo citan prompts,
+manifiestos y docs.

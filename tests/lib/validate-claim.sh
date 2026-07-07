@@ -7,7 +7,7 @@
 #
 # Estrategia (gemelo de validate-citation.sh):
 #   1. Localiza WRITING_FRAMEWORK_HOME relativo al script (dos niveles arriba).
-#   2. Resuelve SCHEMA_PATH = $WRITING_FRAMEWORK_HOME/contracts/claim-record.schema.json.
+#   2. Resuelve SCHEMA_PATH = $WRITING_FRAMEWORK_HOME/writeonmars/contracts/claim-record.schema.json.
 #   3. Valida con python3 + jsonschema (draft 2020-12 sin configuración extra).
 #   4. Fallback a `npx ajv-cli --spec=draft2020` si no hay jsonschema.
 #   5. Si ninguno está disponible, sale con error claro.
@@ -118,7 +118,7 @@ Uso:
   cat record.json | validate-claim.sh -
 
 Valida un ClaimRecord (claim-record v1.0) contra
-contracts/claim-record.schema.json.
+writeonmars/contracts/claim-record.schema.json.
 USAGE
 }
 
@@ -151,7 +151,7 @@ main() {
 
     local framework_home
     framework_home="$(resolve_framework_home "${BASH_SOURCE[0]}")"
-    local schema_path="$framework_home/contracts/claim-record.schema.json"
+    local schema_path="$framework_home/writeonmars/contracts/claim-record.schema.json"
     if [[ ! -f "$schema_path" ]]; then
         log_err "schema ausente: $schema_path"
         exit 1

@@ -18,12 +18,16 @@
 
 ### Tono calibrado
 
+**Registro (capa 2)**: `[REGISTRO_SLUG]` · Base aplicada:
+`references/registros/[REGISTRO_SLUG]/SKILL.md`
+
 [TONO]
 
-*(Persona gramatical / registro / humor: [REGISTRO])*
+*(Persona gramatical / humor / matices sobre el registro: [REGISTRO])*
 
-La pasada de naturalidad (Principio V.3) verifica el texto contra esta calibración,
-no contra un tono genérico.
+La pasada de naturalidad (Principio V.3) verifica el texto contra el registro
+declarado y esta calibración, no contra un tono genérico. La pirámide completa:
+prosa-base (capa 1, siempre) → registro (capa 2, esta adenda) → voz (capa 3).
 
 ### Contrato terminológico
 

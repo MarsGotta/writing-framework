@@ -23,7 +23,7 @@ Revisión (escribe uno, revisa otro — cada pasada asignable a un modelo distin
 |---|---|
 | `speckit.review` | Agrupado: corre las 4 pasadas. |
 | `speckit.review-structure` | Pasada local: estructura + utilidad. |
-| `speckit.review-voice` | Pasada local: voz (`marcela-prose`). |
+| `speckit.review-voice` | Pasada local: naturalidad (`prosa-base` para el hilo + registro del manifiesto + `marcela-prose` para la voz). |
 | `speckit.review-precision` | Pasada local: contrasta contra `research.md` y **verifica las fuentes en vivo** (abre la URL/web) los datos volátiles. |
 | `speckit.review-global` | Pasada global: formato + coherencia (libro entero). |
 | `speckit.revise` | Aplica al texto los hallazgos abiertos de `findings.md` (cierra el loop). |
@@ -226,9 +226,14 @@ hallazgo `critico` abierto bloquea el cierre sea cual sea la firma.
 
 | Pieza | Necesita |
 |---|---|
-| `export` / `close` | `pandoc` + Chrome/Chromium |
+| `export` / `close` | `pandoc` + Chrome/Chromium (ruta con `--chrome` o `WOM_CHROME` si no está en las habituales) |
 | `feedback` | `pymupdf` (recomendado) o `pypdf` |
 | `memory` | nada (TF); `rank-bm25` opcional para BM25 |
+| `bootstrap` | nada; `jsonschema` opcional para validación completa del manifest |
+
+Las dependencias de Python se instalan juntas con
+`pip install -r scripts/requirements.txt` (todas opcionales: cada pieza degrada
+o avisa si le falta la suya).
 
 ## Salidas generadas (caché, gitignorables)
 

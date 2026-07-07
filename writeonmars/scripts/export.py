@@ -278,7 +278,7 @@ def find_chrome(override: str | None) -> str:
     for cand in CHROME_CANDIDATES:
         if Path(cand).exists() or shutil.which(cand):
             return cand
-    fail("no encuentro Chrome ni Chromium; pásalo con --chrome")
+    fail("no encuentro Chrome ni Chromium; pásalo con --chrome /ruta/al/binario o exporta WOM_CHROME=/ruta/al/binario")
 
 
 def slugify(s: str) -> str:
@@ -381,9 +381,11 @@ def main() -> None:
         "--no-pdf-header-footer", f"--print-to-pdf={output}", html_path.as_uri(),
     ]
     try:
-        subprocess.run(cmd, capture_output=True, text=True, check=True)
+        subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=180)
     except subprocess.CalledProcessError as e:
         fail(f"Chrome falló: {e.stderr.strip()[:400]}")
+    except subprocess.TimeoutExpired:
+        fail("Chrome superó los 180 s generando el PDF (¿proceso colgado?); reintenta o prueba otro binario con --chrome / WOM_CHROME")
 
     if not args.keep_temp:
         shutil.rmtree(tmpdir, ignore_errors=True)

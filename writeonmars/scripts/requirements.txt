@@ -1,0 +1,15 @@
+# Dependencias opcionales de los scripts del preset. El núcleo (status.py,
+# close.py, bootstrap.py) corre con la biblioteca estándar de Python 3.10+.
+#
+#   pip install -r requirements.txt
+#
+# feedback_intake.py: extrae anotaciones del PDF. pymupdf es lo recomendado;
+# pypdf sirve como fallback (solo comentarios, sin texto bajo el resaltado).
+pymupdf
+# index.py: ranking BM25. Sin esto usa el backend TF interno, sin dependencias.
+rank-bm25
+# bootstrap.py y smoke tests: validación completa del manifest contra su
+# schema. Sin esto se comprueban solo las claves requeridas.
+jsonschema
+# export.py no usa paquetes de Python: necesita `pandoc` y Chrome/Chromium en
+# el sistema (ruta con --chrome o con la variable de entorno WOM_CHROME).

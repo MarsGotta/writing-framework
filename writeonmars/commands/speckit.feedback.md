@@ -44,7 +44,7 @@ Lee `feedback-changeset.json`. Para cada `item` con `estado: abierto`:
 1. Abre `chapters/<chapter_file>` y localiza el pasaje por `anchor_text` (o
    `line`).
 2. Aplica el cambio según `tipo`:
-   - **Voz** → aplica las reglas de `.specify/presets/writeonmars/references/voz/SKILL.md` SOLO sobre ese pasaje.
+   - **Voz** → aplica las reglas de `.specify/presets/writeonmars/references/prosa/SKILL.md` (hilo), `.specify/presets/writeonmars/references/registros/<registro>/SKILL.md` (registro del manifiesto) y `.specify/presets/writeonmars/references/voz/SKILL.md` (voz) SOLO sobre ese pasaje.
    - **Dato/precisión** → verifica contra `research.md`; si falta cita, búscala
      o marca el finding como bloqueante; nunca inventes el dato.
    - **Estructura / Claridad / Cobertura / Recortar / Ampliar** → reescribe el

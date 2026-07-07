@@ -1,7 +1,7 @@
 ---
-prompt-version: 1.0
+prompt-version: 1.1
 applies-to: writeonmars-redaccion
-last-reviewed: 2026-05-06
+last-reviewed: 2026-07-04
 ---
 
 # Prompt canónico — Redacción de capítulo (Write.OnMars)
@@ -41,10 +41,22 @@ capítulo.
 
 ## Skills permitidas
 
-- `/technical-guide-design` — para arquitectura del capítulo (Diátaxis,
-  worked examples, carga cognitiva, plantilla de capítulo, cajas visuales).
-- `/marcela-prose` — para voz, microestilo, limpieza de patrones LLM y prosa
-  española natural.
+Se aplican en este orden (pirámide de prosa, de cimiento a cúspide):
+
+1. `/prosa-base` — capa 1, SIEMPRE: fluidez y cohesión (frases completas,
+   progresión conocido → nuevo, eco entre párrafos, transiciones con porqué,
+   ritmo de crucero). Redacta con su checklist de generación activo.
+2. `/registro-<slug>` — capa 2: el registro declarado en el manifiesto
+   (`registro`; si falta, el default del sector). Para guías técnicas:
+   `/registro-tecnico-divulgativo` (formalidad profesional cercana, densidad
+   con aterrizaje en artefacto, figuras con presupuesto, aserción con
+   alcance).
+3. `/technical-guide-design` — para arquitectura del capítulo (Diátaxis,
+   worked examples, carga cognitiva, plantilla de capítulo, cajas visuales).
+4. `/marcela-prose` — capa 3: voz, microestilo, limpieza de patrones LLM y
+   prosa española natural. En conflicto de sabor gana la voz; en formalidad
+   y densidad globales, el registro; los dos innegociables de `/prosa-base`
+   (frases completas y progresión conocido → nuevo) no los deroga nadie.
 
 No invoques otras skills durante la redacción. Las pasadas posteriores tienen
 sus propias skills.
@@ -151,17 +163,34 @@ Evita en todo momento:
 - **Metáforas mezcladas** dentro del mismo párrafo o sección.
 - **Anglicismos gratuitos** cuando exista equivalente preciso en español
   (ej.: *return* → retorno; *librería* → biblioteca; *comando* → orden).
+- **Enumeraciones huérfanas**: lista de infinitivos o sintagmas sin verbo
+  soltada tras punto ("Ese trecho tiene pasos con nombre. Convertir el
+  texto, elegir cómo representarlo."). Engánchala con dos puntos o dale un
+  verbo matriz (`/prosa-base`, regla 1).
+- **Arranques en frío**: frase o párrafo que no recoge nada del anterior.
+  Cada frase nace de la anterior; cada párrafo abre con eco del previo
+  (`/prosa-base`, reglas 2 y 3).
+- **Staccato**: tres frases de menos de 8 palabras seguidas sin intención
+  retórica. La frase media es el pulso; la corta remata, no gobierna
+  (`/prosa-base`, regla 6).
 
 ## Pautas microestilísticas (constitución § IV)
 
 - **Univocidad terminológica**: un término por concepto. La repetición exacta
   es preferible a la variación sinonímica cuando ello compromete la precisión.
-- **Pasiva refleja** sobre la pasiva perifrástica ("Se introducen los
-  conceptos" frente a "Los conceptos son introducidos").
-- **Nominalizaciones, aposiciones y construcciones absolutas** para densidad
-  informativa.
-- **Sobriedad**: el texto suena a persona experta explicando con orden, no a
-  IA intentando parecer humana.
+  Además, repetir el término ancla es mecanismo de cohesión (`/prosa-base`,
+  regla 3): univocidad e hilo se refuerzan.
+- **Verbos plenos y sujeto concreto** sobre nominalizaciones y construcciones
+  absolutas: "analizamos el corpus" frente a "el análisis del corpus". La
+  densidad informativa se gana encadenando frases (progresión conocido →
+  nuevo), no comprimiendo varias ideas en sintagmas sin verbo.
+- **Plural inclusivo o sujeto explícito** antes que pasiva sostenida:
+  "introducimos los conceptos" o "el capítulo introduce los conceptos" frente
+  a "se introducen los conceptos" como registro dominante. La pasiva refleja
+  queda para cuando el agente es irrelevante de verdad.
+- **Naturalidad con calidez**: el texto suena a persona experta explicando
+  con orden y ganas de que se entienda, no a IA intentando parecer humana ni
+  a acta administrativa.
 - **Anglicismos técnicos** (harness, MCP, skill, tool use) son admisibles
   cuando no exista equivalente preciso; justifica en el anexo de glosario.
 

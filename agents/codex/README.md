@@ -1,10 +1,12 @@
-# Codex adapter (scaffolding)
+# Codex adapter
 
-Esqueleto del adaptador de Write.OnMars para [Codex](https://openai.com/codex/).
-**Estado v1**: scaffolding. Los prompts canónicos del adaptador Claude Code
-(`agents/claude/prompts/`) se mantienen como fuente de verdad; aquí solo
-existen placeholders para demostrar el agnosticismo declarado en FR-023 y
-FR-024.
+Adaptador de Write.OnMars para [Codex](https://openai.com/codex/).
+**Estado**: port parcial. Los prompts canónicos del adaptador Claude Code
+(`agents/claude/prompts/`) se mantienen como fuente de verdad. `redaccion.md`
+y `pasada-3.md` ya son adaptadores reales, alineados con la constitución
+v1.5.0: aplican el contrato compartido del prompt canónico y definen solo lo
+que difiere en Codex. Las pasadas 1, 2, 4 y 5 siguen siendo placeholders que
+demuestran el agnosticismo declarado en FR-023 y FR-024.
 
 ## Qué falta para portar a Codex
 
@@ -44,17 +46,20 @@ mantenedora que quiera completar el adaptador.
 agents/codex/
 ├── README.md            # este archivo
 └── prompts/
-    ├── redaccion.md           # placeholder
+    ├── redaccion.md           # adaptador (constitución v1.5.0)
     ├── pasada-1.md            # placeholder
     ├── pasada-2.md            # placeholder
-    ├── pasada-3.md            # placeholder
+    ├── pasada-3.md            # adaptador (constitución v1.5.0)
     ├── pasada-4.md            # placeholder
     └── pasada-5.md            # placeholder
 ```
 
-Cada placeholder declara `prompt-version: 0.1.0-scaffold` en el
+Cada placeholder pendiente declara `prompt-version: 0.1.0-scaffold` en el
 front-matter y el cuerpo es un TODO explícito que apunta al prompt canónico
-correspondiente en `agents/claude/prompts/`.
+correspondiente en `agents/claude/prompts/`. Los adaptadores completados
+declaran `prompt-version: 1.0`, remiten al canónico como contrato compartido
+y documentan las diferencias propias de Codex (sin sub-agentes, skills
+resueltas como referencias por ruta, lectura del manifiesto).
 
 ## Referencias
 

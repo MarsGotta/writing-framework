@@ -1,6 +1,6 @@
 ---
 name: writeonmars-redaccion
-description: Redacta un capítulo de la guía despachando un sub-agente con el prompt canónico de redacción. El sub-agente invoca /technical-guide-design para arquitectura y /marcela-prose para voz. Trigger cuando la persona diga "redacta el capítulo N", "produce el capítulo objetivo", "escribe la guía", "redacta capítulo".
+description: Redacta un capítulo de la guía despachando un sub-agente con el prompt canónico de redacción. El sub-agente invoca /prosa-base para fluidez y cohesión (capa 1, siempre), el registro del manifiesto (capa 2, p. ej. /registro-tecnico-divulgativo), /technical-guide-design para arquitectura y /marcela-prose para voz (capa 3). Trigger cuando la persona diga "redacta el capítulo N", "produce el capítulo objetivo", "escribe la guía", "redacta capítulo".
 allowed-tools: Bash, Read, Write, Edit, Agent
 ---
 
@@ -9,8 +9,11 @@ allowed-tools: Bash, Read, Write, Edit, Agent
 Skill orquestadora que despacha un sub-agente fresco por capítulo.
 Materializa FR-014 y FR-015 (en su parte de generación). El sub-agente
 recibe el prompt canónico de `agents/claude/prompts/redaccion.md` y el
-contexto mínimo necesario; invoca `/technical-guide-design` para la
-arquitectura del capítulo y `/marcela-prose` para la voz. Devuelve
+contexto mínimo necesario; invoca `/prosa-base` para fluidez y cohesión
+(capa 1 de la pirámide de prosa, siempre activa), el registro declarado en
+el manifiesto (capa 2, p. ej. `/registro-tecnico-divulgativo`),
+`/technical-guide-design` para la arquitectura del capítulo y
+`/marcela-prose` para la voz (capa 3). Devuelve
 `chapters/[###]-titulo.md` con front-matter YAML y anexo de términos
 nuevos para alimentar a `writeonmars-glossary`.
 

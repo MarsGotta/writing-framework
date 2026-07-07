@@ -7,7 +7,7 @@
 #
 # Estrategia:
 #   1. Localiza WRITING_FRAMEWORK_HOME relativo al script (tres niveles arriba).
-#   2. Resuelve SCHEMA_PATH = $WRITING_FRAMEWORK_HOME/contracts/citation-record.schema.json.
+#   2. Resuelve SCHEMA_PATH = $WRITING_FRAMEWORK_HOME/writeonmars/contracts/citation-record.schema.json.
 #   3. Intenta validar con python3 + jsonschema (soporta draft 2020-12 sin
 #      configuración adicional).
 #   4. Si python3 no tiene jsonschema, fallback a `npx ajv-cli` con
@@ -144,7 +144,7 @@ Uso:
   cat record.json | validate-citation.sh -
 
 Valida un CitationRecord (citation-contract v1.0) contra
-contracts/citation-record.schema.json.
+writeonmars/contracts/citation-record.schema.json.
 USAGE
 }
 
@@ -179,7 +179,7 @@ main() {
 
     local framework_home
     framework_home="$(resolve_framework_home "${BASH_SOURCE[0]}")"
-    local schema_path="$framework_home/contracts/citation-record.schema.json"
+    local schema_path="$framework_home/writeonmars/contracts/citation-record.schema.json"
     if [[ ! -f "$schema_path" ]]; then
         log_err "schema ausente: $schema_path"
         exit 1

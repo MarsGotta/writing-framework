@@ -88,7 +88,7 @@ pass "todas las skills bundled están instaladas"
 # 4. Validar manifiesto contra el schema si tenemos validador.
 if command -v python3 >/dev/null 2>&1; then
     if python3 -c "import jsonschema" 2>/dev/null; then
-        if ! python3 - "$FRAMEWORK_HOME/contracts/manifest-schema.json" "$TMP/.writeonmars-manifest.json" <<'PYEOF' >/dev/null 2>&1
+        if ! python3 - "$FRAMEWORK_HOME/writeonmars/contracts/manifest-schema.json" "$TMP/.writeonmars-manifest.json" <<'PYEOF' >/dev/null 2>&1
 import json, sys, jsonschema
 with open(sys.argv[1]) as f: schema = json.load(f)
 with open(sys.argv[2]) as f: instance = json.load(f)
@@ -97,13 +97,23 @@ PYEOF
         then
             fail "manifiesto no valida contra el schema"
         fi
-        pass "manifiesto valida contra contracts/manifest-schema.json"
+        pass "manifiesto valida contra writeonmars/contracts/manifest-schema.json"
     else
         printf '[%s][skip] python jsonschema no disponible; validación schema omitida.\n' "$TEST_NAME"
     fi
 else
     printf '[%s][skip] python3 no disponible; validación schema omitida.\n' "$TEST_NAME"
 fi
+
+# 4b. La versión del manifiesto DEBE coincidir con el pie de la constitución
+# instalada. Bootstrap la deriva del fichero (nunca de una constante): este check
+# caza cualquier regresión a hardcode, que ya se desincronizó dos veces.
+const_v="$(grep -oE '^\*\*Version\*\*: [0-9]+\.[0-9]+\.[0-9]+' "$TMP/.specify/memory/constitution.md" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || true)"
+man_v="$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))['constitution_version'])" "$TMP/.writeonmars-manifest.json")"
+if [[ -z "$const_v" || "$const_v" != "$man_v" ]]; then
+    fail "constitution_version del manifiesto ($man_v) no coincide con el pie de la constitución instalada ($const_v)"
+fi
+pass "constitution_version del manifiesto coincide con la constitución instalada ($const_v)"
 
 # 5. SC-001: timing <300 s.
 if (( ELAPSED >= 300 )); then

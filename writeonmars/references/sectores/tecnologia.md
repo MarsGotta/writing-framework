@@ -16,12 +16,21 @@ infraestructura y DevOps, APIs y SDKs, herramientas de línea de comandos.
 Lectores profesionales: desarrolladores, ingenieras, personas técnicas que ya
 trabajan en el dominio.
 
+## Registro por defecto
+
+`tecnico-divulgativo` (`references/registros/tecnico-divulgativo/SKILL.md`),
+capa 2 de la pirámide de prosa. Fija formalidad profesional cercana, plural
+inclusivo, densidad con aterrizaje en artefacto, metáfora funcional con
+presupuesto y aserción con alcance. Una guía puede elegir otro registro en sus
+adendas (`/speckit-constitution`, paso 1b).
+
 ## Tono por defecto
 
 Experto, directo, natural y sobrio. Una persona que domina el tema explicando
 con orden y criterio, sin entusiasmo de folleto ni solemnidad académica. Se
 permite una metáfora sensorial puntual cuando aclara (no como adorno). Cierres
-bajos, sin moraleja.
+bajos, sin moraleja. (El marco general lo pone el registro por defecto; este
+tono lo matiza para el sector.)
 
 ## Persona gramatical y registro
 

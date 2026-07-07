@@ -171,7 +171,7 @@ jq --arg n "$TARGET_SKILL" --arg v "$NEW_SEMVER" '
 mv "$tmp" "$manifest"
 
 # 5.e — Re-validar manifest contra el schema (si ajv-cli o python+jsonschema disponibles)
-schema="$FRAMEWORK_HOME/contracts/manifest-schema.json"
+schema="$FRAMEWORK_HOME/writeonmars/contracts/manifest-schema.json"
 validation_status="skipped"
 if command -v npx >/dev/null 2>&1; then
     if npx --no-install ajv-cli validate --spec=draft2020 -s "$schema" -d "$manifest" >/dev/null 2>&1; then

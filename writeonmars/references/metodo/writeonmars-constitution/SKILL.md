@@ -47,7 +47,9 @@ archivos de esa carpeta y los ofrece. Hoy solo existe `tecnologia.md`.
    detente y pide `/speckit-setup`.
 2. Descubre sectores: lista `references/sectores/*.md` salvo `_index.md`. Muestra
    nombre + alcance, numerados. Pide elegir (si hay uno solo, confírmalo).
-3. Carga la base del sector → defaults de todas las preguntas.
+3. Carga la base del sector → defaults de todas las preguntas. Descubre registros
+   (capa 2): lista `references/registros/*/SKILL.md`; propone el "Registro por
+   defecto" del sector (tecnología → `tecnico-divulgativo`) y pide confirmación.
 4. Ofrece camino rápido: aceptar el estándar del sector tal cual, o cuestionario.
 5. Si cuestionario: pregunta **una a una**, mostrando el default entre corchetes.
    Enter mantiene el default; respuesta lo cambia. Permite reintento sin reiniciar.
@@ -61,8 +63,9 @@ archivos de esa carpeta y los ofrece. Hoy solo existe `tecnologia.md`.
    - No toques el núcleo (todo lo anterior al centinela).
    - Si ya hay centinela, diff + confirmación antes de reemplazar desde él al final.
    - Si no, añade el bloque al final.
-7. Actualiza `.writeonmars-manifest.json`: `sector` = slug; `signing_matrix` según
-   gobernanza (por defecto sin cambios). Fechas ISO-8601.
+7. Actualiza `.writeonmars-manifest.json`: `sector` = slug; `registro` = slug del
+   registro elegido; `signing_matrix` según gobernanza (por defecto sin cambios).
+   Fechas ISO-8601.
 
 ## Defaults y no bloqueo
 
@@ -74,8 +77,10 @@ defaults. Lo único que lo detiene es la ausencia del núcleo.
 
 - `.specify/memory/constitution.md` — núcleo (precondición).
 - `references/sectores/*.md` — bases de sector y sus defaults.
+- `references/registros/*/SKILL.md` — registros disponibles (capa 2).
 - `templates/adendas-template.md` — plantilla de la capa por guía.
-- `.writeonmars-manifest.json` — para escribir `sector` y `signing_matrix`.
+- `.writeonmars-manifest.json` — para escribir `sector`, `registro` y
+  `signing_matrix`.
 - Respuestas del cuestionario (o aceptación del estándar).
 
 ## Outputs

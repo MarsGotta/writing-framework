@@ -13,7 +13,7 @@
 # campo (comportamiento por defecto = software para Spec Kit).
 #
 # Salida: <target_dir>/.writeonmars-manifest.json validado contra
-# contracts/manifest-schema.json del repo canónico.
+# writeonmars/contracts/manifest-schema.json del repo canónico.
 #
 # Validación:
 #   1. npx ajv (vía ajv-cli) si está disponible.
@@ -159,7 +159,7 @@ common::info "Manifiesto escrito en $manifest_path"
 # Validación contra el JSON Schema.
 # ---------------------------------------------------------------------------
 
-schema_path="$WRITING_FRAMEWORK_HOME/contracts/manifest-schema.json"
+schema_path="$WRITING_FRAMEWORK_HOME/writeonmars/contracts/manifest-schema.json"
 if [[ ! -f "$schema_path" ]]; then
     common::warn "No se encontró $schema_path; se omite la validación."
     exit 0

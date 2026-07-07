@@ -1,68 +1,93 @@
-# Prose-level pitfalls in technical guides
+# Defectos de prosa en guías técnicas
 
-Microstyle catalogue for technical writing aimed at professional developers. Companion to `SKILL.md`. Use it when reviewing prose that is structurally sound but reads as compressed, mechanical or robotic.
+Catálogo de microestilo para escritura técnica dirigida a desarrolladores
+profesionales. Compañero de `SKILL.md`. Úsalo al revisar prosa que es sólida
+en estructura pero se lee comprimida, mecánica o robótica.
 
-The general diagnosis behind every entry below: a prose problem usually does not come from lack of information. It comes from **excess compression**. The writer summarized their own notes instead of guiding the reader.
+El diagnóstico general detrás de cada entrada: un problema de prosa casi
+nunca viene de falta de información. Viene de **exceso de compresión**. Quien
+escribe resumió sus propias notas en vez de guiar a quien lee.
 
-The remedy pattern, applicable to all entries below:
+El patrón de remedio, aplicable a todas las entradas:
 
 > **situación → explicación → consecuencia práctica**
 
-A reader should not have to reconstruct intention from a tight phrase. A guide that earns its name guides.
+El lector no debería reconstruir la intención desde una frase apretada. Una
+guía que merece el nombre, guía.
 
-Eight pitfalls follow, each with the pattern, why it fails, examples, and the rewrite rule.
-
----
-
-## 1. Compressed sentences (concept + metaphor + conclusion in one line)
-
-**Symptom.** A single sentence trying to deliver three things at once: define, illustrate and conclude.
-
-**Why it fails.** The reader has to unpack the sentence in their head. The text reads like internal author notes, not like an explanation written for someone else.
-
-**Example — bad:**
-
-> Cabe en la cabeza, deja sitio para que cada concepto técnico aterrice en algo reconocible y evita el bullet hipotético del tipo "imaginemos un sistema X".
-
-(Three ideas, two metaphors, one English term, one nested example. The reader has to map all of them.)
-
-**Example — better:**
-
-> El ejemplo es pequeño a propósito. Una API REST de tareas es fácil de seguir y es suficiente para hablar de validación, tests, contexto, memoria, herramientas y revisión de PRs sin cambiar de escenario en cada capítulo.
-
-**Rewrite rule.** If a sentence contains *concept + metaphor + conclusion*, split it. Two clear sentences beat one clever one.
+Siguen ocho defectos, cada uno con el patrón, por qué falla, ejemplos y la
+regla de reescritura.
 
 ---
 
-## 2. Vague pronouns ("lo", "eso", "esto", "aquello")
+## 1. Frases comprimidas (concepto + metáfora + conclusión en una línea)
 
-**Symptom.** A pronoun is doing work the noun should be doing.
+**Síntoma.** Una sola frase intenta entregar tres cosas a la vez: definir,
+ilustrar y concluir.
 
-**Why it fails.** The reader has to scroll back to figure out what the pronoun refers to. Even if the referent is technically deducible, the cognitive cost is real and the prose feels disjointed.
+**Por qué falla.** El lector tiene que desempaquetar la frase en su cabeza.
+El texto se lee como notas internas del autor, no como una explicación
+escrita para otra persona.
 
-**Examples — bad:**
+**Ejemplo malo:**
+
+> Cabe en la cabeza, deja sitio para que cada concepto técnico aterrice en
+> algo reconocible y evita el bullet hipotético del tipo "imaginemos un
+> sistema X".
+
+(Tres ideas, dos metáforas, un término en inglés, un ejemplo anidado. El
+lector tiene que mapearlo todo.)
+
+**Ejemplo mejor:**
+
+> El ejemplo es pequeño a propósito. Una API REST de tareas es fácil de
+> seguir y es suficiente para hablar de validación, tests, contexto,
+> memoria, herramientas y revisión de PRs sin cambiar de escenario en cada
+> capítulo.
+
+**Regla de reescritura.** Si una frase contiene *concepto + metáfora +
+conclusión*, pártela. Dos frases claras ganan a una ingeniosa.
+
+---
+
+## 2. Pronombres vagos ("lo", "eso", "esto", "aquello")
+
+**Síntoma.** Un pronombre hace el trabajo que debería hacer el sustantivo.
+
+**Por qué falla.** El lector tiene que volver atrás para averiguar a qué se
+refiere. Aunque el referente sea técnicamente deducible, el coste cognitivo
+es real y la prosa se siente inconexa.
+
+**Ejemplos malos:**
 
 > Eso cambia la forma de revisar.
 >
-> Desarrolladores que sienten que "lo aceptan a ciegas" cuando el agente entrega un PR y quieren cambiar eso.
+> Desarrolladores que sienten que "lo aceptan a ciegas" cuando el agente
+> entrega un PR y quieren cambiar eso.
 
-**Examples — better:**
+**Ejemplos mejores:**
 
-> Tener una _spec_ cambia la revisión: ya no preguntamos si el código "parece bien", preguntamos si cumple lo acordado.
+> Tener una _spec_ cambia la revisión: ya no preguntamos si el código
+> "parece bien", preguntamos si cumple lo acordado.
 >
-> Personas que ya reciben PRs generados por agentes y sienten que a veces aprueban cambios que no entienden del todo.
+> Personas que ya reciben PRs generados por agentes y sienten que a veces
+> aprueban cambios que no entienden del todo.
 
-**Rewrite rule.** Replace `lo / eso / esto` with the concrete subject the first time it appears. The second mention can pronominalize without ambiguity.
+**Regla de reescritura.** Sustituye `lo / eso / esto` por el sujeto concreto
+la primera vez que aparece. La segunda mención puede pronominalizar sin
+ambigüedad.
 
 ---
 
-## 3. Aphorism chains ("no es X: es Y" repeated)
+## 3. Cadenas de aforismos ("no es X: es Y" repetido)
 
-**Symptom.** Section after section closing with a sentencious "no es X: es Y", "no se hace A: se hace B", or similar negation-affirmation pair.
+**Síntoma.** Sección tras sección cerrando con un sentencioso "no es X: es
+Y", "no se hace A: se hace B" o pareja negación-afirmación similar.
 
-**Why it fails.** Individually these phrases land. Stacked, they manufacture a slogan tone and the text starts to feel like a manifesto written for posters.
+**Por qué falla.** Sueltas, estas frases funcionan. Apiladas, fabrican tono
+de eslogan y el texto empieza a parecer un manifiesto escrito para pósteres.
 
-**Examples — bad (cluster):**
+**Ejemplos malos (en racimo):**
 
 > La economía no es opcional: es estructural.
 >
@@ -70,68 +95,88 @@ Eight pitfalls follow, each with the pattern, why it fails, examples, and the re
 >
 > Delegar lo que no podemos juzgar es no delegar: es aceptar a ciegas.
 
-**Examples — better:**
+**Ejemplos mejores:**
 
-> El coste forma parte del diseño del agente. Cada archivo leído, cada resultado de herramienta y cada respuesta generada vuelve a ocupar contexto y presupuesto.
+> El coste forma parte del diseño del agente. Cada archivo leído, cada
+> resultado de herramienta y cada respuesta generada vuelve a ocupar
+> contexto y presupuesto.
 >
-> Si el coste importa, mide una sesión real. Las estimaciones a ojo suelen fallar porque el gasto depende del historial, las herramientas, las iteraciones y la salida generada.
+> Si el coste importa, mide una sesión real. Las estimaciones a ojo suelen
+> fallar porque el gasto depende del historial, las herramientas, las
+> iteraciones y la salida generada.
 
-**Rewrite rule.** Maximum **one aphoristic phrase per chapter**, and only when it earns its place. The rest of the punchy lines turn into explanations with subject + cause.
+**Regla de reescritura.** Máximo **una frase aforística por capítulo**, y
+solo cuando se gana el sitio. El resto de frases-golpe se convierten en
+explicaciones con sujeto + causa.
 
 ---
 
-## 4. Mixed metaphors
+## 4. Metáforas mezcladas
 
-**Symptom.** Two or more incompatible images in the same sentence (spatial + landing + "in the hand" + "moves the needle").
+**Síntoma.** Dos o más imágenes incompatibles en la misma frase (espacial +
+aterrizaje + "en la mano" + "mueve la aguja").
 
-**Why it fails.** The reader has to reconcile images that don't belong together, which costs more than the metaphor saves.
+**Por qué falla.** El lector tiene que reconciliar imágenes que no encajan
+entre sí, y eso cuesta más de lo que la metáfora ahorra.
 
-**Examples — bad:**
+**Ejemplos malos:**
 
 > deja sitio para que cada concepto técnico aterrice en algo reconocible
 >
-> Modelos parecidos, montados en harnesses distintos, dan agentes que se sienten radicalmente distintos en la mano.
+> Modelos parecidos, montados en harnesses distintos, dan agentes que se
+> sienten radicalmente distintos en la mano.
 
-**Examples — better:**
+**Ejemplos mejores:**
 
 > permite explicar cada concepto con el mismo ejemplo
 >
-> El mismo modelo puede comportarse de forma muy distinta según el harness que lo rodee.
+> El mismo modelo puede comportarse de forma muy distinta según el harness
+> que lo rodee.
 
-**Rewrite rule.** One metaphor per concept, and only if it clarifies. If the metaphor obliges reinterpretation, drop it. Domestic and mechanical metaphors over cosmic or sensorial.
+**Regla de reescritura.** Una metáfora por concepto, y solo si aclara. Si la
+metáfora obliga a reinterpretar, quítala. Domésticas y mecánicas antes que
+cósmicas o sensoriales.
 
 ---
 
-## 5. Anglicisms that don't add precision
+## 5. Anglicismos que no añaden precisión
 
-**Symptom.** English terms peppered through Spanish prose where a clean Spanish word exists and is unambiguous.
+**Síntoma.** Términos en inglés salpicados por la prosa española donde
+existe una palabra española limpia y sin ambigüedad.
 
-**Whitelist (keep in English):** `harness`, `MCP`, `tool use`, `system prompt`, `context window`, `prompt`, `skill`, `spec`, `output`/`input` only when discussing pricing.
+**Lista blanca (se quedan en inglés):** `harness`, `MCP`, `tool use`,
+`system prompt`, `context window`, `prompt`, `skill`, `spec`,
+`output`/`input` solo al hablar de precios.
 
-**To translate by default:**
+**A traducir por defecto:**
 
-| English          | Better in Spanish                              |
-| ---------------- | ---------------------------------------------- |
-| mental model     | modelo mental                                  |
-| scope            | alcance                                        |
-| baseline         | línea base / punto de partida                  |
-| inline           | dentro del propio código / mezclada en lógica  |
-| datasource       | fuente de datos                                |
-| built-in         | nativa / integrada                             |
-| bullet           | viñeta / lista                                 |
+| Inglés           | Mejor en español                                  |
+| ---------------- | ------------------------------------------------- |
+| mental model     | modelo mental                                     |
+| scope            | alcance                                           |
+| baseline         | línea base / punto de partida                     |
+| inline           | dentro del propio código / mezclada en lógica     |
+| datasource       | fuente de datos                                   |
+| built-in         | nativa / integrada                                |
+| bullet           | viñeta / lista                                    |
 | fork             | duplicación de mantenimiento (cuando es figurado) |
 
-**Rule.** Use English only when the term is the canonical one in the discipline or when translating creates ambiguity. Inertia is not a reason.
+**Regla.** Inglés solo cuando el término es el canónico de la disciplina o
+cuando traducir crea ambigüedad. La inercia no es una razón. (La lista
+admitida por dominio la fija la base de sector; esta tabla es el criterio
+general.)
 
 ---
 
-## 6. Dry transitions ("Vamos a verlo", "Quedan tres categorías")
+## 6. Transiciones secas ("Vamos a verlo", "Quedan tres categorías")
 
-**Symptom.** Bare connector at the start of a paragraph or after a list, with no explanation of why we're moving from idea A to idea B.
+**Síntoma.** Conector pelado al inicio de un párrafo o tras una lista, sin
+explicar por qué pasamos de la idea A a la idea B.
 
-**Why it fails.** The text reads like an outline, not a finished document. The reader senses the seams.
+**Por qué falla.** El texto se lee como un esquema, no como un documento
+terminado. El lector nota las costuras.
 
-**Examples — bad:**
+**Ejemplos malos:**
 
 > Vamos a ese tema.
 >
@@ -139,25 +184,30 @@ Eight pitfalls follow, each with the pattern, why it fails, examples, and the re
 >
 > Vamos a verlo.
 
-**Examples — better:**
+**Ejemplos mejores:**
 
 > Ese presupuesto nos lleva al siguiente problema: los tokens.
 >
 > Con esa distinción podemos separar tres casos:
 >
-> Para entender por qué ocurre, hay que mirar qué entra realmente en el contexto.
+> Para entender por qué ocurre, hay que mirar qué entra realmente en el
+> contexto.
 
-**Rewrite rule.** Every transition should answer **why now**: why this idea follows that one, why this list of three appears here.
+**Regla de reescritura.** Toda transición responde al **porqué ahora**: por
+qué esta idea sigue a aquella, por qué esta lista de tres aparece aquí.
 
 ---
 
-## 7. Mechanical repetition of section titles and entries
+## 7. Repetición mecánica de títulos de sección y entradas
 
-**Symptom A.** Every chapter closes with a section called the same: "## La trampa común" five chapters in a row. Every chapter enters the recurring example with "Volvamos a…".
+**Síntoma A.** Todos los capítulos cierran con una sección llamada igual:
+"## La trampa común" cinco capítulos seguidos. Todos los capítulos entran al
+ejemplo recurrente con "Volvamos a…".
 
-**Why it fails.** Predictable bones lower cognitive load. Predictable *skin* manufactures template feel.
+**Por qué falla.** El esqueleto previsible baja la carga cognitiva. La
+*piel* previsible fabrica sensación de plantilla.
 
-**Mechanical (bad):**
+**Mecánico (malo):**
 
 ```
 ## La trampa común: confundir A con B
@@ -165,7 +215,7 @@ Eight pitfalls follow, each with the pattern, why it fails, examples, and the re
 ## La trampa común: confundir E con F
 ```
 
-**Varied (better):**
+**Variado (mejor):**
 
 ```
 ## A no es B
@@ -173,9 +223,10 @@ Eight pitfalls follow, each with the pattern, why it fails, examples, and the re
 ## Lo que una ventana grande no soluciona
 ```
 
-**Symptom B.** Every entry to the recurring domain example uses "Volvamos al ejemplo de…".
+**Síntoma B.** Toda entrada al ejemplo recurrente usa "Volvamos al ejemplo
+de…".
 
-**Varied (better):**
+**Variado (mejor):**
 
 > En la API de tareas, esto aparece de forma concreta cuando…
 >
@@ -183,59 +234,85 @@ Eight pitfalls follow, each with the pattern, why it fails, examples, and the re
 >
 > Pensemos en la paginación de GET /tasks.
 
-**Rewrite rule.** Same structure across files; varied wording in titles and entries. Three alternative phrasings per recurring block beats one fixed phrasing.
+**Regla de reescritura.** Misma estructura entre archivos; redacción variada
+en títulos y entradas. Tres formulaciones alternativas por bloque recurrente
+ganan a una formulación fija.
 
 ---
 
-## 8. Absolute claims that the audience can puncture
+## 8. Afirmaciones absolutas que la audiencia puede pinchar
 
-**Symptom.** A sentence sounds clean and quotable, but a senior developer reading it knows the edge case that breaks it.
+**Síntoma.** Una frase suena limpia y citable, pero un desarrollador senior
+que la lee conoce el caso límite que la rompe.
 
-**Why it fails.** Loss of trust. The reader stops reading the sentence and starts arguing with it.
+**Por qué falla.** Pérdida de confianza. El lector deja de leer la frase y
+empieza a discutir con ella.
 
-**Examples — bad:**
+**Ejemplos malos:**
 
 > Si algo no está en el contexto, para el modelo no existe.
 >
 > El agente no recibió un script.
 
-**Examples — better:**
+**Ejemplos mejores:**
 
-> Si algo no está en el contexto ni puede recuperarse mediante una herramienta, el modelo no puede usarlo de forma fiable en esa llamada.
+> Si algo no está en el contexto ni puede recuperarse mediante una
+> herramienta, el modelo no puede usarlo de forma fiable en esa llamada.
 >
-> En esta sesión, el agente no recibió un script: decidió cada paso a partir del estado del repositorio.
+> En esta sesión, el agente no recibió un script: decidió cada paso a partir
+> del estado del repositorio.
 
-**Rewrite rule.** Add scope words when the universal version overshoots: *en una sesión típica, normalmente, en muchos `harnesses`, en este ejemplo*. Precision earns more trust than slogan.
-
----
-
-## Bonus: reader-orientation cues
-
-Not a pitfall, a tactic. The opposite move of compression. Periodic phrases that lower the reader's cognitive load by signalling what to retain and what to skim.
-
-Examples that work in technical Spanish:
-
-- **"Quédate con esta idea."** — when one paragraph carries the whole point.
-- **"No necesitas memorizar X."** — when a detail is shown for completeness.
-- **"En la práctica esto significa…"** — bridging concept to action.
-- **"El síntoma típico es…"** — anchoring abstraction to a recognizable case.
-- **"Si solo lees esta sección, lee esto."** — explicit fast path.
-
-A guide aimed at adult professionals respects their attention more by signalling what matters than by being uniformly dense.
+**Regla de reescritura.** Añade palabras de alcance cuando la versión
+universal se pasa: *en una sesión típica, normalmente, en muchos
+`harnesses`, en este ejemplo*. La precisión gana más confianza que el
+eslogan.
 
 ---
 
-## Microedit pass — the order to apply the rules
+## Extra: señales de orientación al lector
 
-When auditing prose that is structurally sound but reads off, run in this order:
+No es un defecto, es una táctica. El movimiento opuesto a la compresión.
+Frases periódicas que bajan la carga cognitiva señalando qué retener y qué
+escanear.
 
-1. **Vague pronouns** (entry #2). The cheapest fix and the one with most impact on readability.
-2. **Compressed sentences** (entry #1). Split anything that mixes more than two ideas.
-3. **Aphorism chains** (entry #3). Keep one per chapter at most.
-4. **Mechanical repetition** (entry #7). Vary titles and entries.
-5. **Dry transitions** (entry #6). Add a "why now" to every connector.
-6. **Mixed metaphors** (entry #4). Demote or remove.
-7. **Unnecessary anglicisms** (entry #5).
-8. **Absolute claims** (entry #8).
+Ejemplos que funcionan en español técnico:
 
-Do not run them all in one pass with the goal of "humanize". Run each pass with a single rule in mind. The text will keep its voice and lose the friction.
+- **"Quédate con esta idea."** Cuando un párrafo carga todo el argumento.
+- **"No necesitas memorizar X."** Cuando un detalle se muestra por
+  completitud.
+- **"En la práctica esto significa…"** Puente del concepto a la acción.
+- **"El síntoma típico es…"** Ancla la abstracción a un caso reconocible.
+- **"Si solo lees esta sección, lee esto."** Ruta rápida explícita.
+
+Una guía para profesionales adultos respeta más su atención señalando lo que
+importa que siendo uniformemente densa.
+
+---
+
+## Pasada de microedición: el orden de aplicación
+
+Al auditar prosa sólida en estructura pero que se lee rara, pasa en este
+orden:
+
+1. **Pronombres vagos** (entrada 2). El arreglo más barato y el de mayor
+   impacto en legibilidad.
+2. **Frases comprimidas** (entrada 1). Parte todo lo que mezcle más de dos
+   ideas.
+3. **Cadenas de aforismos** (entrada 3). Deja como mucho una por capítulo.
+4. **Repetición mecánica** (entrada 7). Varía títulos y entradas.
+5. **Transiciones secas** (entrada 6). Añade el porqué-ahora a cada
+   conector.
+6. **Metáforas mezcladas** (entrada 4). Degrada o elimina.
+7. **Anglicismos innecesarios** (entrada 5).
+8. **Afirmaciones absolutas** (entrada 8).
+
+No las pases todas en una sola pasada con el objetivo de "humanizar". Cada
+pasada con una sola regla en mente. El texto conservará su voz y perderá la
+fricción.
+
+---
+
+Traducción al español: 2026-07-04. En el pipeline, el cosido de frases y
+párrafos lo gobierna `references/prosa/SKILL.md` (prosa-base), que acredita
+este catálogo como fuente de sus reglas de transiciones y señales de
+orientación; las entradas siguen valiendo como catálogo de diagnóstico.

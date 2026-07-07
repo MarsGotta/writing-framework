@@ -31,6 +31,7 @@ Thumbs.db
 # === Python (scripts del preset writeonmars) ===
 __pycache__/
 *.pyc
+.pytest_cache/
 
 # === Caché generada por el preset (reconstruible desde el repo) ===
 /.writeonmars-index.json

@@ -19,12 +19,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
 
 PRESET = Path(__file__).resolve().parent.parent  # .../presets/writeonmars
-CONSTITUTION_VERSION = "1.4.0"
 FRAMEWORK_VERSION = "0.1.0"
 # Centinela que separa el núcleo de la capa por guía. Es una marca única que NO
 # aparece en el núcleo (a diferencia del título "## Adendas del proyecto", que el
@@ -36,6 +36,26 @@ ADENDAS_MARKER = "<!-- WRITEONMARS:ADENDAS -->"
 def fail(msg: str) -> "NoReturn":  # type: ignore[name-defined]
     print(f"[bootstrap] error: {msg}", file=sys.stderr)
     sys.exit(1)
+
+
+def read_constitution_version() -> str:
+    """Lee la versión desde memory/constitution.md (pie: `**Version**: X.Y.Z`).
+
+    La versión se deriva del fichero, nunca de una constante: un hardcode aquí ya
+    se desincronizó dos veces (1.3.0 y 1.4.0 quedaron fósiles tras sendos bumps).
+    """
+    src = PRESET / "memory" / "constitution.md"
+    try:
+        text = src.read_text(encoding="utf-8")
+    except OSError as exc:
+        fail(f"no puedo leer la constitución bundled en {src}: {exc}")
+    m = re.search(r"^\*\*Version\*\*:\s*(\d+\.\d+\.\d+)", text, re.MULTILINE)
+    if not m:
+        fail(f"no encuentro la marca '**Version**: X.Y.Z' al pie de {src}")
+    return m.group(1)
+
+
+CONSTITUTION_VERSION = read_constitution_version()
 
 
 def default_manifest(operator: str, email: str) -> dict:
@@ -66,6 +86,30 @@ def default_manifest(operator: str, email: str) -> dict:
         # de las bases en references/sectores/. null = adendas aún sin configurar.
         "sector": None,
     }
+
+
+def validate_manifest(manifest: dict) -> None:
+    """Valida el manifest contra contracts/manifest-schema.json antes de escribirlo.
+
+    Con `jsonschema` instalado la validación es completa; sin él se comprueban
+    las claves requeridas del schema (suficiente para cazar un manifest roto).
+    """
+    schema_path = PRESET / "contracts" / "manifest-schema.json"
+    if not schema_path.exists():
+        print(f"[bootstrap] aviso: no encuentro {schema_path.name}; omito la validación del manifest")
+        return
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    try:
+        import jsonschema  # type: ignore
+    except ImportError:
+        missing = [k for k in schema.get("required", []) if k not in manifest]
+        if missing:
+            fail(f"el manifest generado no tiene claves requeridas: {', '.join(missing)}")
+        return
+    try:
+        jsonschema.validate(instance=manifest, schema=schema)
+    except jsonschema.ValidationError as exc:
+        fail(f"el manifest generado no valida contra el schema: {exc.message}")
 
 
 def main() -> None:
@@ -109,7 +153,9 @@ def main() -> None:
     if man.exists() and not args.force:
         print("[bootstrap] .writeonmars-manifest.json ya existe; --force para regenerar")
     else:
-        man.write_text(json.dumps(default_manifest(args.operator, args.email), ensure_ascii=False, indent=2), encoding="utf-8")
+        manifest = default_manifest(args.operator, args.email)
+        validate_manifest(manifest)
+        man.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
         print(f"[bootstrap] manifest creado → .writeonmars-manifest.json (operador: {args.operator})")
 
     print("[bootstrap] listo. El proyecto ya tiene constitución y manifest.")

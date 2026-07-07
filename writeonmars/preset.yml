@@ -11,7 +11,8 @@ preset:
     encadenadas; tasks → redacción capítulo a capítulo + pasadas de revisión
     (3 locales por capítulo + 1 global). Empaqueta todo lo necesario para correr
     el pipeline: plantillas, comandos (speckit.*), scripts deterministas y las
-    referencias de voz, didáctica y método (marcela-prose, technical-guide-design,
+    referencias de prosa, registros, voz, didáctica y método (prosa-base,
+    registro-tecnico-divulgativo, marcela-prose, technical-guide-design,
     writeonmars-*) que viajan dentro y cualquier modelo lee y aplica.
     Agente-agnóstico: ver AGENTS.md de este preset.
   author: "Marcela Gotta"

@@ -140,11 +140,12 @@ FR-018.)
 ## Pasada 3 — Naturalidad
 
 **Lente**: ausencia de notas internas convertidas en prosa, transiciones
-explicadas, referentes claros, sin abuso de eslóganes ni metáforas mezcladas.
-El texto debe poder leerse en voz alta sin sonar artificial. (Constitución
-§ V.3 y § I, FR-018.)
+explicadas, referentes claros, sin abuso de eslóganes ni metáforas mezcladas;
+hilo entre frases y párrafos (cohesión, `/prosa-base`). El texto debe poder
+leerse en voz alta sin sonar artificial. (Constitución § V.3 y § I, FR-018.)
 
-**Skill principal**: `/marcela-prose`.
+**Skills principales**: `/prosa-base` (capa 1, cosido), el registro del
+manifiesto (capa 2, deriva de género) y `/marcela-prose` (capa 3, voz).
 
 **Default de firma (matriz v1)**: human (FR-020a).
 
@@ -165,6 +166,18 @@ El texto debe poder leerse en voz alta sin sonar artificial. (Constitución
 - [ ] CHK307 El texto se ha leído en voz alta (o se ha simulado la lectura)
   sin sonar artificial.
 - [ ] CHK308 Hallazgos críticos abiertos en `findings.md` para esta pasada: 0.
+- [ ] CHK309 No hay fragmentos sin verbo no deliberados ni enumeraciones
+  huérfanas tras punto; el fragmento retórico se limita a uno por sección
+  (`/prosa-base`, regla 1).
+- [ ] CHK310 Los párrafos no sobreviven al test del barajado: cada frase
+  recoge algo de la anterior y cada párrafo abre con eco del previo; no hay
+  staccato de tres frases cortas seguidas sin intención (`/prosa-base`,
+  reglas 2, 3 y 6).
+- [ ] CHK311 Sin deriva de registro: ni académica (nominalizaciones,
+  impersonal sostenido, abstracción sin artefacto), ni casual (hipérbole,
+  colegueo, afirmación sin alcance), ni de folleto (adjetivos de producto).
+  Cada hallazgo cita el dial violado
+  (`references/registros/<registro>/SKILL.md`).
 
 ### Firma
 

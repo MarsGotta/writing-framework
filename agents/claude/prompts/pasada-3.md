@@ -1,8 +1,8 @@
 ---
-prompt-version: 1.0
+prompt-version: 1.1
 applies-to: writeonmars-pasada-3
 pasada: 3_naturalidad
-last-reviewed: 2026-05-06
+last-reviewed: 2026-07-04
 ---
 
 # Prompt canónico — Pasada 3 (Naturalidad)
@@ -19,11 +19,29 @@ contexto fresco y no heredas nada del agente redactor ni de pasadas 1 / 2.
   (pasada 4). No tocas formato ni glosario (pasada 5).
 - Reescribes prosa solo en `reescritura_sugerida` por finding.
 
-## Skill principal
+## Skills principales
 
-`/marcela-prose`. Aplica los criterios de:
+`/prosa-base` primero, el registro del manifiesto después
+(`/registro-<slug>`, p. ej. `/registro-tecnico-divulgativo`) y
+`/marcela-prose` al final (pirámide de prosa).
 
-- Voz natural y sobria (constitución § I).
+De `/prosa-base` aplica el playbook de cosido y sus diagnósticos:
+
+- Fragmentos sin verbo y enumeraciones huérfanas tras punto (regla 1).
+- Test del barajado: párrafos cuyas frases se pueden reordenar sin perder
+  sentido carecen de progresión conocido → nuevo (regla 2).
+- Arranques en frío: párrafos sin eco del anterior (regla 3).
+- Transiciones sin porqué (regla 4), párrafos-ficha (regla 5) y staccato,
+  tres frases de menos de 8 palabras seguidas (regla 6).
+
+Del registro (capa 2) aplica su checklist y sus síntomas de deriva: académica
+(nominalizaciones, impersonal sostenido, abstracción sin artefacto), casual
+(hipérbole, colegueo, afirmación sin alcance) y de folleto (adjetivos de
+producto). Cita el dial violado en el hallazgo.
+
+De `/marcela-prose` aplica los criterios de:
+
+- Voz natural (constitución § I).
 - Microestilo y limpieza de patrones LLM.
 - Prosa española natural (RAE, Fundéu, Cassany, Grijelmo).
 - Plural inclusivo dominante, paréntesis honesto, antropomorfización del

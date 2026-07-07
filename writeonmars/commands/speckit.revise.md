@@ -24,8 +24,12 @@ los hallazgos con `estado: abierto`.
 
 - `specs/<###-feature>/findings.md` (los hallazgos de las pasadas).
 - Los capítulos en `chapters/`.
-- Voz: `.specify/presets/writeonmars/references/voz/SKILL.md` (para hallazgos de
-  naturalidad). `research.md` (para hallazgos de precisión).
+- Prosa-base: `.specify/presets/writeonmars/references/prosa/SKILL.md`,
+  registro: `.specify/presets/writeonmars/references/registros/<registro>/SKILL.md`
+  (del manifiesto o default del sector) y voz:
+  `.specify/presets/writeonmars/references/voz/SKILL.md` (para hallazgos de
+  naturalidad; la reescritura respeta el hilo, capa 1, el registro, capa 2,
+  y la voz, capa 3). `research.md` (para hallazgos de precisión).
 
 ## Qué haces
 

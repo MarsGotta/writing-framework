@@ -10,6 +10,43 @@ trayectorias paralelas: framework (`vX.Y.Z` del repo) y constitución
 
 ## [Unreleased] — refactor a preset agente-agnóstico
 
+### Mantenimiento (2026-07-04, auditoría de estructura del repo)
+
+- **Versionado a prueba de fósiles**: `bootstrap.py` deriva la versión de la
+  constitución del pie de `memory/constitution.md` en vez de una constante (el
+  hardcode ya se había desincronizado dos veces, en 1.3.0 y 1.4.0). El smoke
+  `install-on-empty-repo.sh` verifica ahora que el `constitution_version` del
+  manifiesto coincide con la constitución instalada.
+- **Contratos con fuente única**: `writeonmars/contracts/` es la única copia
+  editable. `contracts/` (raíz), `specs/001-framework-architecture/contracts/`
+  y los espejos de `docs/` quedaron como punteros; consumidores repuntados
+  (`tests/lib/validate-*.sh`, smoke tests, `install/lib/render-manifest.sh`).
+- **`manifest-schema` v1.2.1 (PATCH)**: `sector` admite `null` (bootstrap
+  escribe `null` hasta que `speckit.constitution` lo fija; con `jsonschema`
+  instalado un proyecto recién creado no validaba). Bug cazado por la suite
+  nueva de tests.
+- **Suite de tests unitarios** en `tests/unit/` (pytest, 133 tests) para los
+  scripts deterministas: parsers y gates de `status.py`, `bootstrap.py`
+  (incluida la validación nueva del manifest contra el schema antes de
+  escribirlo), helpers de `export.py`, backend TF de `index.py` y `close.py`.
+  `writeonmars/scripts/requirements.txt` documenta las dependencias opcionales.
+- **Robustez de `export.py`**: timeout de 180 s en Chrome headless y mensajes
+  de error que documentan `--chrome` / `WOM_CHROME`.
+- **Docs de producto (Vivarium) consolidados en `docs/`**: eliminadas las
+  copias duplicadas de la raíz (la de `graphify-evaluacion.md` ya había
+  divergido), `bookwright-contraste.md` movido a `docs/`, índice nuevo en
+  `docs/README.md`. `specs/004-frontend/` (vacía) eliminada: el frontend de
+  Vivarium irá en repo propio.
+- **Claridad para recién llegados**: banner SUPERSEDED en
+  `specs/002-wom-cli/README.md`; `README.md` en `.claude/skills/` (la fuente
+  de verdad de las skills es `writeonmars/references/`); fallback de
+  registro/sector no cubierto documentado en ambos `_index.md`; la pasada de
+  precisión explicita con qué herramientas se verifica en vivo; el how-to
+  generaliza la ejecución de cualquier comando en agentes no-Claude.
+- **`agents/codex/`**: `pasada-3.md` portado a adaptador alineado con la
+  constitución v1.5.0 y marca de sync corregida (`redaccion.md` ya estaba al
+  día; la marca "pending" de la constitución era la obsoleta).
+
 ### Cambiado
 
 - El método se distribuye y ejecuta como **preset de Spec Kit** (`writeonmars/`),

@@ -24,6 +24,8 @@ neutrales de modelo. Léelas antes de ejecutar cualquier `speckit.*` de este pre
 
 | Para… | Lee |
 |---|---|
+| Escribir con hilo (cohesión y fluidez, capa base, SIEMPRE) | `.specify/presets/writeonmars/references/prosa/SKILL.md` |
+| Aplicar el registro del género (capa 2, del manifiesto) | `.specify/presets/writeonmars/references/registros/<registro>/SKILL.md` (esquema en `_index.md`) |
 | Aplicar la voz al redactar/revisar | `.specify/presets/writeonmars/references/voz/SKILL.md` (+ su `.specify/presets/writeonmars/references/`) |
 | Diseño didáctico (estructura, carga cognitiva) | `.specify/presets/writeonmars/references/didactica/SKILL.md` |
 | Detalle de cada paso del método | `.specify/presets/writeonmars/references/metodo/writeonmars-<paso>/SKILL.md` |

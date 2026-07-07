@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://write-on-mars.dev/contracts/manifest/v1.1.json",
-  "$comment": "Mirror of specs/001-framework-architecture/contracts/manifest-schema.json. v1.1 (MINOR, feature 003-atribucion-factualidad): adds optional quality_gates. Keep both copies (contracts/ + writeonmars/contracts/) in sync.",
-  "title": "Write.OnMars Project Manifest v1.1",
+  "$id": "https://write-on-mars.dev/contracts/manifest/v1.2.1.json",
+  "$comment": "ÚNICA fuente editable desde 2026-07-04 (contracts/ raíz y specs/001 son punteros). v1.1 (MINOR, feature 003-atribucion-factualidad): adds optional quality_gates. v1.2 (MINOR, 2026-07-04, pirámide de prosa): adds optional sector and registro; sector already era escrito por speckit.constitution pero no estaba declarado (con additionalProperties:false el manifiesto no validaba). v1.2.1 (PATCH, 2026-07-04): sector admite null (bootstrap escribe null hasta que speckit.constitution lo fija; un proyecto recién creado no validaba).",
+  "title": "Write.OnMars Project Manifest v1.2.1",
   "description": "Manifest declared by every editorial project that uses the Write.OnMars harness. Produced by `writeonmars-install` (FR-001..FR-004) and updated when versions, signing matrix or operators change.",
   "type": "object",
   "required": [
@@ -97,6 +97,16 @@
       "type": "string",
       "pattern": "^\\d+\\.\\d+$",
       "description": "Citation contract version this project supports. Records emitted by MCPs are validated against this version."
+    },
+    "sector": {
+      "type": ["string", "null"],
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Optional. Slug of the sector base applied to the project addenda (references/sectores/<slug>.md). Written by speckit.constitution; null until then (bootstrap default)."
+    },
+    "registro": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Optional. Slug of the prose register (layer 2 of the prose pyramid) applied to the guide (references/registros/<slug>/SKILL.md). Written by speckit.constitution; defaults to the sector's proposed register when absent."
     },
     "project_type": {
       "type": "string",

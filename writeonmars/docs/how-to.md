@@ -122,8 +122,9 @@ Lee y ejecuta .specify/presets/writeonmars/commands/speckit.review.md sobre el
 capítulo 1 (chapters/01-...md): corre las CUATRO pasadas leyendo cada archivo en
 .specify/presets/writeonmars/commands/ (speckit.review-structure.md,
 speckit.review-voice.md, speckit.review-precision.md, speckit.review-global.md) y
-sus referencias (references/voz para voz, research.md para precisión, contracts/
-para el formato de salida). Escribe el bloque de cada pasada en
+sus referencias (references/prosa para el hilo, references/registros/<registro>
+para el registro del manifiesto, references/voz para la voz, research.md para
+precisión, contracts/ para el formato de salida). Escribe el bloque de cada pasada en
 specs/<###-feature>/findings.md según pass-output-schema (numeración: 1 estructura,
 2 utilidad, 3 naturalidad, 4 precisión, 5 formato). Solo marca hallazgos, no
 reescribas el texto, no finjas firma humana.
@@ -135,6 +136,24 @@ Después, para **aplicar** lo que marcó, usa `speckit-revise` con el modelo red
 
 Cuando registres los comandos para ese agente (ver `ROADMAP.md`), esto se reduce a
 `/speckit-review 1` nativo, sin pegar rutas.
+
+El mismo patrón vale para **cualquier comando del ciclo**, no solo la review: cada
+`speckit.*.md` de `.specify/presets/writeonmars/commands/` es un prompt plano en
+markdown que cualquier agente puede leer y ejecutar. Antes del primer comando, el
+agente debe leer el contrato (`.specify/presets/writeonmars/AGENTS.md`): ahí están
+las reglas de neutralidad y qué referencia cargar en cada paso. Ejemplo con la
+redacción en un agente cualquiera:
+
+```text
+Lee .specify/presets/writeonmars/AGENTS.md (contrato) y ejecuta
+.specify/presets/writeonmars/commands/speckit.implement.md sobre el capítulo 2:
+carga la pirámide de prosa (references/prosa, references/registros/<registro> del
+manifiesto, references/voz), el temario en specs/<###-feature>/plan.md y el
+research.md, y escribe chapters/02-...md según la plantilla de capítulo.
+```
+
+La sintaxis `/speckit-x` de los ejemplos de esta guía es solo el atajo de Claude:
+el comando real es siempre el fichero markdown, igual para todos los agentes.
 
 ## Cómo generar el PDF con otro título o salida
 

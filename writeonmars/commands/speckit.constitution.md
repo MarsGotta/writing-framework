@@ -45,6 +45,15 @@ Pregunta cuál aplica.
 - El sector elegido carga su **base de defaults** (`references/sectores/<slug>.md`):
   de ahí salen los valores por defecto de las preguntas siguientes.
 
+### 1b. Elegir registro (capa 2 de la pirámide de prosa)
+
+Lista los registros disponibles leyendo `references/registros/*/SKILL.md`
+(ignora `_index.md`). El sector propone su default (sección "Registro por
+defecto" de la base; tecnología propone `tecnico-divulgativo`). Pide
+confirmación o elección. El registro fija formalidad, densidad, figuras y
+aserción del género; la voz del autor (capa 3) va encima y la prosa-base
+(capa 1) debajo, siempre.
+
 ### 2. Camino rápido (opcional)
 
 Ofrece: *"¿Acepto el estándar de `<sector>` tal cual y escribo las adendas con los
@@ -59,8 +68,9 @@ valores por defecto, o prefieres ir pregunta por pregunta?"*
 Hazlas **una a una**, mostrando entre corchetes el valor por defecto del sector.
 Enter mantiene el default; una respuesta lo sustituye. No las inventes en bloque.
 
-1. **Tono calibrado** — registro, persona gramatical (plural inclusivo / tú /
-   usted), humor sí o no, cercanía. `[default: Tono por defecto del sector]`.
+1. **Tono calibrado** — persona gramatical (plural inclusivo / tú / usted),
+   humor sí o no, cercanía; matices sobre el registro elegido en 1b.
+   `[default: Tono por defecto del sector + registro del paso 1b]`.
 2. **Anglicismos admitidos** — confirma la lista del sector; permite añadir o
    quitar. `[default: lista del sector]`.
 3. **Matices léxicos** — sustituciones del Principio IV que esta guía mantiene,
@@ -94,6 +104,7 @@ Escríbelo en `.specify/memory/constitution.md`:
 
 Actualiza también `.writeonmars-manifest.json`:
 - `sector`: el slug elegido.
+- `registro`: el slug del registro elegido en 1b (capa 2).
 - `signing_matrix`: según la respuesta de gobernanza (por defecto, sin cambios).
 
 Fechas en ISO-8601.
@@ -108,7 +119,8 @@ estándar. Lo único que detiene el comando es la falta del núcleo (corre
 
 - `.specify/memory/constitution.md` con la sección "## Adendas del proyecto"
   rellena, sobre el núcleo intacto.
-- `.writeonmars-manifest.json` con `sector` (y `signing_matrix` si cambió).
+- `.writeonmars-manifest.json` con `sector`, `registro` (y `signing_matrix`
+  si cambió).
 
 ## Después
 

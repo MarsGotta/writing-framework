@@ -118,7 +118,10 @@ las rellena `speckit.constitution`.)
 
 Dependencias por pieza: `pandoc` + Chrome/Chromium (`export`); `pymupdf` o
 `pypdf` (`feedback`); `rank-bm25` opcional (`memory`, si no usa TF sin
-dependencias). En Linux/Paperclip, Chrome = `chromium`.
+dependencias). Las de Python se instalan juntas con
+`pip install -r scripts/requirements.txt`. En Linux/Paperclip, Chrome =
+`chromium`; si el binario no está en las rutas habituales, indícalo con
+`--chrome` o con la variable de entorno `WOM_CHROME`.
 
 **Pendiente opcional** (no bloquea producir guías):
 
@@ -138,6 +141,6 @@ preset ("reserved for future use").
 ## Modelo de revisión (Principio V)
 
 3 pasadas locales por capítulo (estructura+utilidad / naturalidad con
-`marcela-prose` / precisión con `writeonmars-contraste`) + 1 pasada global
-(formato + coherencia entre capítulos). Las cinco dimensiones se conservan como
+`prosa-base` + `marcela-prose` / precisión con `writeonmars-contraste`) + 1
+pasada global (formato + coherencia entre capítulos). Las cinco dimensiones se conservan como
 ítems de checklist; bajan de 5 ejecuciones a 4.
