@@ -124,7 +124,7 @@ vivarium/
         ├── Cargo.toml
         └── src/main.rs  # subcomandos → llamadas a vivarium-core (shell fino)
 
-tests/smoke/vivarium-e2e.sh   # e2e con agentes stub (SC-002); se suma a run-all.sh
+tests/smoke/vivarium-e2e.sh   # e2e con agentes stub (SC-002); en run-all.sh con skip si falta cargo
 writeonmars/contracts/executor-contract.md   # contrato promovido (FR-011)
 writeonmars/contracts/manifest-schema.json   # + campo mode / mode_history (FR-002)
 ```

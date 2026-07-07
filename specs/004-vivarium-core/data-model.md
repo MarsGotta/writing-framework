@@ -77,7 +77,7 @@ research → plan → implement → review → revise → close`.
 | `next_step` | Acción del runner | Rol / ejecutor | Humano |
 |---|---|---|---|
 | `setup` | sidecar `bootstrap.py` (o ya hecho por `vivarium new`) | sidecar | no |
-| `constitution` | despacho comando `speckit.constitution` | `documentalista` | no |
+| `constitution` | despacho `speckit.constitution` **no-interactivo**: adendas desde los defaults de la base de sector (`references/sectores/<slug>.md`); el sector llega de `vivarium new --sector` (o del manifiesto). La operadora puede ajustar las adendas a mano después — decisión documentada, hallazgo U1 del análisis | `documentalista` | no |
 | `specify` | **checkpoint 1**: detenerse; el brief lo firma la operadora | — | **sí** |
 | `research` | despacho `speckit.research` | `documentalista` | no |
 | `plan` | despacho `speckit.plan` | `redactora` | no |
@@ -85,6 +85,7 @@ research → plan → implement → review → revise → close`.
 | `review` | por capítulo drafted sin pasadas: 1-3 → `editora_mesa`; 4 → `documentalista` | mesa/doc | no |
 | `revise` | por capítulo en `revise_by_chapter`: despacho `speckit.revise N` | `redactora` | no |
 | global: pasada 5 | cuando `all_chapters_approved`: despacho `speckit.review-global` | `editora_mesa` | no |
+| global: intro | despacho `speckit.intro` (README de presentación del PDF, antes del export — executor-contract § 2) | `redactora` | no |
 | global: export | sidecar `export.py` | sidecar | no |
 | global: feedback | **checkpoint 2**: detenerse; PDF anotado → `feedback_intake.py` manual | — | **sí** |
 | `close` | sidecar `close.py` solo con `closeable == true` y gates verdes | sidecar | no |

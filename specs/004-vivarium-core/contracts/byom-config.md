@@ -2,6 +2,9 @@
 
 Vive en la raíz del proyecto editorial, **no versionado** (el bootstrap añade
 `.vivarium/` al `.gitignore`: contiene rutas locales de la operadora).
+`vivarium new` deja `.vivarium/config.toml.example` con esta plantilla
+comentada; la operadora la copia a `config.toml` y ajusta sus órdenes
+(`vivarium check` valida el resultado).
 
 ## Formato
 

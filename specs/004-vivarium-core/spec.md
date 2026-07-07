@@ -186,9 +186,12 @@ proyecto `estudio` rechaza cualquier despacho de redacción.
   instruccional: relanzar tras una interrupción nunca duplica trabajo.
 - **FR-007 (BYOM)**: los agentes MUST ser configurables por rol como órdenes de
   CLI (con variables para el prompt/archivo de entrada), sin acoplarse a un
-  proveedor. La configuración MUST validarse antes de iniciar el ciclo y MUST
-  demostrarse con al menos dos agentes distintos (los adaptadores existentes en
-  `agents/claude/` y `agents/codex/` son la referencia).
+  proveedor. La configuración MUST validarse antes de iniciar el ciclo. La
+  verificación por script MUST demostrar que dos configuraciones BYOM
+  distintas (stubs con órdenes diferentes) corren el mismo ciclo; la
+  demostración con dos agentes reales (los adaptadores de `agents/claude/` y
+  `agents/codex/` como referencia) es una validación manual documentada al
+  cierre de la feature, no un test automatizado.
 - **FR-008 (guardarraíl de modo)**: con `mode: estudio`, el runner MUST NOT
   despachar redacción de manuscrito (comandos que crean o reescriben
   `chapters/` / `content/`); solo revisión, verificación y anotación. El

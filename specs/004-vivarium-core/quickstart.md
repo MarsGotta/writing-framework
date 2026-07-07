@@ -57,7 +57,9 @@ depender de la herramienta real. Ningún test llama a un proveedor de IA.
    dejar puntero en el borrador, actualizar CHANGELOG.
 9. **Smoke e2e** `tests/smoke/vivarium-e2e.sh` (SC-002: 3 capítulos, stubs,
    kill+relaunch a mitad, 0 duplicados) e integrarlo en
-   `tests/smoke/run-all.sh`.
+   `tests/smoke/run-all.sh`. El script MUST autoexcluirse con aviso si
+   `cargo` no está disponible (`command -v cargo || skip`): la suite smoke
+   existente no gana Rust como dependencia dura (hallazgo I2 del análisis).
 
 ## 4. Verificación final (gate de la feature)
 

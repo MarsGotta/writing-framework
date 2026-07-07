@@ -6,7 +6,7 @@ stderr. `--json` disponible en todas las órdenes para salida estructurada.
 
 ## Órdenes
 
-### `vivarium new <dir> --kind <kind> [--mode <mode>] [--preset <ruta>] [--operator <n>] [--email <e>] [--agents <lista>]`
+### `vivarium new <dir> --kind <kind> [--mode <mode>] [--sector <slug>] [--preset <ruta>] [--operator <n>] [--email <e>] [--agents <lista>]`
 
 Crea un proyecto editorial operativo (FR-001). `<kind>` ∈ `guia | tutorial |
 documentacion | no-ficcion | novela | relato | poesia | guion | academico`
@@ -16,7 +16,10 @@ Idempotente: re-ejecutar sobre un proyecto ya creado no duplica ni destruye.
 
 - Efectos: git init + `specify init` + `specify preset add` + `bootstrap.py` +
   manifiesto con `mode` + `roots/README.md` + `decisions.jsonl` + `.vivarium/`
-  en `.gitignore` + commit base.
+  en `.gitignore` + `.vivarium/config.toml.example` (plantilla BYOM comentada,
+  ver `byom-config.md`) + commit base. Acepta `--sector <slug>` (base de
+  sector para las adendas de `speckit.constitution`; default `tecnologia`
+  para kinds de producción).
 - Precondición verificada: `git`, `python3` (o `VIVARIUM_PYTHON`), `specify`
   disponibles; error accionable si falta alguno (exit 3).
 
@@ -24,8 +27,9 @@ Idempotente: re-ejecutar sobre un proyecto ya creado no duplica ni destruye.
 
 Passthrough de `status.py --json` + campos propios del ejecutor:
 `mode` (efectivo), `in_flight` (despachos sin disposición según
-`decisions.jsonl`), `blocked_by_mode` (bool). Exit 0 siempre que el estado sea
-legible.
+`decisions.jsonl`), `blocked_by_mode` (bool). Exit 0 si el estado es legible;
+exit 5 (validación) si el proyecto no es legible (sin manifiesto, JSON del
+sidecar inválido o manifiesto que no valida contra el schema).
 
 ### `vivarium step [--project <dir>]`
 

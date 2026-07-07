@@ -24,7 +24,7 @@
     },
     "step": {
       "type": ["string", "null"],
-      "description": "Paso del método (constitution|research|plan|implement|review-1|review-2|review-3|review-4|review-5|revise|export|feedback|close). Requerido en dispatch/disposition."
+      "description": "Paso del método (constitution|research|plan|implement|review-1|review-2|review-3|review-4|review-5|revise|intro|export|feedback|close). Requerido en dispatch/disposition."
     },
     "chapter": {
       "type": ["string", "null"],
