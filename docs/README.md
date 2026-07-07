@@ -23,6 +23,9 @@ how-to, referencia, arquitectura). Aquí queda solo lo transversal al repo:
 - `compatibility-matrix.md`: agentes y MCPs soportados.
 - `contributing.md`: cómo contribuir.
 - `memory-external.md` y `parallel-execution.md`: notas técnicas.
+- `graphify-vs-codegraph.md`: qué grafo usa el agente para navegar el repo
+  (CodeGraph para código, Graphify para prosa). Distinto de
+  `graphify-evaluacion.md`, que evalúa graphify como motor de producto.
 - `maintenance/`: procedimientos (actualización de la constitución).
 - `citation-contract.md` y `manifest-schema.md`: **punteros**, la fuente es
   `writeonmars/contracts/`.
