@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://write-on-mars.dev/contracts/decision-record/v1.json",
+  "$comment": "Una línea de decisions.jsonl (JSON Lines, append-only). v1 (feature 004-vivarium-core). El archivo lo crea vacío el bootstrap; escriben el runner (dispatch/disposition/checkpoint) y `vivarium mode set` (mode_change). Correlación dispatch→disposition: mismo step+chapter, orden de aparición.",
+  "title": "Write.OnMars DecisionRecord v1",
+  "type": "object",
+  "required": ["v", "ts", "event"],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "type": "integer",
+      "const": 1,
+      "description": "Versión del formato de línea."
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Instante del evento, ISO 8601 con zona."
+    },
+    "event": {
+      "type": "string",
+      "enum": ["dispatch", "disposition", "mode_change", "checkpoint"],
+      "description": "dispatch: relevo lanzado. disposition: cierre de un dispatch. mode_change: cambio de modo aplicado. checkpoint: parada en control humano."
+    },
+    "step": {
+      "type": ["string", "null"],
+      "description": "Paso del método (constitution|research|plan|implement|review-1|review-2|review-3|review-4|review-5|revise|export|feedback|close). Requerido en dispatch/disposition."
+    },
+    "chapter": {
+      "type": ["string", "null"],
+      "description": "Ordinal del temario en string (\"1\"..\"N\"), \"global\", o null si no aplica."
+    },
+    "role": {
+      "type": ["string", "null"],
+      "enum": ["redactora", "editora_mesa", "documentalista", "sidecar", null],
+      "description": "Quién ejecuta el relevo. sidecar = script determinista del preset."
+    },
+    "outcome": {
+      "type": ["string", "null"],
+      "enum": ["ok", "revise", "failed", null],
+      "description": "Solo en disposition: ok (efecto verificado en disco), revise (accionables abiertos), failed (exit != 0 o efecto ausente; estado intacto)."
+    },
+    "detail": {
+      "type": ["string", "null"],
+      "maxLength": 500,
+      "description": "Texto corto. En mode_change: \"<from>→<to>\". En failed: causa resumida."
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "event": { "const": "dispatch" } } },
+      "then": { "required": ["step", "role"] }
+    },
+    {
+      "if": { "properties": { "event": { "const": "disposition" } } },
+      "then": { "required": ["step", "outcome"] }
+    },
+    {
+      "if": { "properties": { "event": { "const": "mode_change" } } },
+      "then": { "required": ["detail"] }
+    }
+  ]
+}

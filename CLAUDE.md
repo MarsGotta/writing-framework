@@ -33,6 +33,11 @@ solo habla con el método vía archivos + scripts + comandos. `paperclip/` queda
 `paperclip/FLOW-CONTRACT.md` (§§ 0-2 = contrato agnóstico del ejecutor).
 Scaffolding de una guía nueva en un comando: `tools/new-guide.sh`.
 
+**Feature activa**: 004-vivarium-core (rama `004-vivarium-core`) — núcleo
+headless de Vivarium. Plan: `specs/004-vivarium-core/plan.md` (research,
+data-model, contratos y quickstart en el mismo directorio). La implementación
+la hará Codex: los artefactos son autocontenidos y agente-neutrales.
+
 Specs (referencia, NO activas):
 - 001-framework-architecture: base del harness editorial (v1.0.0). Vive en `specs/001-framework-architecture/`.
 - 002-wom-cli, **superseded**: el `wom` CLI se descartó; `scripts/status.py` y
