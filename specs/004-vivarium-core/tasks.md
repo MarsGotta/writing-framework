@@ -17,13 +17,13 @@ Formato: `- [ ] [ID] [P?] [Story?] Descripción con ruta exacta`.
 
 **Purpose**: workspace compilable y verificable desde el minuto uno.
 
-- [ ] T001 Crear el workspace Cargo: `vivarium/Cargo.toml` (members =
+- [x] T001 Crear el workspace Cargo: `vivarium/Cargo.toml` (members =
   crates/vivarium-core, crates/vivarium-cli; edition 2021, rust-version 1.75) +
   `vivarium/crates/vivarium-core/{Cargo.toml,src/lib.rs}` +
   `vivarium/crates/vivarium-cli/{Cargo.toml,src/main.rs}` (stub clap con
   `--version`). Dependencias según plan.md § Technical Context. Gate:
   `cargo test --workspace` verde (trivial) y `cargo clippy` sin warnings.
-- [ ] T002 [P] Tipos de error base: `vivarium/crates/vivarium-core/src/error.rs`
+- [x] T002 [P] Tipos de error base: `vivarium/crates/vivarium-core/src/error.rs`
   (thiserror; variantes para entorno incompleto, validación, lock, sidecar,
   despacho — alineadas 1:1 con los exit codes de contracts/cli-vivarium.md) y
   mapeo error→exit code en `vivarium/crates/vivarium-cli/src/main.rs`.
@@ -37,7 +37,7 @@ Formato: `- [ ] [ID] [P?] [Story?] Descripción con ruta exacta`.
 **Purpose**: los tres contratos de lectura/escritura que todo lo demás consume
 (sidecar, manifiesto, registro de decisiones) + el bump del manifest-schema.
 
-- [ ] T003 Implementar `vivarium/crates/vivarium-core/src/sidecar.rs`:
+- [x] T003 Implementar `vivarium/crates/vivarium-core/src/sidecar.rs`:
   resolución del intérprete (`VIVARIUM_PYTHON` → `python3`, research.md R3),
   invocación de `.specify/presets/writeonmars/scripts/status.py --json` con
   cwd = proyecto, deserialización serde de TODOS los campos del
@@ -45,12 +45,12 @@ Formato: `- [ ] [ID] [P?] [Story?] Descripción con ruta exacta`.
   `revise_by_chapter`, `gates`, `closeable`, …). Unit tests contra el fixture
   real `tests/fixtures/003-factualidad-project/` (copiar a
   `vivarium/crates/vivarium-core/tests/fixtures/` si hace falta aislar).
-- [ ] T004 [P] Implementar `vivarium/crates/vivarium-core/src/manifest.rs`:
+- [x] T004 [P] Implementar `vivarium/crates/vivarium-core/src/manifest.rs`:
   lectura/escritura de `.writeonmars-manifest.json`, tipos `Mode`
   (`produccion`|`estudio`) y `ModeChange {from,to,date}`, regla ausencia =
   `produccion`, valor inválido = error de validación (edge case de spec.md).
   Unit tests: con `mode`, sin `mode`, `mode` inválido.
-- [ ] T005 [P] Extender el manifest-schema según
+- [x] T005 [P] Extender el manifest-schema según
   `specs/004-vivarium-core/contracts/manifest-mode.md`: editar
   `writeonmars/contracts/manifest-schema.json` (v1.2.1 → v1.3.0, `$id`,
   `title`, `$comment`, propiedades `mode` y `mode_history`); añadir el paso de
@@ -59,7 +59,7 @@ Formato: `- [ ] [ID] [P?] [Story?] Descripción con ruta exacta`.
   cada modo valida; sin modo valida) y fixture `estudio` en
   `tests/unit/conftest.py`; entrada en `CHANGELOG.md`. Gate:
   `uvx --with pytest --with pyyaml python -m pytest tests/unit -q` verde.
-- [ ] T006 [P] Implementar `vivarium/crates/vivarium-core/src/decisions.rs`:
+- [x] T006 [P] Implementar `vivarium/crates/vivarium-core/src/decisions.rs`:
   append-only de líneas conforme a
   `specs/004-vivarium-core/contracts/decision-record.schema.json` (v1, eventos
   dispatch/disposition/mode_change/checkpoint), lectura para computar
@@ -80,7 +80,7 @@ paridad con `tools/new-guide.sh`.
 proyecto donde el manifiesto valida contra el schema, `status.py --json`
 responde y el commit base existe — sin editar nada a mano (SC-001).
 
-- [ ] T007 [US1] Implementar
+- [x] T007 [US1] Implementar
   `vivarium/crates/vivarium-core/src/bootstrap.rs`: verificación de entorno
   (git, python3, `specify` — error accionable, exit 3), git2 init + commit
   base, subprocesos `specify init` / `specify preset add` (research.md R4),
@@ -90,10 +90,10 @@ responde y el commit base existe — sin editar nada a mano (SC-001).
   `decisions.jsonl` vacío, `.vivarium/` en `.gitignore`,
   `.vivarium/config.toml.example` (plantilla de contracts/byom-config.md).
   Idempotente: re-ejecutar no duplica ni destruye.
-- [ ] T008 [US1] Cablear el subcomando `vivarium new` en
+- [x] T008 [US1] Cablear el subcomando `vivarium new` en
   `vivarium/crates/vivarium-cli/src/main.rs` con los flags del contrato
   (contracts/cli-vivarium.md § new) y exit codes 0/2/3/5.
-- [ ] T009 [US1] Tests de integración de `new` en
+- [x] T009 [US1] Tests de integración de `new` en
   `vivarium/crates/vivarium-cli/tests/new.rs` (assert_cmd + tempfile + stub de
   `specify` en `vivarium/crates/vivarium-cli/tests/stubs/specify`): escenarios
   AS1 (kind guia → `mode: produccion` + estructura completa + status
@@ -116,11 +116,11 @@ a `all_chapters_approved` + etapa global, con kill+relaunch a mitad y 0
 despachos duplicados (SC-002); retirado el runner, `status.py` propone el
 mismo `next_step` (SC-003).
 
-- [ ] T010 [P] [US2] Implementar
+- [x] T010 [P] [US2] Implementar
   `vivarium/crates/vivarium-core/src/state.rs`: derivación de estados por
   capítulo desde `by_chapter` (tabla data-model § 3) + señal global. Unit
   tests por cada estado y transición.
-- [ ] T011 [US2] Implementar
+- [x] T011 [US2] Implementar
   `vivarium/crates/vivarium-core/src/dispatch.rs`: parseo/validación de
   `.vivarium/config.toml` (contracts/byom-config.md: tres roles, placeholders,
   `stdin`), escritura del archivo de tarea en `.vivarium/tasks/`, ejecución
@@ -128,7 +128,7 @@ mismo `next_step` (SC-003).
   (research.md R6), reglas de relevo (FR-005) y guardarraíl de modo estudio
   (FR-008 → `blocked_by_mode`). Unit tests con órdenes stub, incluido el
   rechazo de redacción en `estudio`.
-- [ ] T012 [US2] Implementar
+- [x] T012 [US2] Implementar
   `vivarium/crates/vivarium-core/src/runner.rs`: mapa `next_step`→acción
   completo (data-model § 4, **incluida la fila global `intro`**), lock fd-lock
   sobre `.vivarium/lock` (exit 6), re-verificación de estado antes de cada
@@ -136,18 +136,18 @@ mismo `next_step` (SC-003).
   paradas de checkpoint (exit 10) y `blocked_by_mode` (exit 11), registro
   dispatch/disposition/checkpoint en decisions.jsonl (FR-010), modos
   step-único y run-hasta-bloqueo.
-- [ ] T013 [US2] Cablear subcomandos `vivarium status|step|run|check` en
+- [x] T013 [US2] Cablear subcomandos `vivarium status|step|run|check` en
   `vivarium/crates/vivarium-cli/src/main.rs` según contracts/cli-vivarium.md
   (status con campos propios `mode`/`in_flight`/`blocked_by_mode` y exit 5 si
   ilegible; check valida entorno + config sin despachar).
-- [ ] T014 [P] [US2] Crear los agentes stub deterministas en
+- [x] T014 [P] [US2] Crear los agentes stub deterministas en
   `vivarium/crates/vivarium-cli/tests/stubs/`: `redactora-stub.sh` (escribe
   `chapters/NN-*.md` mínimo válido), `mesa-stub.sh` (añade bloque pass-output
   1·2·3 a `findings.md`), `doc-stub.sh` (bloque pasada 4 + variante que abre
   un accionable medio para forzar un ciclo de revise), más una segunda
   configuración BYOM distinta (FR-007: dos configs stub corren el mismo
   ciclo).
-- [ ] T015 [US2] Tests de integración del runner en
+- [x] T015 [US2] Tests de integración del runner en
   `vivarium/crates/vivarium-cli/tests/runner.rs`: ciclo completo 3 capítulos
   (AS1, incluye un NEEDS_REVISE→IN_REVIEW→APPROVED), kill+relaunch sin
   duplicados contando líneas dispatch de decisions.jsonl (AS2, SC-002),
@@ -169,15 +169,15 @@ de la garantía de procedencia (SC-004, SC-005).
 **Independent Test**: script que verifica exit 4 sin `--yes`, registro
 completo con `--yes`, y que un runner en `estudio` rechaza redacción.
 
-- [ ] T016 [US3] Implementar el cambio de modo en
+- [x] T016 [US3] Implementar el cambio de modo en
   `vivarium/crates/vivarium-core/src/manifest.rs` (append a `mode_history`,
   escritura atómica del manifiesto) + evento `mode_change` en
   `vivarium/crates/vivarium-core/src/decisions.rs` (detail `"from→to"`).
-- [ ] T017 [US3] Cablear `vivarium mode set` en
+- [x] T017 [US3] Cablear `vivarium mode set` en
   `vivarium/crates/vivarium-cli/src/main.rs`: sin `--yes` imprime la
   consecuencia de procedencia y sale con 4; con `--yes` aplica y registra
   (contracts/cli-vivarium.md § mode set).
-- [ ] T018 [US3] Tests de integración en
+- [x] T018 [US3] Tests de integración en
   `vivarium/crates/vivarium-cli/tests/mode.rs`: AS1 (sin confirmación no
   aplica, exit 4, mensaje de consecuencia), AS2 (con `--yes` registra
   manifiesto + decisions), AS3 + SC-004 (proyecto `estudio`: el runner nunca
@@ -193,27 +193,27 @@ completo con `--yes`, y que un runner en `estudio` rechaza redacción.
 
 **Purpose**: publicación del contrato, smoke e2e, docs y gate final.
 
-- [ ] T019 [P] Publicar el contrato del ejecutor (FR-011): copiar
+- [x] T019 [P] Publicar el contrato del ejecutor (FR-011): copiar
   `specs/004-vivarium-core/contracts/executor-contract.md` →
   `writeonmars/contracts/executor-contract.md` (quitando la nota de borrador),
   dejar en el original un puntero al destino (política de fuente única,
   CLAUDE.md), y registrar el contrato nuevo en `CHANGELOG.md`.
-- [ ] T020 Crear `tests/smoke/vivarium-e2e.sh` (SC-002 de punta a punta:
+- [x] T020 Crear `tests/smoke/vivarium-e2e.sh` (SC-002 de punta a punta:
   compila el CLI, crea proyecto sintético de 3 capítulos con stubs, corre
   hasta `all_chapters_approved` con kill+relaunch a mitad, verifica 0
   duplicados) e integrarlo en `tests/smoke/run-all.sh` con guard
   `command -v cargo >/dev/null || { echo "skip: cargo no disponible"; exit 0; }`
   (quickstart § 3.9).
-- [ ] T021 [P] Docs: actualizar `vivarium/README.md` § Estado (de
+- [x] T021 [P] Docs: actualizar `vivarium/README.md` § Estado (de
   pre-scaffolding a núcleo implementado), añadir la entrada de la feature a
   `CHANGELOG.md` y el estado nuevo a `ROADMAP.md` (ejecutor Vivarium
   operativo headless).
-- [ ] T022 Validación manual documentada de FR-007: correr una guía corta con
+- [x] T022 Validación manual documentada de FR-007: correr una guía corta con
   dos agentes reales (`claude` y `codex`, adaptadores de `agents/claude/` y
   `agents/codex/`), archivar la evidencia en
   `tests/editorial-pilot/evidence/<YYYY-MM-DD>-vivarium-byom/` (config usada,
   decisions.jsonl, status final). No es test automatizado.
-- [ ] T023 Gate final (SC-006): `cd vivarium && cargo test --workspace` +
+- [x] T023 Gate final (SC-006): `cd vivarium && cargo test --workspace` +
   `uvx --with pytest --with pyyaml python -m pytest tests/unit -q` +
   `bash tests/smoke/run-all.sh` — todo verde, sin pasos manuales no
   documentados.

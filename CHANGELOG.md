@@ -42,8 +42,8 @@ trayectorias paralelas: framework (`vX.Y.Z` del repo) y constitución
   de la constitución.
 - Constitution Check de `plan-template.md` (preset y copia instalada) ampliado
   a los seis principios + fila "Modo de proyecto"; corregida la referencia de
-  versión fósil (v1.2.0/v1.3.0 → v1.6.0). Pendiente (spec 004): campo `mode`
-  en `manifest-schema.json`; su ausencia se interpreta como `produccion`.
+  versión fósil (v1.2.0/v1.3.0 → v1.6.0). El campo `mode` en
+  `manifest-schema.json` quedó cubierto por la spec 004 (v1.3.0, arriba).
 
 ### Mantenimiento (2026-07-04, auditoría de estructura del repo)
 

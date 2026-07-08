@@ -1,0 +1,15 @@
+# Config BYOM — validación T022 (FR-007): dos agentes reales cruzados.
+# Redactora (voz) = claude · Editora de mesa y Documentalista (precisión) = codex.
+version = 1
+
+[roles.redactora]
+command = ["claude", "-p", "--permission-mode", "acceptEdits"]
+stdin = "prompt_file"
+
+[roles.editora_mesa]
+command = ["codex", "exec", "--cd", "{project_dir}", "--sandbox", "workspace-write", "-"]
+stdin = "prompt_file"
+
+[roles.documentalista]
+command = ["codex", "exec", "--cd", "{project_dir}", "--sandbox", "workspace-write", "-"]
+stdin = "prompt_file"

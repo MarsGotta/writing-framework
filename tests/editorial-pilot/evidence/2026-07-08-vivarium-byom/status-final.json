@@ -1,0 +1,201 @@
+{
+  "spec": "001-markdown-express",
+  "chapters": [
+    "001-lo-esencial-en-10-minutos.md",
+    "002-enlaces-citas-e-imagenes.md"
+  ],
+  "chapters_written": 2,
+  "chapters_expected": 2,
+  "passes": [
+    {
+      "num": 1,
+      "name": "Estructura",
+      "estado": "passed-with-warnings",
+      "firma": "autonomous",
+      "actor": "codex:editora_mesa",
+      "firma_disp": "autonomous",
+      "required": "autonomous",
+      "signed": null,
+      "severidades": {
+        "medio": 1,
+        "bajo": 0,
+        "critico": 0
+      },
+      "abiertos": 0
+    },
+    {
+      "num": 2,
+      "name": "Utilidad",
+      "estado": "blocked",
+      "firma": "autonomous",
+      "actor": "codex:editora_mesa",
+      "firma_disp": "autonomous",
+      "required": "autonomous",
+      "signed": null,
+      "severidades": {
+        "bajo": 0,
+        "critico": 1,
+        "medio": 0
+      },
+      "abiertos": 0
+    },
+    {
+      "num": 3,
+      "name": "Naturalidad",
+      "estado": "passed",
+      "firma": "autonomous",
+      "actor": "codex:editora_mesa",
+      "firma_disp": "autonomous",
+      "required": "autonomous",
+      "signed": null,
+      "severidades": {
+        "critico": 0,
+        "medio": 0,
+        "bajo": 0
+      },
+      "abiertos": 0
+    },
+    {
+      "num": 4,
+      "name": "Precisión",
+      "estado": "passed-with-warnings",
+      "firma": "autonomous",
+      "actor": "codex:documentalista",
+      "firma_disp": "autonomous",
+      "required": "autonomous",
+      "signed": null,
+      "severidades": {
+        "critico": 0,
+        "bajo": 0,
+        "medio": 2
+      },
+      "abiertos": 0
+    },
+    {
+      "num": 1,
+      "name": "Estructura",
+      "estado": "passed-with-warnings",
+      "firma": "autonomous",
+      "actor": "codex:editora_mesa",
+      "firma_disp": "autonomous",
+      "required": "autonomous",
+      "signed": null,
+      "severidades": {
+        "medio": 1,
+        "critico": 0,
+        "bajo": 0
+      },
+      "abiertos": 0
+    },
+    {
+      "num": 2,
+      "name": "Utilidad",
+      "estado": "passed",
+      "firma": "autonomous",
+      "actor": "codex:editora_mesa",
+      "firma_disp": "autonomous",
+      "required": "autonomous",
+      "signed": null,
+      "severidades": {
+        "medio": 0,
+        "bajo": 0,
+        "critico": 0
+      },
+      "abiertos": 0
+    },
+    {
+      "num": 3,
+      "name": "Naturalidad",
+      "estado": "passed",
+      "firma": "autonomous",
+      "actor": "codex:editora_mesa",
+      "firma_disp": "autonomous",
+      "required": "autonomous",
+      "signed": null,
+      "severidades": {
+        "bajo": 0,
+        "critico": 0,
+        "medio": 0
+      },
+      "abiertos": 0
+    },
+    {
+      "num": 4,
+      "name": "Precisión",
+      "estado": "passed-with-warnings",
+      "firma": "autonomous",
+      "actor": "codex:documentalista",
+      "firma_disp": "autonomous",
+      "required": "autonomous",
+      "signed": null,
+      "severidades": {
+        "critico": 0,
+        "medio": 1,
+        "bajo": 0
+      },
+      "abiertos": 0
+    },
+    {
+      "num": 5,
+      "name": "Formato + coherencia",
+      "estado": "passed",
+      "firma": "autonomous",
+      "actor": "codex:editora_mesa",
+      "firma_disp": "autonomous",
+      "required": "autonomous",
+      "signed": null,
+      "severidades": {
+        "critico": 0,
+        "bajo": 0,
+        "medio": 0
+      },
+      "abiertos": 0
+    }
+  ],
+  "criticals_open": 0,
+  "open_findings_total": 0,
+  "revise_pending": 0,
+  "revise_by_chapter": {},
+  "advisory_open_bajo": 0,
+  "sign_violations": [],
+  "gates": {
+    "no_open_criticals": true,
+    "human_signatures": true,
+    "guide_complete": true,
+    "factuality": null
+  },
+  "closeable": true,
+  "has_manifest": true,
+  "by_chapter": {
+    "2": {
+      "drafted": true,
+      "passes_done": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "revise_pending": 0,
+      "advisory": 0,
+      "approved": true
+    },
+    "1": {
+      "drafted": true,
+      "passes_done": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "revise_pending": 0,
+      "advisory": 0,
+      "approved": true
+    }
+  },
+  "all_chapters_approved": true,
+  "next_step": "close",
+  "next_detail": "gates en verde: intro + export + close (PDF final, Editora jefa)",
+  "mode": "produccion",
+  "in_flight": [],
+  "blocked_by_mode": false
+}

@@ -1,0 +1,59 @@
+{"v":1,"ts":"2026-07-08T10:34:44.747146+00:00","event":"checkpoint","step":"specify","chapter":null,"role":null,"outcome":null,"detail":"brief firmado por la operadora"}
+{"v":1,"ts":"2026-07-08T10:35:56.307778+00:00","event":"dispatch","step":"research","chapter":null,"role":"documentalista","outcome":null,"detail":"Ejecutar speckit.research y escribir research.md con fuentes."}
+{"v":1,"ts":"2026-07-08T10:42:00.187271+00:00","event":"disposition","step":"research","chapter":null,"role":"documentalista","outcome":"ok","detail":null}
+{"v":1,"ts":"2026-07-08T10:42:00.241112+00:00","event":"dispatch","step":"plan","chapter":null,"role":"redactora","outcome":null,"detail":"Ejecutar speckit.plan y materializar el temario."}
+{"v":1,"ts":"2026-07-08T10:44:45.790817+00:00","event":"disposition","step":"plan","chapter":null,"role":"redactora","outcome":"ok","detail":null}
+{"v":1,"ts":"2026-07-08T10:44:45.846601+00:00","event":"dispatch","step":"implement","chapter":"1","role":"redactora","outcome":null,"detail":"Ejecutar speckit.implement para el capítulo 1."}
+{"v":1,"ts":"2026-07-08T10:49:11.000000+00:00","event":"disposition","step":"implement","chapter":"1","role":"redactora","outcome":"ok","detail":null}
+{"v":1,"ts":"2026-07-08T10:49:44.942164+00:00","event":"disposition","step":"implement","chapter":"1","role":"redactora","outcome":"ok","detail":null}
+{"v":1,"ts":"2026-07-08T10:49:44.994370+00:00","event":"dispatch","step":"implement","chapter":"2","role":"redactora","outcome":null,"detail":"Ejecutar speckit.implement para el capítulo 2."}
+{"v":1,"ts":"2026-07-08T12:50:00.000000+00:00","event":"disposition","step":"implement","chapter":"2","role":"redactora","outcome":"ok","detail":null}
+{"v":1,"ts":"2026-07-08T10:53:13.027180+00:00","event":"disposition","step":"implement","chapter":"2","role":"redactora","outcome":"ok","detail":null}
+{"v":1,"ts":"2026-07-08T10:53:13.081990+00:00","event":"dispatch","step":"review-1","chapter":"1","role":"editora_mesa","outcome":null,"detail":"Ejecutar pasada 1 para el capítulo 1."}
+{"v":1,"ts":"2026-07-08T10:56:03.849528+00:00","event":"disposition","step":"review-1","chapter":"1","role":"editora_mesa","outcome":"revise","detail":null}
+{"v":1,"ts":"2026-07-08T10:56:03.904242+00:00","event":"dispatch","step":"revise","chapter":"1","role":"redactora","outcome":null,"detail":"Aplicar hallazgos accionables del capítulo 1."}
+{"v":1,"ts":"2026-07-08T10:56:52.620519+00:00","event":"disposition","step":"revise","chapter":"1","role":"redactora","outcome":"ok","detail":null}
+{"v":1,"ts":"2026-07-08T10:56:52.677554+00:00","event":"dispatch","step":"review-2","chapter":"1","role":"editora_mesa","outcome":null,"detail":"Ejecutar pasada 2 para el capítulo 1."}
+{"v":1,"ts":"2026-07-08T11:00:02.003725+00:00","event":"disposition","step":"review-2","chapter":"1","role":"editora_mesa","outcome":"revise","detail":null}
+{"v":1,"ts":"2026-07-08T11:00:02.060407+00:00","event":"dispatch","step":"revise","chapter":"1","role":"redactora","outcome":null,"detail":"Aplicar hallazgos accionables del capítulo 1."}
+{"v":1,"ts":"2026-07-08T11:01:00.169259+00:00","event":"disposition","step":"revise","chapter":"1","role":"redactora","outcome":"ok","detail":null}
+{"v":1,"ts":"2026-07-08T11:01:00.224927+00:00","event":"dispatch","step":"review-3","chapter":"1","role":"editora_mesa","outcome":null,"detail":"Ejecutar pasada 3 para el capítulo 1."}
+{"v":1,"ts":"2026-07-08T11:04:57.670603+00:00","event":"disposition","step":"review-3","chapter":"1","role":"editora_mesa","outcome":"ok","detail":null}
+{"v":1,"ts":"2026-07-08T11:04:57.725318+00:00","event":"dispatch","step":"review-4","chapter":"1","role":"documentalista","outcome":null,"detail":"Ejecutar pasada 4 para el capítulo 1."}
+{"v":1,"ts":"2026-07-08T11:07:22+00:00","event":"disposition","step":"review-4","chapter":"1","role":"documentalista","outcome":"revise","detail":"Pasada 4 completada con 2 hallazgos medios abiertos y 0 críticos."}
+{"v":1,"ts":"2026-07-08T11:12:48.639034+00:00","event":"disposition","step":"review-4","chapter":"1","role":"documentalista","outcome":"revise","detail":null}
+{"v":1,"ts":"2026-07-08T11:12:48.694772+00:00","event":"dispatch","step":"revise","chapter":"1","role":"redactora","outcome":null,"detail":"Aplicar hallazgos accionables del capítulo 1."}
+{"v":1,"ts":"2026-07-08T11:14:14.380995+00:00","event":"disposition","step":"revise","chapter":"1","role":"redactora","outcome":"ok","detail":null}
+{"v":1,"ts":"2026-07-08T11:14:14.437264+00:00","event":"dispatch","step":"review-1","chapter":"2","role":"editora_mesa","outcome":null,"detail":"Ejecutar pasada 1 para el capítulo 2."}
+{"v":1,"ts":"2026-07-08T11:17:20.430578+00:00","event":"disposition","step":"review-1","chapter":"2","role":"editora_mesa","outcome":"revise","detail":null}
+{"v":1,"ts":"2026-07-08T11:17:20.486858+00:00","event":"dispatch","step":"revise","chapter":"2","role":"redactora","outcome":null,"detail":"Aplicar hallazgos accionables del capítulo 2."}
+{"v":1,"ts":"2026-07-08T11:18:19.707686+00:00","event":"disposition","step":"revise","chapter":"2","role":"redactora","outcome":"ok","detail":null}
+{"v":1,"ts":"2026-07-08T11:18:19.762750+00:00","event":"dispatch","step":"review-2","chapter":"2","role":"editora_mesa","outcome":null,"detail":"Ejecutar pasada 2 para el capítulo 2."}
+{"v":1,"ts":"2026-07-08T11:20:01+00:00","event":"disposition","step":"review-2","chapter":"2","role":"editora_mesa","outcome":"ok","detail":"Pasada 2 completada sin hallazgos accionables y con 0 críticos abiertos."}
+{"v":1,"ts":"2026-07-08T11:21:28.332342+00:00","event":"disposition","step":"review-2","chapter":"2","role":"editora_mesa","outcome":"ok","detail":null}
+{"v":1,"ts":"2026-07-08T11:21:28.389784+00:00","event":"dispatch","step":"review-3","chapter":"2","role":"editora_mesa","outcome":null,"detail":"Ejecutar pasada 3 para el capítulo 2."}
+{"v":1,"ts":"2026-07-08T11:25:44.746596+00:00","event":"disposition","step":"review-3","chapter":"2","role":"editora_mesa","outcome":"ok","detail":null}
+{"v":1,"ts":"2026-07-08T11:25:44.801746+00:00","event":"dispatch","step":"review-4","chapter":"2","role":"documentalista","outcome":null,"detail":"Ejecutar pasada 4 para el capítulo 2."}
+{"v":1,"ts":"2026-07-08T11:30:13+00:00","event":"disposition","step":"review-4","chapter":"2","role":"documentalista","outcome":"revise","detail":"Pasada 4 completada con 1 hallazgo medio abierto y 0 críticos; factualidad capítulo 2: 9/11 soportadas."}
+{"v":1,"ts":"2026-07-08T11:34:59.546656+00:00","event":"disposition","step":"review-4","chapter":"2","role":"documentalista","outcome":"revise","detail":null}
+{"v":1,"ts":"2026-07-08T11:34:59.600125+00:00","event":"dispatch","step":"revise","chapter":"2","role":"redactora","outcome":null,"detail":"Aplicar hallazgos accionables del capítulo 2."}
+{"v":1,"ts":"2026-07-08T11:36:51.981228+00:00","event":"disposition","step":"revise","chapter":"2","role":"redactora","outcome":"failed","detail":"interrumpido sin efecto en disco; re-despacho seguro"}
+{"v":1,"ts":"2026-07-08T11:36:51.981907+00:00","event":"dispatch","step":"revise","chapter":"2","role":"redactora","outcome":null,"detail":"Aplicar hallazgos accionables del capítulo 2."}
+{"v":1,"ts":"2026-07-08T11:39:08.752909+00:00","event":"disposition","step":"revise","chapter":"2","role":"redactora","outcome":"ok","detail":null}
+{"v":1,"ts":"2026-07-08T11:39:08.806421+00:00","event":"dispatch","step":"review-5","chapter":"global","role":"editora_mesa","outcome":null,"detail":"Ejecutar pasada 5 global de formato/coherencia."}
+{"v":1,"ts":"2026-07-08T11:47:00.321147+00:00","event":"disposition","step":"review-5","chapter":"global","role":"editora_mesa","outcome":"ok","detail":null}
+{"v":1,"ts":"2026-07-08T11:47:00.378086+00:00","event":"dispatch","step":"intro","chapter":"global","role":"redactora","outcome":null,"detail":"Generar README.md de presentación antes del export."}
+{"v":1,"ts":"2026-07-08T11:48:47.720077+00:00","event":"disposition","step":"intro","chapter":"global","role":"redactora","outcome":"ok","detail":null}
+{"v":1,"ts":"2026-07-08T11:48:47.775481+00:00","event":"dispatch","step":"export","chapter":"global","role":"sidecar","outcome":null,"detail":"Ejecutar export.py para producir el PDF."}
+{"v":1,"ts":"2026-07-08T11:48:47.982915+00:00","event":"disposition","step":"export","chapter":"global","role":"sidecar","outcome":"failed","detail":"despacho falló: export.py falló: [export] error: pandoc no está instalado (brew install pandoc / apt install pandoc)"}
+{"v":1,"ts":"2026-07-08T11:50:13.842501+00:00","event":"dispatch","step":"export","chapter":"global","role":"sidecar","outcome":null,"detail":"Ejecutar export.py para producir el PDF."}
+{"v":1,"ts":"2026-07-08T11:50:23.784522+00:00","event":"disposition","step":"export","chapter":"global","role":"sidecar","outcome":"failed","detail":"despacho falló: export.py falló: [export] error: no encuentro Chrome ni Chromium; pásalo con --chrome /ruta/al/binario o exporta WOM_CHROME=/ruta/al/binario"}
+{"v":1,"ts":"2026-07-08T11:51:14.000887+00:00","event":"dispatch","step":"export","chapter":"global","role":"sidecar","outcome":null,"detail":"Ejecutar export.py para producir el PDF."}
+{"v":1,"ts":"2026-07-08T11:51:24.207967+00:00","event":"disposition","step":"export","chapter":"global","role":"sidecar","outcome":"ok","detail":null}
+{"v":1,"ts":"2026-07-08T11:51:24.261610+00:00","event":"checkpoint","step":"feedback","chapter":null,"role":null,"outcome":null,"detail":"PDF anotado por la operadora"}
+{"v":1,"ts":"2026-07-08T11:52:22.042933+00:00","event":"dispatch","step":"close","chapter":"global","role":"sidecar","outcome":null,"detail":"Ejecutar close.py: gates en verde, cierre del proyecto."}
+{"v":1,"ts":"2026-07-08T11:52:25.685184+00:00","event":"disposition","step":"close","chapter":"global","role":"sidecar","outcome":"failed","detail":"despacho falló: close.py falló: [export] error: no encuentro Chrome ni Chromium; pásalo con --chrome /ruta/al/binario o exporta WOM_CHROME=/ruta/al/binario\n\n[close] el gate pasó pero el export falló."}
+{"v":1,"ts":"2026-07-08T11:52:33.956350+00:00","event":"dispatch","step":"close","chapter":"global","role":"sidecar","outcome":null,"detail":"Ejecutar close.py: gates en verde, cierre del proyecto."}
+{"v":1,"ts":"2026-07-08T11:52:37.422988+00:00","event":"disposition","step":"close","chapter":"global","role":"sidecar","outcome":"failed","detail":"despacho falló: close.py falló: [export] error: no encuentro Chrome ni Chromium; pásalo con --chrome /ruta/al/binario o exporta WOM_CHROME=/ruta/al/binario\n\n[close] el gate pasó pero el export falló."}
+{"v":1,"ts":"2026-07-08T11:52:49.112284+00:00","event":"dispatch","step":"close","chapter":"global","role":"sidecar","outcome":null,"detail":"Ejecutar close.py: gates en verde, cierre del proyecto."}
+{"v":1,"ts":"2026-07-08T11:52:58.836129+00:00","event":"disposition","step":"close","chapter":"global","role":"sidecar","outcome":"ok","detail":null}
