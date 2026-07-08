@@ -33,9 +33,11 @@ solo habla con el método vía archivos + scripts + comandos. `paperclip/` queda
 `paperclip/FLOW-CONTRACT.md` (§§ 0-2 = contrato agnóstico del ejecutor).
 Scaffolding de una guía nueva en un comando: `tools/new-guide.sh`.
 
-**Feature activa**: ninguna. Próximos pasos (ver ROADMAP.md): pipeline del
-modo estudio en el preset, interfaz Tauri sobre `vivarium-core`, empaquetado
-del sidecar Python.
+**Feature activa**: 005-modo-estudio-pipeline (rama `005-modo-estudio-pipeline`)
+— pipeline del modo estudio en el preset. Plan:
+`specs/005-modo-estudio-pipeline/plan.md` (research, data-model, contratos y
+quickstart en el mismo directorio). La implementación la hará Codex: los
+artefactos son autocontenidos y agente-neutrales.
 
 Specs (referencia, NO activas):
 - 001-framework-architecture: base del harness editorial (v1.0.0). Vive en `specs/001-framework-architecture/`.
