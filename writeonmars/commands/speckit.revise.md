@@ -50,3 +50,10 @@ para confirmar que el arreglo cierra el hallazgo.
 Capítulos corregidos solo en los pasajes señalados + `findings.md` con los
 hallazgos marcados `resuelto`. Los `critico` sin fuente quedan `abierto` y bloquean
 `speckit.close`.
+## Modo estudio
+
+Si el manifiesto declara `mode: estudio`, este comando NO aplica. La corrección
+la decide y aplica el humano tras registrar su disposición con
+`scripts/dispose.py`. Detente sin tocar archivos y explica que el flujo humano
+es: revisar hallazgos, editar el manuscrito personalmente si acepta, y registrar
+aceptación, rechazo o aplazamiento con `dispose.py`.

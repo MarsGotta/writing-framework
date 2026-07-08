@@ -70,3 +70,10 @@ revisión es independiente. No escribas en `findings.md` desde este comando.
 (`findings.md`) la produce `speckit.review` por separado, idealmente con otro
 modelo. El glosario consolidado se actualiza (ver
 `.specify/presets/writeonmars/references/metodo/writeonmars-glossary/SKILL.md`).
+## Modo estudio
+
+Si el manifiesto declara `mode: estudio`, este comando NO aplica. El humano
+escribe la prosa del manuscrito en `chapters/NNN-slug.md`; ningún agente debe
+redactar ni modificar `chapters/` o `README.md`. Detente sin tocar archivos y
+explica que el siguiente paso es escritura humana (`write`) o disposición de
+hallazgos (`dispose`), según indique `status.py`.

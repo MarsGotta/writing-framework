@@ -161,9 +161,15 @@ fn plan_action(project: &Path, status: &Status) -> Result<Planned> {
     // delante del trabajo en vuelo): normaliza al paso por capítulo pendiente.
     if status.next_step == "close" && !status.all_chapters_approved {
         if let Some(chapter) = first_chapter(status, |c| !c.drafted) {
+            if is_estudio(status) {
+                return Ok(checkpoint_write());
+            }
             return Ok(Planned::Act(implement_action(&chapter)));
         }
         if let Some(chapter) = first_revise_chapter(status) {
+            if is_estudio(status) {
+                return Ok(checkpoint_dispose());
+            }
             return Ok(Planned::Act(revise_action(&chapter)));
         }
         if let Some(action) = choose_review_action(status)? {
@@ -208,6 +214,7 @@ fn plan_action(project: &Path, status: &Status) -> Result<Planned> {
             Some(chapter) => Planned::Act(implement_action(&chapter)),
             None => Planned::Done("no hay capítulos pendientes de redacción".to_string()),
         }),
+        "write" => Ok(checkpoint_write()),
         "review" => Ok(match choose_review_action(status)? {
             Some(action) => Planned::Act(action),
             None => Planned::Done("no hay pasadas locales pendientes".to_string()),
@@ -216,10 +223,32 @@ fn plan_action(project: &Path, status: &Status) -> Result<Planned> {
             Some(chapter) => Planned::Act(revise_action(&chapter)),
             None => Planned::Done("no hay revisiones pendientes".to_string()),
         }),
+        "dispose" => Ok(checkpoint_dispose()),
         "close" => plan_global(project, status),
         other => Err(VivariumError::Validation(format!(
             "next_step desconocido: {other}"
         ))),
+    }
+}
+
+fn is_estudio(status: &Status) -> bool {
+    status.mode.as_deref() == Some("estudio")
+}
+
+fn checkpoint_write() -> Planned {
+    Planned::Checkpoint {
+        step: "write",
+        detail: "faltan capítulos por escribir (modo estudio)",
+        message: "checkpoint humano: faltan capítulos por escribir (modo estudio)",
+    }
+}
+
+fn checkpoint_dispose() -> Planned {
+    Planned::Checkpoint {
+        step: "dispose",
+        detail: "hallazgos a la espera de disposición humana (scripts/dispose.py)",
+        message:
+            "checkpoint humano: hallazgos a la espera de disposición humana (scripts/dispose.py)",
     }
 }
 
@@ -260,6 +289,13 @@ fn plan_global(project: &Path, status: &Status) -> Result<Planned> {
         }));
     }
     if !project.join("README.md").is_file() {
+        if is_estudio(status) {
+            return Ok(Planned::Checkpoint {
+                step: "intro",
+                detail: "README.md escrito por la humana (modo estudio)",
+                message: "checkpoint humano: falta README.md escrito por la humana (modo estudio)",
+            });
+        }
         return Ok(Planned::Act(Action {
             step: "intro".to_string(),
             chapter: Some("global".to_string()),
@@ -677,6 +713,15 @@ mod tests {
         }
     }
 
+    fn status_estudio(next_step: &str) -> Status {
+        Status {
+            spec: "001-demo".to_string(),
+            mode: Some("estudio".to_string()),
+            next_step: next_step.to_string(),
+            ..Default::default()
+        }
+    }
+
     fn scaffold_global_done(project: &Path) {
         fs::write(project.join("README.md"), "# intro\n").unwrap();
         fs::write(project.join("guia.pdf"), "%PDF-1.4\n").unwrap();
@@ -724,6 +769,76 @@ mod tests {
             }
             other => panic!("esperaba Act(close), fue {other:?}"),
         }
+    }
+
+    #[test]
+    fn write_y_dispose_son_checkpoints_en_estudio() {
+        let tmp = tempfile::tempdir().unwrap();
+        let write = plan_action(tmp.path(), &status_estudio("write")).unwrap();
+        assert!(matches!(write, Planned::Checkpoint { step: "write", .. }));
+        let dispose = plan_action(tmp.path(), &status_estudio("dispose")).unwrap();
+        assert!(matches!(
+            dispose,
+            Planned::Checkpoint {
+                step: "dispose",
+                ..
+            }
+        ));
+    }
+
+    #[test]
+    fn normalizacion_close_incompleto_respeta_checkpoints_estudio() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut status = status_estudio("close");
+        status.all_chapters_approved = false;
+        status.by_chapter.insert(
+            "1".to_string(),
+            crate::sidecar::ChapterStatus {
+                drafted: false,
+                ..Default::default()
+            },
+        );
+        let planned = plan_action(tmp.path(), &status).unwrap();
+        assert!(matches!(planned, Planned::Checkpoint { step: "write", .. }));
+
+        status.by_chapter.get_mut("1").unwrap().drafted = true;
+        status.revise_by_chapter.insert("1".to_string(), 1);
+        let planned = plan_action(tmp.path(), &status).unwrap();
+        assert!(matches!(
+            planned,
+            Planned::Checkpoint {
+                step: "dispose",
+                ..
+            }
+        ));
+    }
+
+    #[test]
+    fn intro_global_es_checkpoint_en_estudio() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut status = status_closeable();
+        status.mode = Some("estudio".to_string());
+        let planned = plan_global(tmp.path(), &status).unwrap();
+        assert!(matches!(planned, Planned::Checkpoint { step: "intro", .. }));
+    }
+
+    #[test]
+    fn implement_imposible_sigue_bloqueado_por_guardarrail() {
+        let tmp = tempfile::tempdir().unwrap();
+        fs::write(
+            tmp.path().join(".writeonmars-manifest.json"),
+            r#"{"mode":"estudio"}"#,
+        )
+        .unwrap();
+        let mut status = status_estudio("implement");
+        status.by_chapter.insert(
+            "1".to_string(),
+            crate::sidecar::ChapterStatus {
+                drafted: false,
+                ..Default::default()
+            },
+        );
+        assert!(blocked_by_mode(tmp.path(), &status).unwrap());
     }
 
     #[test]

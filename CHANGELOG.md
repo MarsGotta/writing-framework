@@ -10,6 +10,18 @@ trayectorias paralelas: framework (`vX.Y.Z` del repo) y constitución
 
 ## [Unreleased] — refactor a preset agente-agnóstico
 
+### Modo estudio operativo (feature 005, 2026-07-08)
+
+- `status.py` entiende `mode: estudio`: expone `mode`, `pending_chapters`,
+  `pending_dispositions`, `deferred_findings` y `reopened_chapters`, y enruta
+  `write`/`dispose` como checkpoints humanos.
+- Añadidos `dispose.py` (disposición humana auditable) y `authorship.py`
+  (informe determinista desde git + `decisions.jsonl`).
+- Publicado `pass-output-schema` v1.2, `disposition-record.schema.json` y la
+  sección "Modo estudio" del contrato del ejecutor.
+- Vivarium mapea `write`, `dispose` e `intro` en estudio como checkpoints
+  humanos sin tocar el guardarraíl exit 11.
+
 ### Constitución v1.6.1 (2026-07-08, lente de modo en Estándares editoriales)
 
 - **PATCH 1.6.0 → 1.6.1**: los bullets "Fuentes por capítulo" y "Atribución por

@@ -31,3 +31,13 @@ Añade a `findings.md` un bloque `## Pasada 5 — Formato + coherencia` conforme
 `capitulos_cubiertos: global` (la dimensión `pasada_5_formato`, extendida con la
 coherencia entre capítulos). Incidencias `flagged` por severidad; las críticas
 bloquean el cierre.
+## Modo estudio
+
+Si el manifiesto declara `mode: estudio`, esta pasada opera sobre la obra humana.
+PROHIBIDO editar `chapters/` o `README.md`; la única salida es el bloque de
+hallazgos en `findings.md`. PROHIBIDO cambiar `estado` de hallazgos existentes:
+las transiciones son exclusivas de `scripts/dispose.py`.
+
+El bloque emitido MUST incluir `<!-- pass-output-schema: v1.2 -->` y terminar
+con `<!-- huellas: {"global": "<sha256-hex>"} -->`, donde el valor global es
+`sha256(concat(sha256(cap_i)))` en orden ordinal.

@@ -74,3 +74,16 @@ Produces **dos** salidas (pass-output-schema v1.1):
    `contradice`/`menciona`), el fragmento de soporte y el veredicto `soporte`. Idempotente
    por capítulo (reemplaza el bloque del capítulo, no duplica). La derivación de
    `soporte` y el mapeo veredicto→severidad están en la skill `writeonmars-contraste`.
+## Modo estudio
+
+Si el manifiesto declara `mode: estudio`, esta pasada opera sobre texto humano.
+PROHIBIDO editar `chapters/` o `README.md`; la única salida es el bloque de
+hallazgos en `findings.md` y, si procede, `claims.md`. PROHIBIDO cambiar
+`estado` de hallazgos existentes: las transiciones son exclusivas de
+`scripts/dispose.py`.
+
+Todo bloque emitido MUST incluir `<!-- pass-output-schema: v1.2 -->` y terminar
+con `<!-- huellas: {"<capitulo>": "<sha256-hex>"} -->` calculado sobre los bytes
+actuales del capítulo. Si `roots/` no contiene fichas aplicables, declara
+"no evaluable contra fuentes: roots/ sin fichas aplicables" en notas en vez de
+emitir 0 hallazgos como si la verificación hubiera ocurrido.

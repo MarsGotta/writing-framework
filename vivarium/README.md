@@ -53,6 +53,9 @@ Núcleo headless implementado en la rama `004-vivarium-core`:
   decisiones sin computar estado editorial propio.
 - `vivarium step|run`: runner secuencial por estados con lock, despachos BYOM,
   guardarraíl de `estudio`, decisiones append-only y checkpoints humanos.
+  En modo estudio, `write`, `dispose` e `intro` se esperan como acciones humanas
+  (exit 10); `implement`, `revise` e `intro` siguen protegidos por el
+  guardarraíl exit 11 si un estado imposible intentara despacharlos.
 - `vivarium mode set`: cambio explícito y registrado de `produccion`/`estudio`.
 
 La interfaz Tauri queda para una etapa posterior; debe llamar a `vivarium-core`

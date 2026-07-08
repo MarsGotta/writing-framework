@@ -84,18 +84,59 @@ fn segunda_config_byom_corre_el_mismo_ciclo() {
 }
 
 #[test]
-fn estudio_bloquea_redaccion_de_manuscrito() {
+fn estudio_con_capitulos_pendientes_espera_write() {
     let tmp = tempfile::tempdir().unwrap();
     let project = common::project_with_preset(tmp.path(), "estudio", Some("tecnologia"));
 
     common::vivarium_cmd()
         .args(["step", "--project", project.to_str().unwrap()])
         .assert()
-        .code(11);
+        .code(10);
 
     assert!(!project.join("chapters").exists());
     let decisions = fs::read_to_string(project.join("decisions.jsonl")).unwrap();
+    assert!(decisions.contains(r#""event":"checkpoint""#));
+    assert!(decisions.contains(r#""step":"write""#));
     assert!(!decisions.contains(r#""event":"dispatch""#));
+}
+
+#[test]
+fn estudio_con_hallazgos_espera_dispose() {
+    let tmp = tempfile::tempdir().unwrap();
+    let project = common::project_with_preset(tmp.path(), "estudio", Some("tecnologia"));
+    write_known_chapter(&project);
+    write_findings_for_one(&project, true, true);
+
+    common::vivarium_cmd()
+        .args(["step", "--project", project.to_str().unwrap()])
+        .assert()
+        .code(10);
+
+    let decisions = fs::read_to_string(project.join("decisions.jsonl")).unwrap();
+    assert!(decisions.contains(r#""step":"dispose""#));
+    assert!(!decisions.contains(r#""step":"revise""#));
+}
+
+#[test]
+fn estudio_global_sin_readme_espera_intro_humano() {
+    let tmp = tempfile::tempdir().unwrap();
+    let project = common::project_with_preset(tmp.path(), "estudio", Some("tecnologia"));
+    fs::write(
+        project.join("specs/001-demo/plan.md"),
+        "# Plan\n\n## Temario\n\n| # | Titulo | Promesa |\n|---|--------|---------|\n| 1 | Uno | A |\n",
+    )
+    .unwrap();
+    write_known_chapter(&project);
+    write_findings_for_one(&project, false, true);
+
+    common::vivarium_cmd()
+        .args(["step", "--project", project.to_str().unwrap()])
+        .assert()
+        .code(10);
+
+    let decisions = fs::read_to_string(project.join("decisions.jsonl")).unwrap();
+    assert!(decisions.contains(r#""step":"intro""#));
+    assert!(!decisions.contains(r#""step":"intro","chapter":"global","role":"redactora""#));
 }
 
 fn dispatch_keys(project: &std::path::Path) -> Vec<String> {
@@ -112,4 +153,52 @@ fn dispatch_keys(project: &std::path::Path) -> Vec<String> {
             )
         })
         .collect()
+}
+
+fn write_known_chapter(project: &std::path::Path) {
+    fs::create_dir_all(project.join("chapters")).unwrap();
+    fs::write(
+        project.join("chapters/001-uno-humano.md"),
+        "# Uno humano\n\nTexto humano del capítulo uno.\n\n## Fuentes\n\n- Fuente A\n",
+    )
+    .unwrap();
+}
+
+fn write_findings_for_one(project: &std::path::Path, open: bool, include_global: bool) {
+    let hash = "6107a3a4e12a9d55ea3365dc69783c8bb3f565cf7eaf4f8c39c9ea3f5099ddaa";
+    let row = if open {
+        "| F-1.1 | 1 | medio | frase | problema | propuesta | abierto | [] |\n"
+    } else {
+        ""
+    };
+    let mut text = String::from("# Findings\n\n");
+    for pass in 1..=4 {
+        text.push_str(&format!(
+            "## Pasada {pass} - Stub\n\n\
+<!-- pass-output-schema: v1.2 -->\n\n\
+**Estado pasada**: passed\n\
+**Capítulos cubiertos**: [1]\n\
+**Firma**:\n  - tipo: autonomous\n  - actor: stub\n\n\
+### Hallazgos\n\n\
+| ID | Capítulo | Severidad | Frase | Problema | Reescritura | Estado | Citas |\n\
+|----|----------|-----------|-------|----------|-------------|--------|-------|\n\
+{}\
+\n<!-- huellas: {{\"1\": \"{hash}\"}} -->\n\n",
+            if pass == 1 { row } else { "" }
+        ));
+    }
+    if include_global {
+        text.push_str(
+            "## Pasada 5 - Stub\n\n\
+<!-- pass-output-schema: v1.2 -->\n\n\
+**Estado pasada**: passed\n\
+**Capítulos cubiertos**: global\n\
+**Firma**:\n  - tipo: autonomous\n  - actor: stub\n\n\
+### Hallazgos\n\n\
+| ID | Capítulo | Severidad | Frase | Problema | Reescritura | Estado | Citas |\n\
+|----|----------|-----------|-------|----------|-------------|--------|-------|\n\n\
+<!-- huellas: {\"global\": \"placeholder\"} -->\n",
+        );
+    }
+    fs::write(project.join("specs/001-demo/findings.md"), text).unwrap();
 }

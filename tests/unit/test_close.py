@@ -87,6 +87,24 @@ class TestMain:
         assert [s for s, _ in registro] == ["status.py"]
         assert "CERRABLE" in capsys.readouterr().out
 
+    def test_no_export_enumera_deuda_declarada(
+        self, close_mod, monkeypatch, calls, capsys, estudio_project
+    ):
+        registro, _ = calls
+        findings = estudio_project / "specs/001-estudio/findings.md"
+        findings.write_text(
+            findings.read_text(encoding="utf-8").replace(
+                "| F-1.3 | 1 | bajo | frase | aviso bajo | sugerencia | abierto | [] |",
+                "| F-1.3 | 1 | bajo | frase | aviso bajo | sugerencia | aplazado | [] |",
+            ),
+            encoding="utf-8",
+        )
+        self._main(close_mod, monkeypatch, "--project-dir", str(estudio_project), "--no-export")
+        assert [s for s, _ in registro] == ["status.py"]
+        out = capsys.readouterr().out
+        assert "Deuda declarada" in out
+        assert "F-1.3" in out
+
     def test_export_fallido_propaga_el_codigo(self, close_mod, monkeypatch, calls, capsys):
         _, rcs = calls
         rcs["export.py"] = 3

@@ -16,6 +16,11 @@ fn status_py_json_del_fixture_real_deserializa() {
         scripts.join("status.py"),
     )
     .unwrap();
+    fs::copy(
+        repo_root().join("writeonmars/scripts/findings_lib.py"),
+        scripts.join("findings_lib.py"),
+    )
+    .unwrap();
 
     let status = vivarium_core::sidecar::run_status(&project).unwrap();
     assert_eq!(status.chapters_expected, 3);

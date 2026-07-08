@@ -16,10 +16,17 @@ Uso:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
 from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+if str(HERE) not in sys.path:
+    sys.path.insert(0, str(HERE))
+
+from findings_lib import iter_finding_rows, parse_findings  # noqa: E402
 
 PASS_KEY = {
     1: "pasada_1_estructura",
@@ -52,74 +59,6 @@ def newest_spec_dir(project: Path, override: str | None, required: bool = True):
     return dirs[-1]
 
 
-def parse_findings(findings_md: Path) -> list[dict]:
-    """Lista de bloques de pasada con su estado, firma y hallazgos."""
-    if not findings_md.exists():
-        return []
-    text = findings_md.read_text(encoding="utf-8")
-    blocks = []
-    headers = list(re.finditer(r"^##\s+Pasada\s+(\d+)\s*[—–-]\s*(.+)$", text, re.M))
-    for i, h in enumerate(headers):
-        start = h.end()
-        end = headers[i + 1].start() if i + 1 < len(headers) else len(text)
-        body = text[start:end]
-        num = int(h.group(1))
-        name = h.group(2).strip()
-        estado = _field(body, r"Estado pasada")
-        firma_tipo = _firma_tipo(body)
-        firma_actor = _firma_actor(body)
-        caps = _field(body, r"Capítulos cubiertos")
-        hallazgos = _parse_findings_table(body)
-        blocks.append(
-            {
-                "num": num,
-                "name": name,
-                "estado": (estado or "—").lower(),
-                "firma": (firma_tipo or "—").lower(),
-                "actor": (firma_actor or "").lower(),
-                "capitulos": caps or "—",
-                "hallazgos": hallazgos,
-            }
-        )
-    return blocks
-
-
-def _field(body: str, label: str) -> str | None:
-    m = re.search(rf"\*\*{label}\*\*\s*:\s*(.+)", body)
-    return m.group(1).strip() if m else None
-
-
-def _firma_tipo(body: str) -> str | None:
-    # Formato: **Firma**:\n  - tipo: autonomous|human
-    m = re.search(r"\*\*Firma\*\*.*?tipo\s*:\s*(\w+)", body, re.S)
-    return m.group(1) if m else None
-
-
-def _firma_actor(body: str) -> str | None:
-    m = re.search(r"\*\*Firma\*\*.*?actor\s*:\s*([^\n]+)", body, re.S)
-    return m.group(1).strip() if m else None
-
-
-def _parse_findings_table(body: str) -> list[dict]:
-    out = []
-    for line in body.splitlines():
-        line = line.strip()
-        if not line.startswith("|"):
-            continue
-        cells = [c.strip() for c in line.strip("|").split("|")]
-        if len(cells) < 8 or not cells[0].startswith("F-"):
-            continue
-        out.append(
-            {
-                "id": cells[0],
-                "capitulo": cells[1],
-                "severidad": cells[2].lower(),
-                "estado": cells[6].lower(),
-            }
-        )
-    return out
-
-
 def load_manifest(project: Path) -> dict | None:
     p = project / ".writeonmars-manifest.json"
     if not p.exists():
@@ -128,6 +67,17 @@ def load_manifest(project: Path) -> dict | None:
         return json.loads(p.read_text(encoding="utf-8"))
     except json.JSONDecodeError as e:
         fail(f".writeonmars-manifest.json no es JSON válido: {e}")
+
+
+def project_mode(manifest: dict | None) -> str:
+    if manifest is None:
+        return "produccion"
+    mode = manifest.get("mode", "produccion")
+    if mode is None:
+        return "produccion"
+    if mode not in {"produccion", "estudio"}:
+        fail("manifest.mode debe ser 'produccion' o 'estudio'")
+    return mode
 
 
 def bar(label: str, width: int = 18) -> str:
@@ -194,6 +144,80 @@ def _passes_by_chapter(blocks: list[dict]) -> dict[str, set[int]]:
             key = "global" if token.lower() == "global" else str(int(token))
             out.setdefault(key, set()).add(num)
     return out
+
+
+def _chapter_hashes(project: Path) -> dict[str, str]:
+    hashes: dict[str, str] = {}
+    chapters_dir = project / "chapters"
+    if not chapters_dir.is_dir():
+        return hashes
+    for path in sorted(chapters_dir.glob("*.md")):
+        m = re.match(r"\s*(\d+)", path.name)
+        if not m:
+            continue
+        hashes[str(int(m.group(1)))] = hashlib.sha256(path.read_bytes()).hexdigest()
+    return hashes
+
+
+def _passes_by_chapter_checked(
+    blocks: list[dict], chapter_hashes: dict[str, str]
+) -> tuple[dict[str, set[int]], set[str], list[str]]:
+    out: dict[str, set[int]] = {}
+    reopened: set[str] = set()
+    warnings: list[str] = []
+    for b in blocks:
+        num = b["num"]
+        if num not in (1, 2, 3, 4):
+            continue
+        huellas = b.get("huellas") or {}
+        caps_raw = b.get("capitulos") or ""
+        for token in re.findall(r"\d+|global", caps_raw, re.I):
+            if token.lower() == "global":
+                continue
+            key = str(int(token))
+            current = chapter_hashes.get(key)
+            recorded = huellas.get(key)
+            if current is None:
+                continue
+            if recorded != current:
+                reopened.add(key)
+                reason = "sin huella" if not recorded else "huella no coincide"
+                warnings.append(
+                    f"capítulo {key}: pasada {num} no cuenta en modo estudio ({reason})"
+                )
+                continue
+            out.setdefault(key, set()).add(num)
+    return out, reopened, warnings
+
+
+def _load_dispositions(spec_dir: Path | None) -> tuple[dict[str, set[str]], list[str]]:
+    records: dict[str, set[str]] = {}
+    if spec_dir is None:
+        return records, []
+    path = spec_dir / "disposiciones.jsonl"
+    if not path.exists():
+        return records, []
+    for idx, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        if not line.strip():
+            continue
+        try:
+            data = json.loads(line)
+        except json.JSONDecodeError as exc:
+            fail(f"{path}:{idx} no es DispositionRecord válido: {exc}")
+        fid = data.get("finding_id")
+        disp = data.get("disposicion")
+        if isinstance(fid, str) and isinstance(disp, str):
+            records.setdefault(fid, set()).add(disp)
+    return records, []
+
+
+def _disposition_matches(state: str, dispositions: set[str]) -> bool:
+    expected = {
+        "resuelto": "aceptado",
+        "desviacion_justificada": "rechazado",
+        "aplazado": "aplazado",
+    }.get(state)
+    return bool(expected and expected in dispositions)
 
 
 # --- Factualidad (feature 003): atribución por afirmación + índice determinista ---
@@ -306,6 +330,7 @@ def _build_by_chapter(
     blocks: list[dict],
     revise_by_chapter: dict[str, int],
     advisory_by_chapter: dict[str, int],
+    passes_override: dict[str, set[int]] | None = None,
 ) -> tuple[dict[str, dict], bool]:
     """Construye el objeto `by_chapter` (contrato FLOW-CONTRACT §3.7) y la señal
     global `all_chapters_approved`.
@@ -314,7 +339,7 @@ def _build_by_chapter(
     hallazgos o cobertura globales. approved = drafted AND {1,2,3,4} ⊆ passes_done
     AND revise_pending == 0."""
     drafted = _drafted_ordinals(chapters)
-    passes = _passes_by_chapter(blocks)
+    passes = passes_override if passes_override is not None else _passes_by_chapter(blocks)
 
     # Claves: 1..expected (temario) + cualquier ordinal con fichero/hallazgo/pasada
     # fuera de rango + 'global' si aparece en hallazgos o cobertura.
@@ -354,7 +379,11 @@ def _next_step(project: Path, spec_dir: Path, manifest: dict | None,
                blocks: list, chapters: list, expected: int,
                closeable: bool, crit_open: int, sign_violations: list,
                revise_pending: int = 0, revise_by_chapter: dict | None = None,
-               advisory_open: int = 0, fact_block: bool = False) -> tuple[str, str]:
+               advisory_open: int = 0, fact_block: bool = False,
+               mode: str = "produccion",
+               pending_chapters: list[int] | None = None,
+               pending_dispositions: list[str] | None = None,
+               reopened_chapters: list[str] | None = None) -> tuple[str, str]:
     """Deriva el siguiente paso del ciclo para el orquestador (Editora jefa).
 
     Es el corazón del heartbeat: con esto el orquestador decide a qué rol
@@ -371,16 +400,35 @@ def _next_step(project: Path, spec_dir: Path, manifest: dict | None,
         return "research", "no hay research.md: delegar a Documentalista (resources/ + web rigurosa)"
     if expected == 0:
         return "plan", "no hay temario en plan.md: diseñar el temario (Editora jefa)"
-    pendientes = expected - len(chapters)
-    if pendientes > 0:
+    pending_chapters = pending_chapters or []
+    pending_dispositions = pending_dispositions or []
+    reopened_chapters = reopened_chapters or []
+    pendientes = len(pending_chapters) if pending_chapters else max(0, expected - len(chapters))
+    if pendientes > 0 and not (mode == "estudio" and chapters):
+        if mode == "estudio":
+            return "write", (
+                "faltan capítulos por escribir (modo estudio): "
+                + ", ".join(str(n) for n in pending_chapters)
+            )
         return "implement", f"faltan {pendientes} capítulo(s): delegar a Redactora (paralelo en worktrees)"
     if not blocks:
         return "review", "capítulos completos sin findings.md: lanzar pasadas (Mesa + Documentalista)"
+    if mode == "estudio" and reopened_chapters:
+        return "review", (
+            "capítulos con pasadas invalidadas por huella: "
+            + ", ".join(reopened_chapters)
+        )
     if revise_pending > 0:
         # Política: crítico + medio fuerzan revise (detector ≠ corrector); 'bajo' es
         # aviso y NO bloquea ni fuerza. Enumera los capítulos accionables para que el
         # orquestador haga un BARRIDO —una tarea revise por capítulo a la Redactora—,
         # no un one-off que deja el resto sin corregir.
+        if mode == "estudio":
+            ids = ", ".join(pending_dispositions) if pending_dispositions else "—"
+            return "dispose", (
+                f"{revise_pending} hallazgo(s) accionable(s) a la espera de "
+                f"disposición humana: {ids}"
+            )
         caps = sorted((revise_by_chapter or {}), key=_cap_sort_key)
         detalle_crit = f", {crit_open} crítico(s)" if crit_open else ""
         aviso = f"; {advisory_open} aviso(s) 'bajo' aparte (no bloquean)" if advisory_open else ""
@@ -401,6 +449,11 @@ def _next_step(project: Path, spec_dir: Path, manifest: dict | None,
             "hallazgos crítico/medio en la pasada 4 y enrutarse por revise; revisa "
             "coherencia claims.md↔findings.md"
         )
+    if pendientes > 0 and mode == "estudio":
+        return "write", (
+            "faltan capítulos por escribir (modo estudio): "
+            + ", ".join(str(n) for n in pending_chapters)
+        )
     if closeable:
         return "close", "gates en verde: intro + export + close (PDF final, Editora jefa)"
     return "review", "revisión en curso: hallazgos abiertos sin resolver"
@@ -412,11 +465,18 @@ def evaluate(project: Path, spec_dir: Path) -> dict:
     """
     blocks = parse_findings(spec_dir / "findings.md") if spec_dir else []
     manifest = load_manifest(project)
+    mode = project_mode(manifest)
     signing = (manifest or {}).get("signing_matrix", {})
     chapters = sorted(
         p.name for p in (project / "chapters").glob("*.md")
     ) if (project / "chapters").is_dir() else []
     expected = count_temario(spec_dir) if spec_dir else 0
+    drafted_ordinals = _drafted_ordinals(chapters)
+    pending_chapters = [
+        n for n in range(1, expected + 1)
+        if n not in drafted_ordinals
+    ]
+    dispositions, disposition_warnings = _load_dispositions(spec_dir)
 
     passes: list[dict] = []
     crit_open = 0
@@ -425,24 +485,47 @@ def evaluate(project: Path, spec_dir: Path) -> dict:
     advisory_open = 0                         # 'bajo' abiertos: avisan, no fuerzan revise
     revise_by_chapter: dict[str, int] = {}    # crítico+medio abiertos por capítulo
     advisory_by_chapter: dict[str, int] = {}  # 'bajo' abiertos por capítulo (avisos)
+    pending_dispositions: list[str] = []
+    deferred_findings: list[str] = []
+    deferred_details: list[dict] = []
+    warnings: list[str] = list(disposition_warnings)
     for b in blocks:
         sev = {"critico": 0, "medio": 0, "bajo": 0}
         open_here = 0
         for h in b["hallazgos"]:
             s = h["severidad"]
             sev[s] = sev.get(s, 0) + 1
-            if h["estado"] != "abierto":
+            state = h["estado"]
+            fid = h.get("id", "")
+            cap = _norm_cap(h.get("capitulo") or "") or "—"
+            if state == "aplazado":
+                deferred_findings.append(fid)
+                deferred_details.append({
+                    "id": fid,
+                    "capitulo": cap,
+                    "severidad": s,
+                })
+            inconsistent_disposition = False
+            if mode == "estudio" and state != "abierto":
+                if not _disposition_matches(state, dispositions.get(fid, set())):
+                    inconsistent_disposition = True
+                    warnings.append(
+                        f"{fid}: estado {state} sin DispositionRecord compatible; "
+                        "cuenta como pendiente en modo estudio"
+                    )
+            if state != "abierto" and not inconsistent_disposition:
                 continue
             open_here += 1
             if s == "critico":
                 crit_open += 1
-            cap = _norm_cap(h.get("capitulo") or "") or "—"
             if s == "bajo":
                 advisory_open += 1            # aviso: no fuerza revise ni bloquea
                 advisory_by_chapter[cap] = advisory_by_chapter.get(cap, 0) + 1
             else:
                 # crítico, medio o etiqueta desconocida → accionable (nunca perder un hallazgo)
                 revise_by_chapter[cap] = revise_by_chapter.get(cap, 0) + 1
+                if fid:
+                    pending_dispositions.append(fid)
         total_open += open_here
         # Gate de firma: una pasada que el manifest exige `human` solo cuenta como
         # firmada si tiene tipo human Y un actor real (no vacío ni "pendiente").
@@ -484,7 +567,6 @@ def evaluate(project: Path, spec_dir: Path) -> dict:
     fmin = qg.get("factuality_min")
     fmin_cap = qg.get("factuality_min_per_chapter")
     fmode = qg.get("factuality_mode", "blocking")
-    warnings: list[str] = []
     if fmin is None:
         g4 = None
     else:
@@ -504,24 +586,43 @@ def evaluate(project: Path, spec_dir: Path) -> dict:
             "por cada déficit, FR-009)"
         )
 
+    reopened_chapters: list[str] = []
+    passes_override = None
+    if mode == "estudio":
+        checked, reopened, hash_warnings = _passes_by_chapter_checked(blocks, _chapter_hashes(project))
+        passes_override = checked
+        reopened_chapters = sorted(reopened, key=_cap_sort_key)
+        warnings.extend(hash_warnings)
+
     by_chapter, all_chapters_approved = _build_by_chapter(
         expected, chapters, blocks, revise_by_chapter, advisory_by_chapter,
+        passes_override=passes_override,
     )
     next_step, next_detail = _next_step(
         project, spec_dir, manifest, blocks, chapters, expected,
         closeable, crit_open, sign_violations,
         revise_pending, revise_by_chapter, advisory_open, fact_blocks,
+        mode=mode,
+        pending_chapters=pending_chapters,
+        pending_dispositions=pending_dispositions,
+        reopened_chapters=reopened_chapters,
     )
     return {
         "spec": spec_dir.name if spec_dir else "(sin spec todavía)",
+        "mode": mode,
         "chapters": chapters,
         "chapters_written": len(chapters),
         "chapters_expected": expected,
+        "pending_chapters": pending_chapters,
         "passes": passes,
         "criticals_open": crit_open,
         "open_findings_total": total_open,
         "revise_pending": revise_pending,
         "revise_by_chapter": revise_by_chapter,
+        "pending_dispositions": pending_dispositions,
+        "deferred_findings": deferred_findings,
+        "deferred_details": deferred_details,
+        "reopened_chapters": reopened_chapters,
         "advisory_open_bajo": advisory_open,
         "by_chapter": by_chapter,
         "all_chapters_approved": all_chapters_approved,

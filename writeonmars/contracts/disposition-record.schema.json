@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://writeonmars.dev/contracts/disposition-record.schema.json",
+  "title": "DispositionRecord",
+  "description": "Disposición humana sobre un hallazgo de pasada en modo estudio. Una línea por registro en specs/<feature>/disposiciones.jsonl (append-only). Único escritor autorizado: writeonmars/scripts/dispose.py. v1.0",
+  "type": "object",
+  "required": ["v", "ts", "finding_id", "disposicion", "actor"],
+  "additionalProperties": false,
+  "properties": {
+    "v": {
+      "const": 1,
+      "description": "Versión del registro."
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha-hora RFC 3339 de la disposición."
+    },
+    "finding_id": {
+      "type": "string",
+      "pattern": "^F-[0-9]+\\.[0-9]+$",
+      "description": "Id del hallazgo en findings.md (F-N.M)."
+    },
+    "disposicion": {
+      "enum": ["aceptado", "rechazado", "aplazado"],
+      "description": "Decisión humana. aceptado→resuelto; rechazado→desviacion_justificada; aplazado→aplazado."
+    },
+    "actor": {
+      "type": "string",
+      "minLength": 1,
+      "description": "git config user.name del humano que dispone."
+    },
+    "email": {
+      "type": "string",
+      "description": "git config user.email si existe."
+    },
+    "motivo": {
+      "type": "string",
+      "minLength": 3,
+      "description": "Razón del rechazo. Obligatorio cuando disposicion=rechazado."
+    },
+    "nota": {
+      "type": "string",
+      "description": "Comentario libre opcional."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "disposicion": { "const": "rechazado" } }
+      },
+      "then": {
+        "required": ["motivo"]
+      }
+    }
+  ]
+}

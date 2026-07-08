@@ -52,3 +52,13 @@ Añade a `findings.md` un bloque `## Pasada 3 — Naturalidad` conforme a
 `.specify/presets/writeonmars/contracts/pass-output-schema.md`, en modo autónomo con
 incidencias `flagged`. La `signing_matrix` del manifiesto puede exigir firma humana
 en esta pasada.
+## Modo estudio
+
+Si el manifiesto declara `mode: estudio`, esta pasada opera sobre texto humano.
+PROHIBIDO editar `chapters/` o `README.md`; la única salida es el bloque de
+hallazgos en `findings.md`. PROHIBIDO cambiar `estado` de hallazgos existentes:
+las transiciones son exclusivas de `scripts/dispose.py`.
+
+Todo bloque emitido MUST incluir `<!-- pass-output-schema: v1.2 -->` y terminar
+con `<!-- huellas: {"<capitulo>": "<sha256-hex>"} -->` calculado sobre los bytes
+actuales del capítulo.
