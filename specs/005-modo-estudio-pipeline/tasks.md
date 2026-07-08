@@ -73,10 +73,11 @@ actual.
 - [ ] T006 [US1] `writeonmars/scripts/status.py`: verificación de huellas en
   estudio (research R4, data-model § 3): leer el comentario
   `<!-- huellas: {...} -->` de cada bloque de pasada; huella registrada ≠
-  sha256 actual del capítulo ⇒ esa pasada no cuenta en `passes_done` del
-  capítulo, el capítulo entra en `reopened_chapters` y el dashboard lo
-  explica; huella ausente (bloques v1.1) ⇒ cuenta con warning. En produccion
-  no se verifica nada.
+  sha256 actual del capítulo **o huella ausente** ⇒ esa pasada no cuenta en
+  `passes_done` del capítulo, el capítulo entra en `reopened_chapters` y el
+  dashboard lo explica (no evaluado ≠ verde: sin huella no hay forma de
+  anclar la pasada al texto actual). En produccion no se verifica nada
+  (bloques v1.1 siguen contando, FR-011).
 - [ ] T007 [P] [US1] `tests/unit/test_status_estudio.py`: escenarios de
   aceptación de US1 (write con pendientes, review al aparecer capítulo,
   produccion intacta — comparar salida completa contra el fixture de
@@ -119,7 +120,9 @@ pendientes y produce warning.
   `speckit.review-voice.md`, `speckit.review.md`, `speckit.review-precision.md`,
   `speckit.review-global.md` (prohibido editar `chapters/`/`README.md` y
   cambiar `estado`; emitir el comentario de huellas en TODOS los bloques de
-  pasada, `"global"` en la 5); `speckit.revise.md` y `speckit.implement.md`
+  pasada, `"global"` en la 5; la pasada 4 en estudio sin fichas aplicables en
+  `roots/` declara "no evaluable contra fuentes" en vez de 0 hallazgos —
+  delta § 5); `speckit.revise.md` y `speckit.implement.md`
   (en estudio no aplican: detenerse sin tocar archivos y explicar el flujo
   humano — write/dispose).
 - [ ] T012 [US2] `writeonmars/scripts/close.py`: al componer el resumen de

@@ -135,6 +135,14 @@ Y, ya en Paperclip:
    varios proyectos a la vez.
 7. **Distribución**: elegir licencia, publicar el preset
    (`specify preset add --from <github>`), versionar releases.
+8. **Inspiración externa** (análisis 2026-07-08, ver
+   `docs/comparativa-bookwright-sloop.md`): firma de fallo repetida como
+   clasificador transitorio/determinista en el runner de Vivarium (S|Loop);
+   late binding de prompts de capítulo contra estado real + decisions.jsonl
+   (S|Loop); protocolo `[PENDING]` de tres sistemas para adendas/claims
+   (Bookwright); hallazgo-vs-ancla con umbral de fiabilidad para el índice de
+   factualidad (Bookwright); plantillas de fichas narrativas en `roots/` con
+   "diálogo de muestra" para el modo estudio con novela (Bookwright).
 
 ## Bugs de orquestación — primera corrida real (guide-nlp, 2026-06-20)
 

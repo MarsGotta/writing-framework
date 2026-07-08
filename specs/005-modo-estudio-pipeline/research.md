@@ -109,7 +109,11 @@ La huella es `sha256` de los bytes del archivo del capítulo en el momento de
 la pasada (sin normalización: cualquier byte distinto = contenido distinto).
 En modo estudio, `status.py` considera válida una pasada N para el capítulo C
 solo si la huella registrada coincide con la huella actual del archivo; si no
-coincide, esa pasada deja de contar en `passes_done` para C (el capítulo se
+coincide **o la huella está ausente**, esa pasada deja de contar en
+`passes_done` para C — no evaluado ≠ verde (lección de la validación
+tri-valuada de Bookwright, docs/comparativa-bookwright-sloop.md): no existen
+proyectos estudio anteriores a v1.2, y en un proyecto convertido re-pasar es
+barato y honesto — (el capítulo se
 "reabre" y `next_step` vuelve a `review`). El dashboard lo explica
 (`"capítulo 2 cambió tras la pasada 3: pasadas 3-4 invalidadas"`). En modo
 produccion la huella se escribe igualmente (los comandos la emiten siempre)

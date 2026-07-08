@@ -48,10 +48,11 @@ Todo bloque de pasada (1-5) termina con un comentario de máquina:
 - Emisión: obligatoria en v1.2 en ambos modos (los comandos de pasada la
   calculan con `sha256sum chapters/NNN-*.md` o equivalente).
 - Verificación: solo en modo estudio (`status.py`): huella registrada ≠
-  huella actual ⇒ la pasada no cuenta para ese capítulo (capítulo reabierto).
+  huella actual **o huella ausente** ⇒ la pasada no cuenta para ese capítulo
+  (capítulo reabierto; no evaluado ≠ verde). En produccion los bloques v1.1
+  sin huella siguen contando (retrocompatibilidad FR-011).
 - Pasada 5 (`global`): clave `"global"`, valor `sha256` de la concatenación
   de los sha256 de todos los capítulos en orden ordinal.
-- Bloques v1.1 sin huella: cuentan (compatibilidad), con warning en estudio.
 
 ## 4. Marcador de versión
 
@@ -68,6 +69,13 @@ Los comandos `speckit.review*` (pasadas 1-5) incorporan la cláusula:
 > `findings.md` (+ `claims.md` si la pasada 4 lo emite). PROHIBIDO cambiar el
 > `estado` de hallazgos existentes: las transiciones son exclusivas de la
 > disposición humana (`scripts/dispose.py`).
+
+Adicional para la pasada 4 en estudio (no evaluado ≠ verde):
+
+> Si `roots/` no contiene fichas de fuente aplicables al capítulo, el bloque
+> de pasada MUST declararlo ("no evaluable contra fuentes: roots/ sin fichas
+> aplicables") en el campo de notas del bloque, en vez de emitir 0 hallazgos
+> como si la verificación hubiera ocurrido.
 
 `speckit.revise` incorpora:
 

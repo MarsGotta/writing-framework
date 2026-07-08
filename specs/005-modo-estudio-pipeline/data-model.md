@@ -57,9 +57,10 @@ Cada bloque de pasada termina con un comentario de máquina:
 - Valor: sha256 de los bytes del archivo `chapters/NNN-*.md` en el momento de
   la pasada.
 - En modo estudio, una pasada N cuenta en `passes_done[C]` solo si
-  `huellas[C] == sha256(chapters/C actual)`. Huella ausente (bloques
-  anteriores a v1.2) ⇒ la pasada cuenta (compatibilidad hacia atrás) pero
-  `status.py` emite warning `huella ausente`.
+  `huellas[C] == sha256(chapters/C actual)`. Huella ausente ⇒ la pasada NO
+  cuenta para ese capítulo (no evaluado ≠ verde: no hay proyectos estudio
+  legacy; en un proyecto convertido, re-pasar es barato y honesto) y
+  `status.py` lo explica en el dashboard y como warning.
 - En modo produccion las huellas se escriben pero no se verifican.
 
 ## 4. Salida `--json` de status.py — campos nuevos/cambiados
