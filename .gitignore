@@ -36,3 +36,6 @@ __pycache__/
 # === Caché generada por el preset (reconstruible desde el repo) ===
 /.writeonmars-index.json
 /feedback-changeset.json
+
+# === Rust ===
+/vivarium/target/

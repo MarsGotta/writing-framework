@@ -33,10 +33,18 @@ solo habla con el método vía archivos + scripts + comandos. `paperclip/` queda
 `paperclip/FLOW-CONTRACT.md` (§§ 0-2 = contrato agnóstico del ejecutor).
 Scaffolding de una guía nueva en un comando: `tools/new-guide.sh`.
 
+**Feature activa**: ninguna. Próximos pasos (ver ROADMAP.md): pipeline del
+modo estudio en el preset, interfaz Tauri sobre `vivarium-core`, empaquetado
+del sidecar Python.
+
 Specs (referencia, NO activas):
 - 001-framework-architecture: base del harness editorial (v1.0.0). Vive en `specs/001-framework-architecture/`.
 - 002-wom-cli, **superseded**: el `wom` CLI se descartó; `scripts/status.py` y
   `scripts/close.py` cubren su función.
 - 003-atribucion-factualidad: **integrada y validada e2e** (claims.md, índice de
   factualidad, gate g4); el directorio queda como referencia de diseño.
+- 004-vivarium-core: **integrada y validada con agentes reales** (2026-07-08) —
+  núcleo headless de Vivarium (`vivarium new|status|check|step|run|mode set`).
+  Evidencia BYOM: `tests/editorial-pilot/evidence/2026-07-08-vivarium-byom/`.
+  Gate extra al tocar `vivarium/`: `cd vivarium && cargo test --workspace`.
 <!-- SPECKIT END -->

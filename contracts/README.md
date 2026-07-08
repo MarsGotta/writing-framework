@@ -10,5 +10,6 @@ la copia del preset.
 | citation-contract.md | `writeonmars/contracts/citation-contract.md` |
 | citation-record.schema.json | `writeonmars/contracts/citation-record.schema.json` |
 | claim-record.schema.json | `writeonmars/contracts/claim-record.schema.json` |
+| executor-contract.md | `writeonmars/contracts/executor-contract.md` |
 | manifest-schema.json | `writeonmars/contracts/manifest-schema.json` |
 | pass-output-schema.md | `writeonmars/contracts/pass-output-schema.md` |

@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
 import sys
@@ -58,7 +59,7 @@ def read_constitution_version() -> str:
 CONSTITUTION_VERSION = read_constitution_version()
 
 
-def default_manifest(operator: str, email: str) -> dict:
+def default_manifest(operator: str, email: str, mode: str = "produccion") -> dict:
     op = {"id": operator, "role": "author"}
     if email:
         op["email"] = email
@@ -82,6 +83,7 @@ def default_manifest(operator: str, email: str) -> dict:
         "human_operators": [op],
         "citation_contract_version": "1.0",
         "project_type": "editorial",
+        "mode": mode,
         # El sector lo fija `/speckit-constitution` (primer paso del ciclo) a partir
         # de las bases en references/sectores/. null = adendas aún sin configurar.
         "sector": None,
@@ -117,8 +119,19 @@ def main() -> None:
     ap.add_argument("--project-dir", default=".")
     ap.add_argument("--operator", default="marcela.gotta", help="ID del operador humano.")
     ap.add_argument("--email", default="", help="Email del operador (opcional).")
+    ap.add_argument(
+        "--mode",
+        default=os.environ.get("WRITEONMARS_MODE", "produccion"),
+        choices=["produccion", "estudio"],
+        help="Modo del proyecto: produccion (default) o estudio.",
+    )
     ap.add_argument("--force", action="store_true", help="Sobrescribe constitución y manifest existentes.")
     args = ap.parse_args()
+
+    # argparse no valida `choices` sobre el default: un WRITEONMARS_MODE con
+    # typo llegaría aquí intacto y acabaría escrito en el manifest.
+    if args.mode not in ("produccion", "estudio"):
+        fail(f"mode inválido: {args.mode!r} (esperado produccion|estudio; revisa WRITEONMARS_MODE)")
 
     proj = Path(args.project_dir).resolve()
     if not (proj / ".specify").is_dir():
@@ -153,7 +166,7 @@ def main() -> None:
     if man.exists() and not args.force:
         print("[bootstrap] .writeonmars-manifest.json ya existe; --force para regenerar")
     else:
-        manifest = default_manifest(args.operator, args.email)
+        manifest = default_manifest(args.operator, args.email, args.mode)
         validate_manifest(manifest)
         man.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
         print(f"[bootstrap] manifest creado → .writeonmars-manifest.json (operador: {args.operator})")

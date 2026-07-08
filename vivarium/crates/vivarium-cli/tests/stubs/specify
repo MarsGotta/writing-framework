@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cmd="${1:-}"
+shift || true
+
+case "$cmd" in
+  init)
+    mkdir -p .specify/memory .specify/presets
+    cat > .specify/memory/constitution.md <<'EOF'
+# [PROJECT_NAME]
+
+Placeholder de Spec Kit.
+EOF
+    ;;
+  preset)
+    sub="${1:-}"
+    shift || true
+    [[ "$sub" == "add" ]] || { echo "stub specify: subcomando preset invalido" >&2; exit 2; }
+    preset=""
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --dev) preset="${2:?}"; shift 2 ;;
+        *) shift ;;
+      esac
+    done
+    [[ -n "$preset" ]] || { echo "stub specify: falta --dev <preset>" >&2; exit 2; }
+    mkdir -p .specify/presets/writeonmars
+    cp -R "$preset/." .specify/presets/writeonmars/
+    ;;
+  *)
+    echo "stub specify: comando desconocido: $cmd" >&2
+    exit 2
+    ;;
+esac

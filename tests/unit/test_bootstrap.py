@@ -77,6 +77,15 @@ class TestDefaultManifest:
         assert m["project_type"] == "editorial"
         assert m["constitution_version"] == bootstrap_mod.CONSTITUTION_VERSION
 
+    def test_mode_default_es_produccion(self, bootstrap_mod):
+        m = bootstrap_mod.default_manifest("op", "")
+        assert m["mode"] == "produccion"
+
+    @pytest.mark.parametrize("mode", ["produccion", "estudio"])
+    def test_mode_explicito(self, bootstrap_mod, mode):
+        m = bootstrap_mod.default_manifest("op", "", mode=mode)
+        assert m["mode"] == mode
+
 
 # ---------------------------------------------------------------------------
 # validate_manifest
@@ -107,6 +116,18 @@ class TestValidateManifest:
         slug de sector el manifest valida contra el schema completo."""
         m = bootstrap_mod.default_manifest("op", "")
         m["sector"] = "tecnologia"
+        bootstrap_mod.validate_manifest(m)
+
+    @pytest.mark.skipif(not HAS_JSONSCHEMA, reason="requiere jsonschema instalado")
+    @pytest.mark.parametrize("mode", ["produccion", "estudio"])
+    def test_manifest_con_cada_mode_valida_completo(self, bootstrap_mod, mode):
+        m = bootstrap_mod.default_manifest("op", "", mode=mode)
+        bootstrap_mod.validate_manifest(m)
+
+    @pytest.mark.skipif(not HAS_JSONSCHEMA, reason="requiere jsonschema instalado")
+    def test_manifest_sin_mode_sigue_validando(self, bootstrap_mod):
+        m = bootstrap_mod.default_manifest("op", "")
+        del m["mode"]
         bootstrap_mod.validate_manifest(m)
 
     def test_sin_schema_solo_avisa(self, bootstrap_mod, monkeypatch, tmp_path, capsys):
@@ -159,11 +180,50 @@ class TestMainEndToEnd:
         )
         assert manifest["constitution_version"] == bootstrap_mod.CONSTITUTION_VERSION
         assert manifest["human_operators"][0]["id"] == "test.op"
+        assert manifest["mode"] == "produccion"
+
+    def test_crea_manifest_en_modo_estudio(
+        self, scripts_dir, proyecto_speckit, stub_sin_jsonschema
+    ):
+        res = self._run(
+            scripts_dir,
+            proyecto_speckit,
+            stub_sin_jsonschema,
+            "--operator",
+            "test.op",
+            "--mode",
+            "estudio",
+        )
+        assert res.returncode == 0, res.stderr
+        manifest = json.loads(
+            (proyecto_speckit / ".writeonmars-manifest.json").read_text(encoding="utf-8")
+        )
+        assert manifest["mode"] == "estudio"
 
     def test_sin_specify_falla(self, scripts_dir, tmp_path, stub_sin_jsonschema):
         res = self._run(scripts_dir, tmp_path, stub_sin_jsonschema)
         assert res.returncode == 1
         assert "no es un proyecto spec-kit" in res.stderr
+
+    def test_mode_invalido_por_entorno_falla(
+        self, scripts_dir, proyecto_speckit, stub_sin_jsonschema
+    ):
+        """argparse no valida `choices` sobre el default: un WRITEONMARS_MODE
+        con typo debe cazarlo el guard explícito antes de escribir el manifest
+        (sin jsonschema el fallback solo comprueba claves required)."""
+        env = dict(
+            os.environ,
+            PYTHONPATH=str(stub_sin_jsonschema),
+            WRITEONMARS_MODE="Estudio",
+        )
+        res = subprocess.run(
+            [sys.executable, str(scripts_dir / "bootstrap.py"),
+             "--project-dir", str(proyecto_speckit)],
+            capture_output=True, text=True, env=env,
+        )
+        assert res.returncode == 1
+        assert "mode inválido" in res.stderr
+        assert not (proyecto_speckit / ".writeonmars-manifest.json").exists()
 
     def test_sin_force_no_sobrescribe(
         self, scripts_dir, proyecto_speckit, stub_sin_jsonschema

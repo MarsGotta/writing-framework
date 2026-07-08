@@ -48,19 +48,23 @@ resolve_framework_home() {
 }
 
 # validate_with_ajv <schema_path> <data_path>
+# Requiere ajv-formats (los schemas usan format: date/uri) y --strict=false
+# (el modo estricto de ajv rechaza construcciones válidas de draft 2020-12).
 validate_with_ajv() {
     local schema_path="$1"
     local data_path="$2"
     if ! command -v npx >/dev/null 2>&1; then
         return 127
     fi
-    if npx --yes ajv-cli validate \
-        --spec=draft2020 \
+    if npx --yes -p ajv-cli -p ajv-formats ajv validate \
+        --spec=draft2020 --strict=false -c ajv-formats \
         -s "$schema_path" \
         -d "$data_path" >/dev/null 2>&1; then
         return 0
     fi
-    npx --yes ajv-cli validate --spec=draft2020 -s "$schema_path" -d "$data_path" >&2 || return 1
+    npx --yes -p ajv-cli -p ajv-formats ajv validate \
+        --spec=draft2020 --strict=false -c ajv-formats \
+        -s "$schema_path" -d "$data_path" >&2 || return 1
 }
 
 # validate_with_python <schema_path> <data_path>
@@ -70,7 +74,7 @@ validate_with_python() {
     if ! command -v python3 >/dev/null 2>&1; then
         return 127
     fi
-    python3 - "$schema_path" "$data_path" <<'PY' || return 1
+    python3 - "$schema_path" "$data_path" <<'PY' || return $?
 import json
 import sys
 

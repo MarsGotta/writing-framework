@@ -10,6 +10,20 @@ trayectorias paralelas: framework (`vX.Y.Z` del repo) y constitución
 
 ## [Unreleased] — refactor a preset agente-agnóstico
 
+### Vivarium headless (feature 004, 2026-07-07)
+
+- Añadido workspace Rust `vivarium/` con `vivarium-core` y `vivarium-cli`:
+  bootstrap `vivarium new`, `status|check`, runner `step|run`, config BYOM,
+  lock de proyecto, `decisions.jsonl` y `mode set`.
+- Publicado `writeonmars/contracts/executor-contract.md` como contrato del
+  ejecutor; el borrador de `specs/004-vivarium-core/contracts/` quedó como
+  puntero.
+- **`manifest-schema` v1.3.0 (MINOR)**: campos opcionales `mode`
+  (`produccion`/`estudio`) y `mode_history`; ausencia de `mode` =
+  `produccion`. `bootstrap.py` acepta `--mode` / `WRITEONMARS_MODE`.
+- Añadido smoke `tests/smoke/vivarium-e2e.sh` con stubs deterministas y skip
+  automático si `cargo` no está disponible.
+
 ### Constitución v1.6.0 (2026-07-07, modos de proyecto + ejecutores del método)
 
 - **MINOR 1.5.0 → 1.6.0**: nueva sección "Modos de proyecto" — todo proyecto
@@ -28,8 +42,8 @@ trayectorias paralelas: framework (`vX.Y.Z` del repo) y constitución
   de la constitución.
 - Constitution Check de `plan-template.md` (preset y copia instalada) ampliado
   a los seis principios + fila "Modo de proyecto"; corregida la referencia de
-  versión fósil (v1.2.0/v1.3.0 → v1.6.0). Pendiente (spec 004): campo `mode`
-  en `manifest-schema.json`; su ausencia se interpreta como `produccion`.
+  versión fósil (v1.2.0/v1.3.0 → v1.6.0). El campo `mode` en
+  `manifest-schema.json` quedó cubierto por la spec 004 (v1.3.0, arriba).
 
 ### Mantenimiento (2026-07-04, auditoría de estructura del repo)
 
