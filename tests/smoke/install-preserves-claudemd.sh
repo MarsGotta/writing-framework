@@ -13,6 +13,13 @@
 
 set -euo pipefail
 
+# install.sh (legacy) exige Bash 5: en un bash mas viejo este smoke se salta
+# con exit 99 (SKIP en run-all.sh), nunca un falso PASS ni un FAIL espurio.
+if [ "${BASH_VERSINFO[0]:-0}" -lt 5 ]; then
+    echo "skip: install.sh requiere Bash 5+ (actual: $BASH_VERSION)"
+    exit 99
+fi
+
 FRAMEWORK_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 TEST_NAME="install-preserves-claudemd"
 

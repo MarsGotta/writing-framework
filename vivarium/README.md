@@ -30,7 +30,7 @@ Vivarium habla con el método **solo a través de archivos, scripts y comandos**
 Si esa disciplina se mantiene, extraer `vivarium/` a su propio repositorio es
 un movimiento de carpetas, no una refactorización.
 
-## Layout previsto (lo materializa la spec 004; implementación: Codex)
+## Layout
 
 ```
 vivarium/
@@ -45,7 +45,15 @@ vía MCP/CLIs (BYOM); scripts Python del preset como sidecar (no se portan).
 
 ## Estado
 
-Pre-scaffolding (2026-07-07). Secuencia acordada: backend primero (bootstrap +
-runner headless), editor visual después. La spec `specs/004-vivarium-core/`
-define contrato del ejecutor, bootstrap de proyecto (repo + preset + manifest
-con `mode` + `roots/` + `decisions.jsonl`) y runner.
+Núcleo headless implementado en la rama `004-vivarium-core`:
+
+- `vivarium new`: crea proyecto editorial con repo git, preset Write.OnMars,
+  manifest con `mode`, `roots/`, `decisions.jsonl`, `.vivarium/` y commit base.
+- `vivarium status|check`: lee `status.py --json`, manifiesto, config BYOM y
+  decisiones sin computar estado editorial propio.
+- `vivarium step|run`: runner secuencial por estados con lock, despachos BYOM,
+  guardarraíl de `estudio`, decisiones append-only y checkpoints humanos.
+- `vivarium mode set`: cambio explícito y registrado de `produccion`/`estudio`.
+
+La interfaz Tauri queda para una etapa posterior; debe llamar a `vivarium-core`
+sin duplicar lógica.

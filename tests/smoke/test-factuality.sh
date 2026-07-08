@@ -120,8 +120,12 @@ JSON
 cat > "$TMP/bad-envivo.json" <<'JSON'
 {"claim_id":"c3","capitulo":1,"frase":"afirmacion verificable larga de prueba","tipo_afirmacion":"dato_duro","evidencia":[],"soporte":"sin_fuente","verificado_en_vivo":true,"pasada_schema":"1.1"}
 JSON
-if ! bash "$VALIDATE" "$TMP/valid.json" >/dev/null 2>&1; then
-    rc=$?; [ "$rc" -eq 2 ] && { pass "g validate-claim: sin validador instalado, salto (exit 2)"; SKIP_VALIDATE=1; } || fail "g: claim válido rechazado"
+# OJO: `if ! cmd` niega el status y `$?` dentro del then ya no es el exit real
+# del validador (perdía el 2 de "sin validador"): captura directa.
+rc=0
+bash "$VALIDATE" "$TMP/valid.json" >/dev/null 2>&1 || rc=$?
+if [ "$rc" -ne 0 ]; then
+    [ "$rc" -eq 2 ] && { pass "g validate-claim: sin validador instalado, salto (exit 2)"; SKIP_VALIDATE=1; } || fail "g: claim válido rechazado (rc=$rc)"
 fi
 if [ -z "${SKIP_VALIDATE:-}" ]; then
     bash "$VALIDATE" "$TMP/bad-apoya.json" >/dev/null 2>&1 && fail "g: 'apoya' sin fragmento debió fallar"

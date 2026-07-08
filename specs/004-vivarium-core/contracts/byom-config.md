@@ -13,12 +13,8 @@ comentada; la operadora la copia a `config.toml` y ajusta sus órdenes
 version = 1
 
 [python]
-# Opcional. Si falta: $VIVARIUM_PYTHON, y si no, `python3` del PATH.
+# Opcional. Precedencia: $VIVARIUM_PYTHON (env) > este campo > `python3` del PATH.
 interpreter = "/usr/local/bin/python3"
-
-[preset]
-# Opcional. Ruta del preset para `vivarium new` (default: copia local del framework).
-path = "~/Projects/writing-framework/writeonmars"
 
 # Tres roles OBLIGATORIOS. `command` es una plantilla: lista de argv donde los
 # placeholders se sustituyen literalmente (sin shell, sin quoting frágil).
@@ -53,6 +49,9 @@ stdin = "prompt_file"
   runner escribe en `.vivarium/tasks/` (contenido: encargo del paso, capítulo,
   rutas relevantes, contrato de salida); `{project_dir}` = raíz absoluta del
   proyecto; `{chapter}` = ordinal (vacío en pasos globales).
+- **Preset**: la ruta del preset para `vivarium new` NO va en este archivo (el
+  config vive dentro del proyecto, que aún no existe al crear): se pasa con el
+  flag `--preset` (default: la copia local del framework).
 - **Validación (`vivarium check` y arranque de `step|run`)**: los tres roles
   presentes; el binario (primer elemento de `command`) resoluble en PATH o
   ruta absoluta existente; la plantilla contiene `{prompt_file}` o declara

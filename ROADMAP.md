@@ -1,6 +1,6 @@
 # Write.OnMars — Roadmap y estado
 
-> Estado al **2026-06-20**. Resumen de lo construido, lo validado de verdad y lo
+> Estado al **2026-07-07**. Resumen de lo construido, lo validado de verdad y lo
 > que queda. Punto de retorno para no perder el hilo entre sesiones.
 
 ## En una frase
@@ -8,9 +8,10 @@
 El método editorial es un **preset de Spec Kit agente-agnóstico** (`writeonmars/`),
 instalable con `specify preset add` y **probado de punta a punta**. La voz, la
 didáctica y el método viajan como **referencias** neutrales de modelo; la lógica,
-como **comandos**; lo determinista, como **scripts**. La orquestación (Paperclip)
-ya tiene un **primer corte construido** en `paperclip/`; falta el webhook del
-checkpoint del PDF, los presupuestos y pulir la distribución.
+como **comandos**; lo determinista, como **scripts**. La orquestación de
+referencia ya es **Vivarium headless** (`vivarium/`): bootstrap, runner por
+estados, BYOM, modos y contrato publicado. Paperclip queda archivado como
+referencia histórica.
 
 ## Cómo está montado (capas)
 
@@ -120,17 +121,19 @@ Y, ya en Paperclip:
 
 ## Pendiente (orden sugerido)
 
-1. **Registrar los comandos para Codex/Gemini nativamente** (hoy se les apunta al
+1. **Interfaz Tauri de Vivarium**: envolver `vivarium-core` sin duplicar lógica
+   editorial, empezando por nuevo proyecto, estado y ejecución supervisada.
+2. **Registrar los comandos para Codex/Gemini nativamente** (hoy se les apunta al
    archivo del comando; funciona, pero registrarlos evita pegar la ruta).
-2. **Opcionales del preset**: búsqueda semántica real en `index.py` (embeddings,
+3. **Opcionales del preset**: búsqueda semántica real en `index.py` (embeddings,
    chromadb); hook `after_close` para auto-export.
-3. **Webhook del checkpoint 2**: cerrar el lazo del segundo control humano — el
+4. **Checkpoint 2 en producto**: cerrar el lazo del segundo control humano — el
    **PDF anotado** del documento terminado debe entrar por `feedback_intake`
    (hoy ese paso es manual).
-4. **Presupuestos**: topes de gasto/tokens por Project y por rol en Paperclip.
-5. **Varias guías en paralelo**: hoy se corre **una guía a la vez**; falta operar
-   varios Projects a la vez bajo la misma Company.
-6. **Distribución**: elegir licencia, publicar el preset
+5. **Presupuestos**: topes de gasto/tokens por Project y por rol.
+6. **Varias guías en paralelo**: hoy se corre **una guía a la vez**; falta operar
+   varios proyectos a la vez.
+7. **Distribución**: elegir licencia, publicar el preset
    (`specify preset add --from <github>`), versionar releases.
 
 ## Bugs de orquestación — primera corrida real (guide-nlp, 2026-06-20)

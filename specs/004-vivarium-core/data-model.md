@@ -87,7 +87,7 @@ research → plan → implement → review → revise → close`.
 | global: pasada 5 | cuando `all_chapters_approved`: despacho `speckit.review-global` | `editora_mesa` | no |
 | global: intro | despacho `speckit.intro` (README de presentación del PDF, antes del export — executor-contract § 2) | `redactora` | no |
 | global: export | sidecar `export.py` | sidecar | no |
-| global: feedback | **checkpoint 2**: detenerse; PDF anotado → `feedback_intake.py` manual | — | **sí** |
+| global: feedback | **checkpoint 2**: detenerse; PDF anotado → `feedback_intake.py` manual. Atendido cuando existe `specs/<spec>/feedback.md`; hasta entonces el runner NO cierra aunque los gates estén verdes | — | **sí** |
 | `close` | sidecar `close.py` solo con `closeable == true` y gates verdes | sidecar | no |
 
 Guardarraíl de modo (FR-008): con `mode: estudio`, las filas `implement` y

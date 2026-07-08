@@ -12,7 +12,11 @@ Crea un proyecto editorial operativo (FR-001). `<kind>` ∈ `guia | tutorial |
 documentacion | no-ficcion | novela | relato | poesia | guion | academico`
 (fija el `mode` default, data-model § 2); `--mode` lo sobrescribe. Operador y
 email heredan de `git config` si se omiten (paridad con `tools/new-guide.sh`).
-Idempotente: re-ejecutar sobre un proyecto ya creado no duplica ni destruye.
+Idempotente: re-ejecutar sobre un proyecto ya creado no duplica ni destruye, y
+**nunca cambia el `mode` de un manifiesto existente** (con `--mode` distinto al
+actual falla con exit 5 remitiendo a `vivarium mode set`; el cambio de modo es
+siempre acción explícita con registro, FR-009). El `sector` existente tampoco
+se pisa: solo se completa cuando falta.
 
 - Efectos: git init + `specify init` + `specify preset add` + `bootstrap.py` +
   manifiesto con `mode` + `roots/README.md` + `decisions.jsonl` + `.vivarium/`
@@ -66,7 +70,15 @@ binarios de agentes, manifiesto contra schema). Exit 0 = listo para `run`.
 | 6 | Lock tomado por otra instancia |
 | 10 | Detenido en checkpoint humano (brief o PDF anotado) |
 | 11 | Bloqueado por modo (`estudio` prohíbe el despacho requerido) |
-| 12 | Fallo de despacho de agente (estado en disco intacto; reintento seguro) |
+| 12 | Fallo de despacho — agente o sidecar del ciclo (estado en disco intacto; reintento seguro) |
+
+Semántica de los checkpoints: el checkpoint 2 (feedback) se considera atendido
+cuando existe `specs/<spec>/feedback.md` (lo escribe `feedback_intake.py`
+sobre el PDF anotado); hasta entonces `run` sale con 10 **aunque los gates
+estén en verde**. Con feedback presente y `closeable`, `run` despacha
+`close.py` una sola vez y termina con 0; el guardarraíl de modo evalúa la
+acción sintetizada (no el `next_step` crudo) e incluye `intro` entre los pasos
+que escriben prosa.
 
 ## Invariantes de toda orden
 

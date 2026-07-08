@@ -219,6 +219,16 @@ def mini_project(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
+def mini_project_estudio(mini_project: Path) -> Path:
+    """Variante del proyecto mínimo con mode=estudio en el manifiesto."""
+    man_p = mini_project / ".writeonmars-manifest.json"
+    data = json.loads(man_p.read_text(encoding="utf-8"))
+    data["mode"] = "estudio"
+    man_p.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    return mini_project
+
+
+@pytest.fixture
 def mini_spec_dir(mini_project: Path) -> Path:
     return mini_project / "specs" / "001-guia"
 

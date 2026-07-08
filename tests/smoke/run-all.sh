@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
-# run-all.sh — ejecuta los tres smoke tests de US1 y reporta resumen.
+# run-all.sh — ejecuta los smoke tests y reporta resumen.
 #
 # Cubre el "Independent Test" de US1: ejecutar los tres acceptance scenarios
 # (AC1, AC2, AC3) sobre un instalador real y verificar PASS/FAIL.
+#
+# Portable a Bash 3.2 (el /bin/bash de macOS): sin arrays asociativos. Este
+# script es gate en CLAUDE.md — nunca debe salir 0 sin ejecutar los tests.
+#
+# Convención de exit codes de los tests: 0 = PASS, 99 = SKIP (dependencia
+# opcional ausente, p. ej. cargo), cualquier otro = FAIL.
 
 set -uo pipefail
 
@@ -13,17 +19,22 @@ tests=(
     "install-preserves-claudemd.sh"
     "specify-after-install.sh"
     "test-factuality.sh"
+    "vivarium-e2e.sh"
 )
 
-declare -A results=()
+results=()
 overall_rc=0
 
 for t in "${tests[@]}"; do
     printf '\n========== Ejecutando %s ==========\n' "$t"
-    if bash "$SMOKE_DIR/$t"; then
-        results[$t]="PASS"
+    rc=0
+    bash "$SMOKE_DIR/$t" || rc=$?
+    if [[ $rc -eq 0 ]]; then
+        results+=("PASS")
+    elif [[ $rc -eq 99 ]]; then
+        results+=("SKIP")
     else
-        results[$t]="FAIL"
+        results+=("FAIL")
         overall_rc=1
     fi
 done
@@ -31,13 +42,15 @@ done
 printf '\n========== Resumen ==========\n'
 printf '%-40s | %s\n' "Test" "Resultado"
 printf '%-40s-+-%s\n' "----------------------------------------" "---------"
+i=0
 for t in "${tests[@]}"; do
-    printf '%-40s | %s\n' "$t" "${results[$t]}"
+    printf '%-40s | %s\n' "$t" "${results[$i]}"
+    i=$((i + 1))
 done
 printf '\n'
 
 if [[ $overall_rc -eq 0 ]]; then
-    printf 'Todos los smoke tests pasaron.\n'
+    printf 'Smoke tests en verde (los SKIP no cuentan como PASS: revisa el resumen).\n'
 else
     printf 'Al menos un smoke test falló (ver salida arriba).\n'
 fi
