@@ -202,10 +202,11 @@ resultado (determinismo).
 - **FR-007**: Los hallazgos aplazados MUST quedar documentados como deuda
   declarada en el cierre del proyecto: no bloquean `close`, pero aparecen en
   el resumen de cierre y permanecen en el registro.
-- **FR-008**: En modo estudio, si un capítulo aprobado cambia sustancialmente
-  después de su última pasada, la brújula MUST reabrir la necesidad de
-  revisión de ese capítulo (la aprobación se ancla al contenido revisado, no
-  al nombre del archivo).
+- **FR-008**: En modo estudio, si el contenido de un capítulo aprobado cambia
+  después de su última pasada (cualquier diferencia de contenido cuenta: si la
+  humana corrigió una tilde tras la pasada, re-pasar es barato y honesto), la
+  brújula MUST reabrir la necesidad de revisión de ese capítulo (la aprobación
+  se ancla al contenido revisado, no al nombre del archivo).
 - **FR-009**: El preset MUST incluir un script determinista de **informe de
   autoría humana** que derive, del historial git del proyecto y de
   `decisions.jsonl`, la clasificación de cada cambio del manuscrito
@@ -278,9 +279,9 @@ resultado (determinismo).
   findings.md o en él), editado por el humano y validado por script; la
   interfaz gráfica de disposición es de Vivarium/Tauri y queda fuera de
   alcance.
-- **"Cambio sustancial" de un capítulo aprobado** se define de forma
-  determinista y barata (p. ej. huella del contenido registrada al aprobar);
-  el umbral exacto lo fija el plan, no esta spec.
+- **El cambio de un capítulo aprobado** se detecta de forma determinista y
+  barata mediante huella del contenido registrada en cada pasada (fijado en
+  research R4: sha256 de los bytes; sin umbral de "sustancialidad").
 - **El informe de autoría usa la identidad de los commits** (autor git) más el
   registro de despachos (`decisions.jsonl`) para distinguir humano de agente;
   supone que los agentes comitean con identidad propia o que sus acciones

@@ -24,6 +24,10 @@ python3 scripts/dispose.py <finding_id> (--aceptar | --rechazar --motivo "…" |
 Transiciones permitidas: `abierto → {resuelto, desviacion_justificada,
 aplazado}`; `aplazado → {resuelto, desviacion_justificada}`.
 
+Resolución del directorio de spec: la misma regla que `status.py` — primer
+directorio de `specs/` (orden lexicográfico) que contenga `spec.md`. Sin
+spec ⇒ exit 1.
+
 `--json` imprime el DispositionRecord escrito. La actualización de findings.md
 toca **solo** la celda `estado` (y `decision_humana` en rechazo) de la fila
 del hallazgo; el resto del archivo queda byte a byte intacto.
@@ -44,8 +48,13 @@ python3 scripts/authorship.py [--project-dir DIR] [--json] [--out PATH]
 Clasificación por commit que toca `chapters/` (data-model § 6):
 `agente` ⟺ email `*@agents.writeonmars.invalid` ∨ commit dentro de una
 ventana dispatch→disposition de `implement|revise|intro` para ese capítulo en
-`decisions.jsonl`. Determinismo: la salida depende solo de (HEAD,
-decisions.jsonl); sin timestamps de generación.
+`decisions.jsonl`. Reglas de resolución fijas: (a) el ordinal de capítulo de
+un archivo es su prefijo numérico (`chapters/NNN-*.md` → `NNN` sin ceros a la
+izquierda); archivos bajo `chapters/` sin prefijo numérico se reportan en una
+sección "sin ordinal" con su clasificación, sin romper; (b) el instante del
+commit comparado con la ventana es el **committer date en UTC** (`%cI` de
+git). Determinismo: la salida depende solo de (HEAD, decisions.jsonl); sin
+timestamps de generación.
 
 ## 3. `status.py` — cambios de contrato (v de salida no versionada; aditivo)
 

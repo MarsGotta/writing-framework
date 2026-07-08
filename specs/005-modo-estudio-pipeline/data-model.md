@@ -68,7 +68,7 @@ Cada bloque de pasada termina con un comentario de máquina:
 |-------|------|--------|
 | `mode` | string | **Nuevo**: `"produccion"` \| `"estudio"` (ausencia en manifiesto = produccion). |
 | `next_step` | string | Gana valores `write` y `dispose` (solo en estudio). |
-| `pending_chapters` | lista | **Nuevo**: ordinales del temario sin capítulo en disco (ambos modos; ya derivable, ahora explícito). |
+| `pending_chapters` | lista de enteros | **Nuevo**: ordinales del temario sin capítulo en disco, como enteros (ambos modos; ya derivable, ahora explícito). |
 | `pending_dispositions` | lista | **Nuevo** (estudio): ids de hallazgos crítico/medio abiertos. |
 | `deferred_findings` | lista | **Nuevo**: ids con `estado = aplazado` (ambos modos; en produccion siempre `[]` salvo migraciones). |
 | `reopened_chapters` | lista | **Nuevo** (estudio): capítulos cuya huella no coincide (pasadas invalidadas). |

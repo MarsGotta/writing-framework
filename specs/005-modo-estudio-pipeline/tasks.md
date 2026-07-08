@@ -158,17 +158,22 @@ mixto clasifica agente/humano correctamente.
 
 - [ ] T015 `vivarium/crates/vivarium-core/src/sidecar.rs`: campos nuevos de
   `Status` con `#[serde(default)]` — `mode: Option<String>`,
-  `pending_chapters: Vec<serde_json::Value>`, `pending_dispositions:
-  Vec<String>`, `deferred_findings: Vec<String>`, `reopened_chapters:
-  Vec<String>` — tolerante a salidas de status.py antiguas.
+  `pending_chapters: Vec<u32>`, `pending_dispositions: Vec<String>`,
+  `deferred_findings: Vec<String>`, `reopened_chapters: Vec<String>` —
+  tolerante a salidas de status.py antiguas (campos ausentes = default).
 - [ ] T016 `vivarium/crates/vivarium-core/src/runner.rs` (research R6,
   cli-estudio § 5): brazos `"write"` y `"dispose"` en `plan_action` ⇒
   `Planned::Checkpoint` (mensajes del contrato; `append_checkpoint_once`
-  evita duplicados, mismo patrón que `specify`); en `plan_global`, si el
-  manifiesto declara `mode == estudio` y falta `README.md` ⇒
+  evita duplicados, mismo patrón que `specify`); en la rama de
+  **normalización** (`next_step == "close"` con capítulos sin aprobar), si
+  `mode == estudio`: capítulo sin redactar ⇒ Checkpoint `write` y revise
+  pendiente ⇒ Checkpoint `dispose` (nunca `Act(implement/revise)`, que
+  chocaría con el guardarraíl en vez de esperar al humano); en `plan_global`,
+  si el manifiesto declara `mode == estudio` y falta `README.md` ⇒
   `Planned::Checkpoint{step: "intro"}` en lugar de despachar a la Redactora.
   PROHIBIDO tocar `writes_manuscript`, `blocked_by_mode` y los exit codes.
-  Unit tests del planificador junto a los existentes en `runner.rs`.
+  Unit tests del planificador junto a los existentes en `runner.rs`
+  (incluido el caso de normalización en estudio).
 - [ ] T017 [P] Tests de integración del ejecutor en
   `vivarium/crates/vivarium-cli/tests/runner.rs` (stubs existentes de
   `tests/common/mod.rs` + fixture estudio): `vivarium run` sobre proyecto
