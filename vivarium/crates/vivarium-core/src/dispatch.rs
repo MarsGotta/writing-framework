@@ -227,7 +227,7 @@ fn render_argv(
         .collect()
 }
 
-fn command_resolves(command: &str) -> bool {
+pub(crate) fn command_resolves(command: &str) -> bool {
     let path = Path::new(command);
     if path.components().count() > 1 {
         return path.exists();

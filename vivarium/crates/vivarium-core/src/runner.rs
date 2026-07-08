@@ -289,7 +289,9 @@ fn plan_global(project: &Path, status: &Status) -> Result<Planned> {
     }
     if status.closeable {
         if already_closed(project)? {
-            return Ok(Planned::Done("proyecto ya cerrado (close.py OK)".to_string()));
+            return Ok(Planned::Done(
+                "proyecto ya cerrado (close.py OK)".to_string(),
+            ));
         }
         return Ok(Planned::Act(Action {
             step: "close".to_string(),
@@ -701,7 +703,13 @@ mod tests {
         fs::write(tmp.path().join("guia.pdf"), "%PDF-1.4\n").unwrap();
         // Sin specs/001-demo/feedback.md: el checkpoint 2 manda sobre los gates.
         let planned = plan_global(tmp.path(), &status_closeable()).unwrap();
-        assert!(matches!(planned, Planned::Checkpoint { step: "feedback", .. }));
+        assert!(matches!(
+            planned,
+            Planned::Checkpoint {
+                step: "feedback",
+                ..
+            }
+        ));
     }
 
     #[test]

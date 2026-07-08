@@ -198,8 +198,9 @@ fn run(cli: Cli) -> Result<i32> {
 // Un mode mal escrito es un error de argumentos (exit 2), no de validación de
 // proyecto (exit 5) — mismo trato que un --kind inválido.
 fn parse_mode_arg(value: &str) -> Result<Mode> {
-    Mode::from_str(value)
-        .map_err(|_| VivariumError::InvalidUsage(format!("mode inválido: {value} (produccion|estudio)")))
+    Mode::from_str(value).map_err(|_| {
+        VivariumError::InvalidUsage(format!("mode inválido: {value} (produccion|estudio)"))
+    })
 }
 
 fn status_value(project: &PathBuf) -> Result<Value> {

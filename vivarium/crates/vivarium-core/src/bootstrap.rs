@@ -37,7 +37,7 @@ impl BootstrapOptions {
 
 pub fn new_project(options: &BootstrapOptions) -> Result<PathBuf> {
     verify_environment()?;
-    let target = options.target.resolve_relative()?;
+    let target = absolutize(&options.target)?;
     if target.exists() && !target.is_dir() {
         return Err(VivariumError::Validation(format!(
             "{} existe y no es directorio",
@@ -110,14 +110,14 @@ pub fn new_project(options: &BootstrapOptions) -> Result<PathBuf> {
 
 fn verify_environment() -> Result<()> {
     for command in ["git", "specify"] {
-        if !command_resolves(command) {
+        if !dispatch::command_resolves(command) {
             return Err(VivariumError::EnvironmentIncomplete(format!(
                 "falta {command} en PATH"
             )));
         }
     }
     let python = sidecar::resolve_python();
-    if !command_resolves(&python) {
+    if !dispatch::command_resolves(&python) {
         return Err(VivariumError::EnvironmentIncomplete(format!(
             "falta intérprete Python: {python}"
         )));
@@ -334,16 +334,6 @@ fn append_unique_line(path: &Path, line: &str) -> Result<()> {
     Ok(())
 }
 
-fn command_resolves(command: &str) -> bool {
-    let path = Path::new(command);
-    if path.components().count() > 1 {
-        return path.exists();
-    }
-    env::var_os("PATH")
-        .map(|paths| env::split_paths(&paths).any(|p| p.join(command).is_file()))
-        .unwrap_or(false)
-}
-
 fn default_preset_path() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .ancestors()
@@ -352,17 +342,11 @@ fn default_preset_path() -> PathBuf {
         .unwrap_or_else(|| PathBuf::from("writeonmars"))
 }
 
-trait ResolveRelative {
-    fn resolve_relative(&self) -> Result<PathBuf>;
-}
-
-impl ResolveRelative for Path {
-    fn resolve_relative(&self) -> Result<PathBuf> {
-        if self.is_absolute() {
-            Ok(self.to_path_buf())
-        } else {
-            Ok(env::current_dir()?.join(self))
-        }
+fn absolutize(path: &Path) -> Result<PathBuf> {
+    if path.is_absolute() {
+        Ok(path.to_path_buf())
+    } else {
+        Ok(env::current_dir()?.join(path))
     }
 }
 
