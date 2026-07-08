@@ -10,7 +10,7 @@
 
 ## Summary
 
-El modo estudio (constitución v1.6.0: el humano escribe, la IA MUST NOT
+El modo estudio (constitución § Modos de proyecto: el humano escribe, la IA MUST NOT
 redactar prosa del manuscrito) existe como norma y como guardarraíl del
 ejecutor, pero el preset no sabe operarlo: `status.py` pide "delegar a
 Redactora" ante capítulos faltantes y no hay ciclo para que el humano

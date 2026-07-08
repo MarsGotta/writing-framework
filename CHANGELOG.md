@@ -10,6 +10,16 @@ trayectorias paralelas: framework (`vX.Y.Z` del repo) y constitución
 
 ## [Unreleased] — refactor a preset agente-agnóstico
 
+### Constitución v1.6.1 (2026-07-08, lente de modo en Estándares editoriales)
+
+- **PATCH 1.6.0 → 1.6.1**: los bullets "Fuentes por capítulo" y "Atribución por
+  afirmación" (texto de la era 003, previo a los modos) ganan la lente de modo
+  que § Modos de proyecto ya establecía: el MUST de `claims.md` es del modo
+  produccion; en estudio la pasada 4 verifica consistencia contra las fuentes
+  del proyecto y `claims.md` solo se exige con umbral declarado. Detectado como
+  conflicto C1 por el `/speckit-analyze` de la feature 005 (Codex). Las
+  referencias de versión en plan-template pasan a ser agnósticas (anti-fósil).
+
 ### Vivarium headless (feature 004, 2026-07-07)
 
 - Añadido workspace Rust `vivarium/` con `vivarium-core` y `vivarium-cli`:

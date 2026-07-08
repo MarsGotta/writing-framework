@@ -55,7 +55,7 @@ Recorrido paso a paso: [`writeonmars/docs/tutorial-primera-guia.md`](writeonmars
 - **Preset `writeonmars`**: v0.1.0, agente-agnóstico, probado con proyecto
   sintético. 6 plantillas + 18 comandos + 6 scripts.
 - **Framework**: 0.x.0 (pre-tag; v1.0.0 pendiente).
-- **Constitución**: v1.6.0 (modos de proyecto `produccion`/`estudio` con cambio
+- **Constitución**: v1.6.1 (modos de proyecto `produccion`/`estudio` con cambio
   explícito y consecuencias de procedencia; § Ejecutores del método — Vivarium
   como ejecutor orquestado de referencia, Paperclip archivado).
 - **Contrato de citación**: v1.0 · **Manifest**: v1.0.

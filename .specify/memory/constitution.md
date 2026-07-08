@@ -1,6 +1,35 @@
 <!--
 SYNC IMPACT REPORT
 ==================
+Version change: 1.6.0 → 1.6.1
+Bump rationale: PATCH — clarificación de alcance, sin cambio de intención. Los
+bullets "Fuentes por capítulo" y "Atribución por afirmación" de Estándares
+editoriales eran texto de la era 003 (previo a los modos) y enunciaban el MUST
+de claims.md sin la lente de modo que la sección "Modos de proyecto" (v1.6.0)
+ya establece ("el modo no cambia los principios, cambia su lente de
+aplicación"; la obligación de atribución cuelga del bullet de producción).
+Detectado como conflicto C1 por /speckit-analyze de la feature 005 (el cierre
+en modo estudio sin claims contradecía el texto literal). En modo produccion
+nada cambia: el MUST queda íntegro.
+
+Modified sections:
+- Estándares editoriales § "Fuentes por capítulo" — MUST en modo produccion;
+  en modo estudio la sección es SHOULD según género/adendas y la validación
+  contra claims.md aplica solo si existen claims.
+- Estándares editoriales § "Atribución por afirmación" — MUST en modo
+  produccion (prosa redactada por IA); en modo estudio la pasada 4 verifica
+  consistencia contra las fuentes del proyecto y claims.md solo se exige si
+  el manifiesto declara umbral de factualidad (quality_gates).
+
+Templates: sin cambios necesarios (el Constitution Check de plan-template ya
+incluye la fila "Modo de proyecto" desde v1.6.0).
+
+Resolved from v1.6.0: el ⚠ pending de manifest-schema.json quedó cerrado — la
+feature 004 publicó manifest-schema v1.3.0 con `mode`/`mode_history`
+(ausencia = produccion).
+
+Historial previo
+----------------
 Version change: 1.5.0 → 1.6.0
 Bump rationale: MINOR — nueva sección normativa "Modos de proyecto" (estudio /
 producción: quién redacta la prosa, qué garantías de procedencia ofrece el
@@ -420,18 +449,27 @@ Restricciones materiales aplicables a todo artefacto del framework:
   "Qué hacer en la práctica" pueden centralizarse u omitirse por capítulo cuando
   las adendas del proyecto lo declaren. La estructura concreta del capítulo la fija
   la base del sector (p. ej. `references/sectores/tecnologia.md`).
-- **Fuentes por capítulo**: cada capítulo MUST cerrar con una sección "Fuentes"
-  que nombre las fuentes citadas en ese capítulo (nombre, enlace y fecha cuando
-  aplique), además del research consolidado. Es trazabilidad por capítulo, no solo
-  un research.md central. Esta sección se **valida/deriva** contra `claims.md`
-  (atribución por afirmación): la escribe la Redactora y `export.py` comprueba que
-  ninguna afirmación `sin_fuente`/`contradicho` llegue al PDF sin marca.
-- **Atribución por afirmación** (pasada 4): cada afirmación verificable de un
-  capítulo MUST quedar registrada en `claims.md` (ClaimRecord v1.0) con su(s)
-  cita(s) y el veredicto de relación (apoya/matiza/contradice/menciona). De ahí se
-  deriva un **índice de factualidad** determinista (`status.py`), gate de cierre
-  opcional vía `manifest.quality_gates`. El juicio vive en la referencia de la
-  pasada 4; el conteo, en el script (Principio VI).
+- **Fuentes por capítulo** (modo produccion): cada capítulo MUST cerrar con una
+  sección "Fuentes" que nombre las fuentes citadas en ese capítulo (nombre,
+  enlace y fecha cuando aplique), además del research consolidado. Es
+  trazabilidad por capítulo, no solo un research.md central. Esta sección se
+  **valida/deriva** contra `claims.md` (atribución por afirmación): la escribe
+  la Redactora y `export.py` comprueba que ninguna afirmación
+  `sin_fuente`/`contradicho` llegue al PDF sin marca. En modo estudio la
+  sección "Fuentes" SHOULD mantenerse cuando el género lo pida (las adendas del
+  proyecto lo declaran) y la validación contra `claims.md` aplica solo si
+  existen claims.
+- **Atribución por afirmación** (pasada 4, modo produccion): cada afirmación
+  verificable de un capítulo redactado por IA MUST quedar registrada en
+  `claims.md` (ClaimRecord v1.0) con su(s) cita(s) y el veredicto de relación
+  (apoya/matiza/contradice/menciona). De ahí se deriva un **índice de
+  factualidad** determinista (`status.py`), gate de cierre opcional vía
+  `manifest.quality_gates`. El juicio vive en la referencia de la pasada 4; el
+  conteo, en el script (Principio VI). En modo estudio (§ Modos de proyecto)
+  la pasada 4 verifica la consistencia del texto humano contra las fuentes del
+  proyecto (`roots/`, research) y emite hallazgos; `claims.md` es opcional y
+  solo se exige cuando el manifiesto declara umbral de factualidad
+  (`quality_gates`).
 - **Cajas visuales**: las cajas "Quédate con esto", "Qué hacer mañana" o "Síntoma →
   causa probable" SHOULD usarse cuando aportan, y las adendas del proyecto declaran
   si alguna es obligatoria por capítulo. Algunos sectores (médico, veterinario) se
@@ -657,4 +695,4 @@ cumplimiento explícito antes de cerrarse.
 - La guía operativa de runtime para agentes (p.ej., `CLAUDE.md`, `AGENTS.md`)
   MUST citar esta constitución como fuente de verdad editorial.
 
-**Version**: 1.6.0 | **Ratified**: 2026-05-06 | **Last Amended**: 2026-07-07
+**Version**: 1.6.1 | **Ratified**: 2026-05-06 | **Last Amended**: 2026-07-08
