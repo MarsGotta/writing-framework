@@ -136,7 +136,9 @@ Y, ya en Paperclip:
 7. **Distribución**: elegir licencia, publicar el preset
    (`specify preset add --from <github>`), versionar releases.
 8. **Inspiración externa** (análisis 2026-07-08, ver
-   `docs/comparativa-bookwright-sloop.md`): firma de fallo repetida como
+   `docs/comparativa-bookwright-sloop.md` y diseños de adopción en
+   `docs/inspiracion-bookwright-profundizada.md` — candidata a spec 006:
+   biblia narrativa en roots/ + ejes de continuidad): firma de fallo repetida como
    clasificador transitorio/determinista en el runner de Vivarium (S|Loop);
    late binding de prompts de capítulo contra estado real + decisions.jsonl
    (S|Loop); protocolo `[PENDING]` de tres sistemas para adendas/claims

@@ -82,7 +82,10 @@ actual.
   aceptación de US1 (write con pendientes, review al aparecer capítulo,
   produccion intacta — comparar salida completa contra el fixture de
   produccion), huellas (capítulo editado tras pasada ⇒ reabierto, FR-008) y
-  `mode` en JSON. Usa `tests/fixtures/005-estudio/`.
+  `mode` en JSON. Usa `tests/fixtures/005-estudio/`. Incluir un **test de
+  oráculo**: la salida `--json` completa del fixture estudio comparada contra
+  `tests/fixtures/005-estudio/expected-status.json` (byte a byte tras
+  normalizar el orden de claves) — congela el contrato de la brújula.
 
 **Checkpoint US1**: `pytest tests/unit/test_status_estudio.py` verde + suite
 previa verde sin ediciones.
