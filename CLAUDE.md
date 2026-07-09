@@ -33,11 +33,11 @@ solo habla con el método vía archivos + scripts + comandos. `paperclip/` queda
 `paperclip/FLOW-CONTRACT.md` (§§ 0-2 = contrato agnóstico del ejecutor).
 Scaffolding de una guía nueva en un comando: `tools/new-guide.sh`.
 
-**Feature activa**: 005-modo-estudio-pipeline (rama `005-modo-estudio-pipeline`)
-— pipeline del modo estudio en el preset. Plan:
-`specs/005-modo-estudio-pipeline/plan.md` (research, data-model, contratos y
-quickstart en el mismo directorio). La implementación la hará Codex: los
-artefactos son autocontenidos y agente-neutrales.
+**Feature activa**: ninguna. Próximos pasos (ver ROADMAP.md): validación BYOM
+del modo estudio con agentes reales (pendiente), biblia narrativa en `roots/` +
+ejes de continuidad (candidata a spec 006, ver
+`docs/inspiracion-bookwright-profundizada.md`), interfaz Tauri sobre
+`vivarium-core`.
 
 Specs (referencia, NO activas):
 - 001-framework-architecture: base del harness editorial (v1.0.0). Vive en `specs/001-framework-architecture/`.
@@ -49,4 +49,8 @@ Specs (referencia, NO activas):
   núcleo headless de Vivarium (`vivarium new|status|check|step|run|mode set`).
   Evidencia BYOM: `tests/editorial-pilot/evidence/2026-07-08-vivarium-byom/`.
   Gate extra al tocar `vivarium/`: `cd vivarium && cargo test --workspace`.
+- 005-modo-estudio-pipeline: **integrada** (2026-07-09) — pipeline del modo
+  estudio en el preset (`dispose.py`, `authorship.py`, huellas, checkpoints
+  write/dispose). Revisada (8 ángulos, 10 correcciones). Validación BYOM con
+  agentes reales aún pendiente.
 <!-- SPECKIT END -->
