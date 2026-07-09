@@ -10,6 +10,31 @@ trayectorias paralelas: framework (`vX.Y.Z` del repo) y constitución
 
 ## [Unreleased] — refactor a preset agente-agnóstico
 
+### Mantenimiento (2026-07-09, limpieza de la casa)
+
+- **Copias muertas de skills retiradas**: `.agents/skills/` y `.claude/skills/`
+  arrastraban 17 skills duplicadas por carpeta (marcela-prose,
+  technical-guide-design, `writeonmars-*`) que ya habían divergido de la
+  fuente canónica (`references/voz` del 2026-07-07 vs copia del 2026-05-06).
+  Solo quedan las `speckit-*` de la integración Spec Kit; la fuente única del
+  método es `writeonmars/references/`.
+- **Vía legacy `install.sh` eliminada del árbol**: `install/` (instalador + 5
+  libs), sus 4 smoke tests y las referencias `writeonmars-install` /
+  `writeonmars-update` que envolvían ese flujo. `run-all.sh` queda con los
+  smokes vigentes. La historia de git conserva todo.
+- **`graphify-out/` fuera del versionado** (242 archivos, ~5,5 MB de salidas y
+  caché de la herramienta de exploración): regenerable; la caché local se
+  conserva en disco.
+- **CI**: gates en GitHub Actions (`.github/workflows/ci.yml`) — pytest de
+  `tests/unit`, `cargo test --workspace` y smokes con stubs (factualidad,
+  vivarium-e2e, estudio-e2e, smoke del preset) en cada push/PR.
+- **Licencia: Apache-2.0** (LICENSE en raíz; `preset.yml`, `pyproject.toml`
+  del MCP y `Cargo.toml` del workspace actualizados). Desbloquea publicar el
+  preset.
+- Docs alineados con la realidad: el tag `v1.0.0` existe desde 2026-05-06
+  (README y este CHANGELOG decían "pendiente de tag"), el preset son 8
+  scripts (no 6) y el enlace del repo apunta a `MarsGotta/writing-framework`.
+
 ### Modo estudio operativo (feature 005, 2026-07-08)
 
 - `status.py` entiende `mode: estudio`: expone `mode`, `pending_chapters`,
@@ -184,7 +209,7 @@ trayectorias paralelas: framework (`vX.Y.Z` del repo) y constitución
 
 - Verificar que `specify preset add` copie `references/`.
 
-## [1.0.0] - 2026-05-06 (pendiente de tag)
+## [1.0.0] - 2026-05-06
 
 Primera release del harness Write.OnMars. Materializa los cinco principios
 de la constitución (v1.1.0) en una pipeline ejecutable, agnóstica de
@@ -316,7 +341,8 @@ demuestran SC-001..SC-009.
   vive en sandboxes efímeros bajo `/tmp/` y NO se commitea: el repo
   canónico no carga prosa de pilotos editoriales (regla T002).
 - T080 (`git tag v1.0.0`) queda como acción manual del mantenedor —
-  esta entrada del CHANGELOG es la marca de lectura para el tag.
+  esta entrada del CHANGELOG es la marca de lectura para el tag. (Hecho:
+  el tag existe y apunta al cierre de US4.)
 - El adaptador Codex queda como scaffolding en v1; la validación
   end-to-end con un segundo agente real (Codex o Cursor produciendo una
   guía completa) se difiere a la feature `002-portability-codex` (o
@@ -325,4 +351,4 @@ demuestran SC-001..SC-009.
   `tools/rebuild-memory.sh` queda especificado en
   `docs/memory-external.md`, no implementado en v1.
 
-[1.0.0]: https://github.com/marcela-gotta/writing-framework/releases/tag/v1.0.0
+[1.0.0]: https://github.com/MarsGotta/writing-framework/releases/tag/v1.0.0

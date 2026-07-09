@@ -52,9 +52,11 @@ Recorrido paso a paso: [`writeonmars/docs/tutorial-primera-guia.md`](writeonmars
 
 ## Estado
 
-- **Preset `writeonmars`**: v0.1.0, agente-agnóstico, probado con proyecto
-  sintético. 6 plantillas + 18 comandos + 6 scripts.
-- **Framework**: 0.x.0 (pre-tag; v1.0.0 pendiente).
+- **Preset `writeonmars`**: v0.1.0, agente-agnóstico, probado de punta a punta
+  (incluida una corrida BYOM real con dos agentes cruzados, 2026-07-08).
+  6 plantillas + 18 comandos + 8 scripts.
+- **Framework**: v1.0.0 etiquetada (2026-05-06); el refactor a preset sigue en
+  `main` como Unreleased.
 - **Constitución**: v1.6.1 (modos de proyecto `produccion`/`estudio` con cambio
   explícito y consecuencias de procedencia; § Ejecutores del método — Vivarium
   como ejecutor orquestado de referencia, Paperclip archivado).

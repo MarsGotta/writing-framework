@@ -17,11 +17,14 @@ disponible `tecnico-divulgativo`) → voz de la autora (`references/voz`). Empie
 
 **Fuente única de contratos**: `writeonmars/contracts/`. La raíz `contracts/`,
 `specs/001-framework-architecture/contracts/` y los espejos de `docs/` son
-punteros (desde 2026-07-04): no edites ahí.
+punteros (desde 2026-07-04): no edites ahí. Las skills del método tampoco viven
+en `.claude/skills/` ni `.agents/skills/` (copias retiradas 2026-07-09): la
+fuente única es `writeonmars/references/`.
 
 **Tests como gate**: `python3 -m pytest tests/unit` (unitarios de los scripts) y
-`bash tests/smoke/run-all.sh` (instalación + factualidad). Ambos deben quedar en
-verde tras tocar `writeonmars/scripts/` o contratos.
+`bash tests/smoke/run-all.sh` (factualidad + e2e de Vivarium y modo estudio).
+Ambos deben quedar en verde tras tocar `writeonmars/scripts/` o contratos. CI
+(`.github/workflows/ci.yml`) corre ambos más `cargo test` en cada push.
 
 **Vivarium (producto)**: sus docs viven en `docs/` (índice en `docs/README.md`);
 `docs/vivarium.md` es la fuente de verdad del producto.

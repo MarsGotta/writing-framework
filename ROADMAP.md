@@ -1,6 +1,6 @@
 # Write.OnMars — Roadmap y estado
 
-> Estado al **2026-07-08**. Resumen de lo construido, lo validado de verdad y lo
+> Estado al **2026-07-09**. Resumen de lo construido, lo validado de verdad y lo
 > que queda. Punto de retorno para no perder el hilo entre sesiones.
 
 ## En una frase
@@ -139,8 +139,8 @@ Y, ya en Paperclip:
 5. **Presupuestos**: topes de gasto/tokens por Project y por rol.
 6. **Varias guías en paralelo**: hoy se corre **una guía a la vez**; falta operar
    varios proyectos a la vez.
-7. **Distribución**: elegir licencia, publicar el preset
-   (`specify preset add --from <github>`), versionar releases.
+7. **Distribución**: publicar el preset (`specify preset add --from <github>`)
+   y versionar releases. (Licencia elegida: Apache-2.0, 2026-07-09.)
 8. **Inspiración externa** (análisis 2026-07-08, ver
    `docs/comparativa-bookwright-sloop.md` y diseños de adopción en
    `docs/inspiracion-bookwright-profundizada.md` — candidata a spec 006:
@@ -309,10 +309,15 @@ sin avisos. Confirma SC-001/SC-004 (0 tipos/estados/routines nuevos de Paperclip
   (`/speckit-specify`), aunque el nombre canónico lleva **punto** (`speckit.specify`).
   Los docs mezclan ambas formas; pendiente de unificar.
 - **Sincronía de voz**: `references/voz/` es copia de `mars-voice`. Si actualizas la
-  voz allí, re-sincroniza (`cp`) la del preset.
+  voz allí, re-sincroniza (`cp`) la del preset. Las copias en `.claude/skills/` y
+  `.agents/skills/` se retiraron (2026-07-09, habían divergido): la fuente única
+  en el repo es `writeonmars/references/`.
+- **CI**: desde 2026-07-09 los gates corren en GitHub Actions
+  (`.github/workflows/ci.yml`): pytest, `cargo test` y smokes con stubs en cada
+  push. En local siguen siendo obligatorios antes de commitear (CLAUDE.md).
 - **`guia-prueba`**: su `findings.md` quedó con numeración mezclada de pruebas
   previas; se limpia al re-correr `review` con el preset corregido.
-- **`install.sh`**: legacy. La vía canónica es el preset.
+- **`install.sh`**: retirado del árbol (2026-07-09; vive en la historia de git). La vía canónica es el preset.
 
 ## Cómo retomar (mínimo)
 
