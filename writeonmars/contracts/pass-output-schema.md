@@ -77,7 +77,7 @@ Un único `findings.md` por proyecto editorial, ubicado en `specs/[###-feature]/
 | `estado` | enum | sí | `abierto` \| `resuelto` \| `desviacion_justificada` \| `aplazado`. |
 | `referencias_cita` | lista de `citation_id` | sí cuando `pasada = 4_precision` | Enlaces al `research.md` que sustentan o contradicen la afirmación. |
 | `claim_id` | string | no (v1.1; recomendado en `pasada = 4_precision`) | Trazabilidad al `ClaimRecord` de `claims.md` afectado por el hallazgo. Alternativa sin romper la tabla: listar `claim:<id>` en la columna `Citas`. |
-| `decision_humana` | string | si `estado = desviacion_justificada` | Razón firmada por un operador humano para no resolver. |
+| `decision_humana` | string | si `estado = desviacion_justificada` | Razón firmada por un operador humano para no resolver. En la tabla markdown viaja como **novena columna opcional** (`Decisión humana`): `dispose.py --rechazar` la añade a la fila si no existe. |
 
 ---
 
@@ -144,11 +144,14 @@ Cada bloque de pasada 1-5 emitido bajo v1.2 termina con:
 - En pasadas locales, la clave es el ordinal del capítulo (`"1"`, `"2"`).
 - En pasada 5, la clave es `"global"` y el valor es
   `sha256(concat(sha256(cap_i)))` en orden ordinal.
+- La emisión es **obligatoria en ambos modos** (los comandos de pasada la
+  calculan siempre): deja el terreno preparado para verificar también en
+  producción sin invalidar pasadas históricas.
 - En modo estudio, `status.py` solo cuenta la pasada para un capítulo si la
   huella registrada coincide con el contenido actual de `chapters/NNN-*.md`.
   Huella ausente o distinta reabre la revisión del capítulo.
-- En modo producción, las huellas se pueden emitir, pero no se verifican para
-  preservar retrocompatibilidad.
+- En modo producción, las huellas no se verifican (retrocompatibilidad: los
+  bloques v1.1 sin huella siguen contando).
 
 ## Cláusula de modo para pasadas
 

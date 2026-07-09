@@ -55,6 +55,7 @@ cat > "$PROJECT/specs/001-estudio/plan.md" <<'EOF'
 | # | Titulo | Promesa |
 |---|--------|---------|
 | 1 | Uno humano | Validar estudio |
+| 2 | Dos humano | Cubrir SC-002 con dos capítulos |
 EOF
 
 cat > "$STUBS/review-stub.sh" <<'SH'
@@ -95,8 +96,10 @@ for p in sorted(Path(sys.argv[1]).glob("*.md")):
 PY
 )"
 fi
+# Un único hallazgo accionable, en la pasada 1 del capítulo 1: ejercita el
+# checkpoint dispose exactamente una vez. El capítulo 2 sale limpio.
 row=""
-if [[ "$pass" == "1" ]]; then
+if [[ "$pass" == "1" && "$chapter" == "1" ]]; then
   row="| F-1.1 | $chapter | medio | frase | problema | propuesta | abierto | [] |"
 fi
 cat >> "$findings" <<EOF
@@ -151,10 +154,20 @@ if grep -q '"event":"dispatch","step":"implement"' "$PROJECT/decisions.jsonl"; t
   exit 1
 fi
 
+# La humana escribe LOS DOS capítulos pendientes que nombró el checkpoint write.
 mkdir -p "$PROJECT/chapters"
 cp "$REPO_ROOT/tests/fixtures/005-estudio/chapters/001-uno-humano.md" "$PROJECT/chapters/001-uno-humano.md"
-git -C "$PROJECT" add chapters/001-uno-humano.md
-git -C "$PROJECT" commit -m "human writes chapter 1" >/dev/null
+cat > "$PROJECT/chapters/002-dos-humano.md" <<'EOF'
+# Dos humano
+
+Texto humano del capítulo dos.
+
+## Fuentes
+
+- Fuente B
+EOF
+git -C "$PROJECT" add chapters/001-uno-humano.md chapters/002-dos-humano.md
+git -C "$PROJECT" commit -m "human writes chapters 1 and 2" >/dev/null
 
 set +e
 "$VIVARIUM" run --project "$PROJECT"
@@ -202,16 +215,24 @@ cat > "$PROJECT/specs/001-estudio/feedback.md" <<'EOF'
 
 Visto bueno humano.
 EOF
-cat > "$PROJECT/.specify/presets/writeonmars/scripts/close.py" <<'PY'
-print("[close] OK estudio")
-PY
-
+# close.py REAL (no stub): ejercita el gate real. Solo export.py está stubeado
+# (PDF falso) para no exigir pandoc/chrome en CI.
 set +e
 "$VIVARIUM" run --project "$PROJECT"
 rc=$?
 set -e
 if [[ "$rc" -ne 0 ]]; then
   echo "FAIL: cierre esperaba exit 0, obtuvo $rc" >&2
+  exit 1
+fi
+# FR-007: el hallazgo aplazado se enumera como deuda declarada. El runner traga
+# el stdout del sidecar, así que se comprueba invocando close.py directamente
+# (mismo script del preset, --no-export para no repetir el PDF).
+debt="$(python3 "$PROJECT/.specify/presets/writeonmars/scripts/close.py" \
+  --project-dir "$PROJECT" --no-export 2>&1)"
+if ! printf '%s' "$debt" | grep -q "Deuda declarada"; then
+  echo "FAIL: close no enumeró la deuda declarada (F-1.1 aplazado)" >&2
+  printf '%s\n' "$debt" >&2
   exit 1
 fi
 
@@ -231,12 +252,20 @@ if report.get("veredicto_global") != "autoria_humana_demostrada":
     raise SystemExit(report)
 PY
 
+# Idempotencia (SC-002 / quickstart §5.6): un segundo run sobre el proyecto
+# cerrado no despacha nada nuevo — decisions.jsonl no crece.
+before="$(wc -l < "$PROJECT/decisions.jsonl")"
 set +e
 "$VIVARIUM" run --project "$PROJECT"
 rc=$?
 set -e
 if [[ "$rc" -ne 0 ]]; then
   echo "FAIL: segundo cierre esperaba exit 0, obtuvo $rc" >&2
+  exit 1
+fi
+after="$(wc -l < "$PROJECT/decisions.jsonl")"
+if [[ "$before" -ne "$after" ]]; then
+  echo "FAIL: el re-run sobre proyecto cerrado añadió despachos ($before → $after)" >&2
   exit 1
 fi
 

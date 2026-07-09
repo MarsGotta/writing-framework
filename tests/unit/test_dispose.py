@@ -107,3 +107,68 @@ def test_atomicidad_sin_linea_huerfana(dispose_mod, estudio_project, monkeypatch
         dispose_mod.main()
     assert findings.read_text(encoding="utf-8") == original
     assert not (estudio_project / "specs/001-estudio/disposiciones.jsonl").exists()
+
+
+def test_rechazar_escribe_decision_humana_en_findings(scripts_dir, estudio_project):
+    """D#1 de la revisión: el motivo del rechazo debe quedar en findings.md
+    (novena columna), no solo en el JSONL."""
+    init_git_identity(estudio_project)
+    res = run_dispose(
+        scripts_dir, estudio_project, "F-1.2", "--rechazar", "--motivo", "correcto en mi dialecto"
+    )
+    assert res.returncode == 0, res.stderr
+    findings = (estudio_project / "specs/001-estudio/findings.md").read_text(encoding="utf-8")
+    row = next(l for l in findings.splitlines() if l.startswith("| F-1.2 "))
+    assert "desviacion_justificada" in row
+    assert "correcto en mi dialecto" in row
+
+
+def test_edicion_preserva_bytes_fuera_de_la_celda(scripts_dir, estudio_project):
+    """El contrato exige que el resto del archivo quede intacto: CRLF y padding
+    de otras filas/celdas se conservan; solo cambia la celda estado."""
+    init_git_identity(estudio_project)
+    findings = estudio_project / "specs/001-estudio/findings.md"
+    crlf = findings.read_text(encoding="utf-8").replace("\n", "\r\n")
+    # Fila con padding de alineación distinto al de dispose.
+    crlf = crlf.replace(
+        "| F-1.1 | 1 | critico | frase | problema crítico | sugerencia | abierto | [] |",
+        "| F-1.1  | 1 | critico | frase | problema crítico | sugerencia | abierto | []   |",
+    )
+    findings.write_bytes(crlf.encode("utf-8"))
+    before = findings.read_bytes()
+    res = run_dispose(scripts_dir, estudio_project, "F-1.1", "--aceptar")
+    assert res.returncode == 0, res.stderr
+    after = findings.read_bytes()
+    # Sigue siendo CRLF salvo la transición de estado en la fila tocada.
+    assert after.count(b"\r\n") == before.count(b"\r\n")
+    otras = [l for l in after.split(b"\r\n") if l.startswith(b"| F-1.2") or l.startswith(b"| F-1.3")]
+    otras_before = [l for l in before.split(b"\r\n") if l.startswith(b"| F-1.2") or l.startswith(b"| F-1.3")]
+    assert otras == otras_before  # filas vecinas byte a byte iguales
+    fila = next(l for l in after.split(b"\r\n") if l.startswith(b"| F-1.1"))
+    assert b"resuelto" in fila and b"[]   |" in fila  # padding de Citas conservado
+
+
+def test_regulariza_estado_incoherente_sin_livelock(scripts_dir, estudio_project):
+    """A#5 de la revisión: un estado no-abierto SIN disposición registrada (un
+    agente tocó la tabla) debe poder regularizarse — status lo cuenta como
+    pendiente, así que dispose no puede rechazarlo o habría livelock."""
+    init_git_identity(estudio_project)
+    findings = estudio_project / "specs/001-estudio/findings.md"
+    findings.write_text(
+        findings.read_text(encoding="utf-8").replace(
+            "| F-1.1 | 1 | critico | frase | problema crítico | sugerencia | abierto | [] |",
+            "| F-1.1 | 1 | critico | frase | problema crítico | sugerencia | resuelto | [] |",
+        ),
+        encoding="utf-8",
+    )
+    # Sin disposiciones.jsonl: 'resuelto' no tiene respaldo humano.
+    res = run_dispose(scripts_dir, estudio_project, "F-1.1", "--aceptar")
+    assert res.returncode == 0, res.stderr
+    lines = (estudio_project / "specs/001-estudio/disposiciones.jsonl").read_text(encoding="utf-8").splitlines()
+    assert len(lines) == 1  # ahora sí hay registro auditable
+
+
+def test_finding_id_invalido_es_uso_incorrecto(scripts_dir, estudio_project):
+    init_git_identity(estudio_project)
+    res = run_dispose(scripts_dir, estudio_project, "F-7", "--aceptar")
+    assert res.returncode == 2  # formato F-N.M

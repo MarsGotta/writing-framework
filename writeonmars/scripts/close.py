@@ -23,6 +23,7 @@ HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 
+import findings_lib  # noqa: E402
 from findings_lib import parse_findings  # noqa: E402
 
 
@@ -31,14 +32,13 @@ def run(script: str, extra: list[str]) -> int:
 
 
 def _spec_dir(project: Path, override: str | None) -> Path | None:
-    specs = project / "specs"
-    if override:
-        cand = specs / override if not Path(override).is_absolute() else Path(override)
-        return cand if cand.is_dir() else None
-    if not specs.is_dir():
+    # Resolución canónica compartida (findings_lib). Un --spec con typo ya lo
+    # atrapa ruidosamente el gate (status.py --gate falla antes de llegar aquí);
+    # en el reporte de deuda basta con no inventar nada.
+    try:
+        return findings_lib.newest_spec_dir(project, override)
+    except ValueError:
         return None
-    dirs = sorted(d for d in specs.iterdir() if d.is_dir() and (d / "spec.md").exists())
-    return dirs[-1] if dirs else None
 
 
 def deferred_debt(project: Path, spec: str | None) -> list[dict]:

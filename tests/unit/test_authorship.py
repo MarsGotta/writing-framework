@@ -116,3 +116,56 @@ def test_authorship_sin_repo_falla(scripts_dir, tmp_path):
     project.mkdir()
     res = run_authorship(scripts_dir, project)
     assert res.returncode == 1
+
+
+def test_veredicto_global_autoria_humana_demostrada(scripts_dir, tmp_path):
+    """H#1 de la revisión: el veredicto estrella (US3 esc.1) sin red en CI sin
+    Rust. Repo con solo commits humanos y sin decisions.jsonl."""
+    project = tmp_path / "solo-humano"
+    project.mkdir()
+    git(project, "init")
+    (project / "specs/001-estudio").mkdir(parents=True)
+    (project / "specs/001-estudio/spec.md").write_text("# Spec\n", encoding="utf-8")
+    commit_file(
+        project, "chapters/001-uno.md", "# Uno\n\nMía.\n",
+        "Marcela", "marcela@example.com", "2026-01-01T00:00:00+00:00",
+    )
+    commit_file(
+        project, "chapters/002-dos.md", "# Dos\n\nMía.\n",
+        "Marcela", "marcela@example.com", "2026-01-02T00:00:00+00:00",
+    )
+    res = run_authorship(scripts_dir, project)
+    assert res.returncode == 0, res.stderr
+    report = json.loads(res.stdout)
+    assert report["veredicto_global"] == "autoria_humana_demostrada"
+    assert all(c["veredicto"] == "humana" for c in report["chapters"].values())
+
+
+def test_rename_de_capitulo_no_pierde_el_ordinal(scripts_dir, tmp_path):
+    """F#4 de la revisión: git renombra capítulo (chapters/{a => b}); el commit
+    debe clasificarse bajo el capítulo real, no en 'sin_ordinal'."""
+    project = tmp_path / "rename"
+    project.mkdir()
+    git(project, "init")
+    (project / "specs/001-estudio").mkdir(parents=True)
+    (project / "specs/001-estudio/spec.md").write_text("# Spec\n", encoding="utf-8")
+    commit_file(
+        project, "chapters/001-viejo.md", "# Uno\n\nHumano.\n",
+        "Marcela", "marcela@example.com", "2026-01-01T00:00:00+00:00",
+    )
+    # Rename detectado por git (mismo contenido, nombre nuevo con igual ordinal).
+    (project / "chapters/001-nuevo.md").write_text("# Uno\n\nHumano.\n", encoding="utf-8")
+    (project / "chapters/001-viejo.md").unlink()
+    env = {
+        "GIT_AUTHOR_NAME": "Marcela", "GIT_AUTHOR_EMAIL": "marcela@example.com",
+        "GIT_AUTHOR_DATE": "2026-01-02T00:00:00+00:00",
+        "GIT_COMMITTER_NAME": "Marcela", "GIT_COMMITTER_EMAIL": "marcela@example.com",
+        "GIT_COMMITTER_DATE": "2026-01-02T00:00:00+00:00",
+    }
+    git(project, "add", "-A")
+    git(project, "commit", "-m", "rename cap 1", env=env)
+    res = run_authorship(scripts_dir, project)
+    assert res.returncode == 0, res.stderr
+    report = json.loads(res.stdout)
+    assert "1" in report["chapters"]
+    assert "sin_ordinal" not in report["chapters"]

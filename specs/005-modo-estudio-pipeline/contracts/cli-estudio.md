@@ -24,9 +24,12 @@ python3 scripts/dispose.py <finding_id> (--aceptar | --rechazar --motivo "…" |
 Transiciones permitidas: `abierto → {resuelto, desviacion_justificada,
 aplazado}`; `aplazado → {resuelto, desviacion_justificada}`.
 
-Resolución del directorio de spec: la misma regla que `status.py` — primer
-directorio de `specs/` (orden lexicográfico) que contenga `spec.md`. Sin
-spec ⇒ exit 1.
+Resolución del directorio de spec: la misma regla que `status.py`
+(`findings_lib.newest_spec_dir`, compartida) — el directorio **más reciente**
+de `specs/` (último en orden lexicográfico) que contenga `spec.md`, con
+override `--spec`. Sin spec ⇒ exit 1. *(Corregido en la revisión: la versión
+inicial de este contrato decía "primer directorio", contradiciendo a
+status.py.)*
 
 `--json` imprime el DispositionRecord escrito. La actualización de findings.md
 toca **solo** la celda `estado` (y `decision_humana` en rechazo) de la fila

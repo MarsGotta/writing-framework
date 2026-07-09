@@ -21,6 +21,19 @@ trayectorias paralelas: framework (`vX.Y.Z` del repo) y constitución
   sección "Modo estudio" del contrato del ejecutor.
 - Vivarium mapea `write`, `dispose` e `intro` en estudio como checkpoints
   humanos sin tocar el guardarraíl exit 11.
+- **Revisión adversarial (2026-07-09, 8 ángulos)**: corregidas 3 regresiones de
+  retrocompatibilidad (FR-011) reproducidas en vivo — cuenta de pendientes en
+  produccion vuelve a ser por ficheros (un `intro.md` no reabre `implement`),
+  `disposiciones.jsonl` solo se lee en estudio (una línea corrupta ya no tumba
+  la brújula en produccion), `mode` desconocido en manifiesto legado degrada a
+  produccion; y bugs de contrato: `dispose --rechazar` escribe el motivo en
+  `decision_humana` (9ª columna), edición byte-intacta de findings.md (CRLF y
+  padding preservados), resolución de spec-dir unificada en `findings_lib`
+  (dispose usaba el spec más viejo), cierre en estudio anclado a la huella
+  (editar un capítulo aprobado lo vuelve no-cerrable), sin livelock cuando un
+  agente deja un estado incoherente, y `authorship.py` robusto a monorepos,
+  renames y timestamps naive. Smoke `estudio-e2e` ampliado a 2 capítulos (SC-002)
+  con `close.py` real e idempotencia verificada.
 
 ### Constitución v1.6.1 (2026-07-08, lente de modo en Estándares editoriales)
 

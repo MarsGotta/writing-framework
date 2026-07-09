@@ -182,7 +182,10 @@ main() {
         fi
     fi
 
-    if command -v npx >/dev/null 2>&1; then
+    # ajv local no necesita npx: el gate anterior (command -v npx) dejaba el
+    # validador local inalcanzable en máquinas con ajv pero sin node/npx.
+    if command -v ajv >/dev/null 2>&1 \
+        || { [[ "${WRITEONMARS_ALLOW_NPX:-0}" == "1" ]] && command -v npx >/dev/null 2>&1; }; then
         if validate_with_ajv "$schema_path" "$data_path"; then
             echo "valid"
             exit 0

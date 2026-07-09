@@ -9,8 +9,14 @@ import re
 import shutil
 import subprocess
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+if str(HERE) not in sys.path:
+    sys.path.insert(0, str(HERE))
+
+import findings_lib  # noqa: E402
 
 AGENT_DOMAIN = "@agents.writeonmars.invalid"
 MANUSCRIPT_STEPS = {"implement", "revise", "intro"}
@@ -28,6 +34,7 @@ def run_git(project: Path, *args: str) -> str:
         ["git", "-C", str(project), *args],
         capture_output=True,
         text=True,
+        encoding="utf-8",
     )
     if result.returncode != 0:
         die(result.stderr.strip() or f"git {' '.join(args)} falló", 1)
@@ -35,20 +42,35 @@ def run_git(project: Path, *args: str) -> str:
 
 
 def latest_spec_dir(project: Path) -> Path:
-    specs = project / "specs"
-    dirs = sorted(d for d in specs.iterdir() if d.is_dir() and (d / "spec.md").exists()) if specs.is_dir() else []
-    if not dirs:
+    spec_dir = findings_lib.newest_spec_dir(project)
+    if spec_dir is None:
         die("sin specs/<feature>/spec.md; no hay destino para el informe", 1)
-    return dirs[-1]
+    return spec_dir
 
 
 def parse_ts(value: str) -> datetime | None:
     if not value:
         return None
     try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError:
         return None
+    # Un ejecutor BYOM puede escribir ts naive en decisions.jsonl: se asume UTC
+    # para que la comparación con el committer date (%cI, aware) no explote.
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed
+
+
+def resolve_numstat_path(raw: str) -> str:
+    """Normaliza el path de una línea --numstat: resuelve la sintaxis de rename
+    de git (`chapters/{a.md => b.md}` o `a.md => b.md`) al nombre NUEVO."""
+    if "=>" in raw:
+        m = re.match(r"^(.*)\{(.*) => (.*)\}(.*)$", raw)
+        if m:
+            return f"{m.group(1)}{m.group(3)}{m.group(4)}".replace("//", "/")
+        return raw.split(" => ")[-1].strip()
+    return raw
 
 
 def chapter_from_path(path: str) -> str:
@@ -123,6 +145,10 @@ def in_agent_window(chapter: str, commit_ts: datetime | None, windows: list[dict
 def git_chapter_commits(project: Path) -> tuple[str, dict[str, dict]]:
     run_git(project, "rev-parse", "--is-inside-work-tree")
     head = run_git(project, "rev-parse", "HEAD").strip()
+    # Los paths de --numstat son relativos a la RAÍZ del repo git; si el
+    # proyecto editorial vive en un subdirectorio (monorepo), hay que pelar el
+    # prefijo antes de filtrar por chapters/.
+    repo_prefix = run_git(project, "rev-parse", "--show-prefix").strip()
     raw = run_git(
         project,
         "log",
@@ -146,7 +172,9 @@ def git_chapter_commits(project: Path) -> tuple[str, dict[str, dict]]:
         parts = line.split("\t")
         if len(parts) < 3:
             continue
-        path = parts[2]
+        path = resolve_numstat_path(parts[2])
+        if repo_prefix and path.startswith(repo_prefix):
+            path = path[len(repo_prefix):]
         if not path.startswith("chapters/"):
             continue
         chapter = chapter_from_path(path)

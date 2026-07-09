@@ -26,7 +26,8 @@ HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 
-from findings_lib import iter_finding_rows, parse_findings  # noqa: E402
+import findings_lib  # noqa: E402
+from findings_lib import DISPOSITION_BY_STATE, parse_findings  # noqa: E402
 
 PASS_KEY = {
     1: "pasada_1_estructura",
@@ -43,41 +44,30 @@ def fail(msg: str) -> "NoReturn":  # type: ignore[name-defined]
 
 
 def newest_spec_dir(project: Path, override: str | None, required: bool = True):
-    """Localiza specs/<###>/. Con required=False devuelve None si todavía no hay
-    specs/ (estado normal recién scaffoldeado: aún no se corrió `specify`)."""
-    specs = project / "specs"
-    if override:
-        cand = (specs / override) if not Path(override).is_absolute() else Path(override)
-        if not cand.is_dir():
-            fail(f"no existe el spec {cand}")
-        return cand
-    if not specs.is_dir():
-        return None if not required else fail(f"no existe {specs}")
-    dirs = sorted(d for d in specs.iterdir() if d.is_dir() and (d / "spec.md").exists())
-    if not dirs:
-        return None if not required else fail(f"ningún specs/*/spec.md bajo {specs}")
-    return dirs[-1]
+    """Localiza specs/<###>/ vía la resolución canónica compartida (findings_lib).
+    Con required=False devuelve None si todavía no hay specs/ (estado normal
+    recién scaffoldeado: aún no se corrió `specify`)."""
+    try:
+        spec_dir = findings_lib.newest_spec_dir(project, override)
+    except ValueError as e:
+        fail(str(e))
+    if spec_dir is None and required:
+        fail(f"ningún specs/*/spec.md bajo {project / 'specs'}")
+    return spec_dir
 
 
 def load_manifest(project: Path) -> dict | None:
-    p = project / ".writeonmars-manifest.json"
-    if not p.exists():
-        return None
     try:
-        return json.loads(p.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as e:
-        fail(f".writeonmars-manifest.json no es JSON válido: {e}")
+        return findings_lib.load_manifest(project)
+    except ValueError as e:
+        fail(str(e))
 
 
 def project_mode(manifest: dict | None) -> str:
-    if manifest is None:
-        return "produccion"
-    mode = manifest.get("mode", "produccion")
-    if mode is None:
-        return "produccion"
-    if mode not in {"produccion", "estudio"}:
-        fail("manifest.mode debe ser 'produccion' o 'estudio'")
-    return mode
+    try:
+        return findings_lib.project_mode(manifest)
+    except ValueError as e:
+        fail(str(e))
 
 
 def bar(label: str, width: int = 18) -> str:
@@ -190,13 +180,15 @@ def _passes_by_chapter_checked(
     return out, reopened, warnings
 
 
-def _load_dispositions(spec_dir: Path | None) -> tuple[dict[str, set[str]], list[str]]:
+def _load_dispositions(spec_dir: Path | None) -> dict[str, set[str]]:
+    """Disposiciones humanas por finding_id. Solo se invoca en modo estudio:
+    en produccion el archivo se ignora por completo (retrocompat FR-011)."""
     records: dict[str, set[str]] = {}
     if spec_dir is None:
-        return records, []
+        return records
     path = spec_dir / "disposiciones.jsonl"
     if not path.exists():
-        return records, []
+        return records
     for idx, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
         if not line.strip():
             continue
@@ -208,15 +200,11 @@ def _load_dispositions(spec_dir: Path | None) -> tuple[dict[str, set[str]], list
         disp = data.get("disposicion")
         if isinstance(fid, str) and isinstance(disp, str):
             records.setdefault(fid, set()).add(disp)
-    return records, []
+    return records
 
 
 def _disposition_matches(state: str, dispositions: set[str]) -> bool:
-    expected = {
-        "resuelto": "aceptado",
-        "desviacion_justificada": "rechazado",
-        "aplazado": "aplazado",
-    }.get(state)
+    expected = DISPOSITION_BY_STATE.get(state)
     return bool(expected and expected in dispositions)
 
 
@@ -403,21 +391,30 @@ def _next_step(project: Path, spec_dir: Path, manifest: dict | None,
     pending_chapters = pending_chapters or []
     pending_dispositions = pending_dispositions or []
     reopened_chapters = reopened_chapters or []
-    pendientes = len(pending_chapters) if pending_chapters else max(0, expected - len(chapters))
+    # En produccion, la cuenta de pendientes es la histórica (ficheros vs temario):
+    # un capítulo sin prefijo numérico (intro.md) sigue contando como escrito
+    # (FR-011). Los ordinales solo gobiernan en estudio, donde nombran qué falta.
+    if mode == "estudio":
+        pendientes = len(pending_chapters)
+        write_step = (
+            "write",
+            "faltan capítulos por escribir (modo estudio): "
+            + ", ".join(str(n) for n in pending_chapters),
+        )
+    else:
+        pendientes = max(0, expected - len(chapters))
+        write_step = None
     if pendientes > 0 and not (mode == "estudio" and chapters):
-        if mode == "estudio":
-            return "write", (
-                "faltan capítulos por escribir (modo estudio): "
-                + ", ".join(str(n) for n in pending_chapters)
-            )
+        if write_step:
+            return write_step
         return "implement", f"faltan {pendientes} capítulo(s): delegar a Redactora (paralelo en worktrees)"
     if not blocks:
+        if mode == "estudio" and pendientes > 0:
+            return "review", (
+                f"capítulos escritos sin findings.md: lanzar pasadas "
+                f"(quedan {pendientes} por escribir después)"
+            )
         return "review", "capítulos completos sin findings.md: lanzar pasadas (Mesa + Documentalista)"
-    if mode == "estudio" and reopened_chapters:
-        return "review", (
-            "capítulos con pasadas invalidadas por huella: "
-            + ", ".join(reopened_chapters)
-        )
     if revise_pending > 0:
         # Política: crítico + medio fuerzan revise (detector ≠ corrector); 'bajo' es
         # aviso y NO bloquea ni fuerza. Enumera los capítulos accionables para que el
@@ -438,6 +435,14 @@ def _next_step(project: Path, spec_dir: Path, manifest: dict | None,
             f"{len(caps)} capítulo(s) [{etiqueta}]: una tarea revise POR CAPÍTULO a la "
             f"Redactora (barrido completo, no one-off){aviso}"
         )
+    # Reabiertos por huella DESPUÉS de dispose: con hallazgos accionables abiertos
+    # primero dispone la humana (el ejecutor no tiene pasada que despachar sobre un
+    # capítulo con revise_pending > 0: sería un callejón sin salida).
+    if mode == "estudio" and reopened_chapters:
+        return "review", (
+            "capítulos con pasadas invalidadas por huella: "
+            + ", ".join(reopened_chapters)
+        )
     if sign_violations:
         return "review", "faltan firmas humanas exigidas por el manifest"
     if fact_block:
@@ -449,11 +454,8 @@ def _next_step(project: Path, spec_dir: Path, manifest: dict | None,
             "hallazgos crítico/medio en la pasada 4 y enrutarse por revise; revisa "
             "coherencia claims.md↔findings.md"
         )
-    if pendientes > 0 and mode == "estudio":
-        return "write", (
-            "faltan capítulos por escribir (modo estudio): "
-            + ", ".join(str(n) for n in pending_chapters)
-        )
+    if pendientes > 0 and write_step:
+        return write_step
     if closeable:
         return "close", "gates en verde: intro + export + close (PDF final, Editora jefa)"
     return "review", "revisión en curso: hallazgos abiertos sin resolver"
@@ -476,7 +478,9 @@ def evaluate(project: Path, spec_dir: Path) -> dict:
         n for n in range(1, expected + 1)
         if n not in drafted_ordinals
     ]
-    dispositions, disposition_warnings = _load_dispositions(spec_dir)
+    # El registro de disposiciones es exclusivo del modo estudio; en produccion
+    # ni se lee (un archivo corrupto no puede tumbar la brújula, FR-011).
+    dispositions = _load_dispositions(spec_dir) if mode == "estudio" else {}
 
     passes: list[dict] = []
     crit_open = 0
@@ -488,7 +492,7 @@ def evaluate(project: Path, spec_dir: Path) -> dict:
     pending_dispositions: list[str] = []
     deferred_findings: list[str] = []
     deferred_details: list[dict] = []
-    warnings: list[str] = list(disposition_warnings)
+    warnings: list[str] = []
     for b in blocks:
         sev = {"critico": 0, "medio": 0, "bajo": 0}
         open_here = 0
@@ -598,6 +602,12 @@ def evaluate(project: Path, spec_dir: Path) -> dict:
         expected, chapters, blocks, revise_by_chapter, advisory_by_chapter,
         passes_override=passes_override,
     )
+    if mode == "estudio" and expected > 0:
+        # El cierre en estudio se ancla a lo revisado: pasadas invalidadas por
+        # huella o hallazgos sin disponer dejan el proyecto no-cerrable aunque
+        # g1-g3 estén en verde — la aprobación se refiere al texto actual, y
+        # close.py solo consulta closeable (FR-008 hasta el final del pipeline).
+        closeable = closeable and all_chapters_approved and not reopened_chapters
     next_step, next_detail = _next_step(
         project, spec_dir, manifest, blocks, chapters, expected,
         closeable, crit_open, sign_violations,
