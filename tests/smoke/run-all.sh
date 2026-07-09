@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # run-all.sh — ejecuta los smoke tests y reporta resumen.
 #
-# Cubre el "Independent Test" de US1: ejecutar los tres acceptance scenarios
-# (AC1, AC2, AC3) sobre un instalador real y verificar PASS/FAIL.
+# Smokes vigentes del preset y de Vivarium. (Los smokes del instalador legacy
+# install.sh se retiraron el 2026-07-09 junto con la vía legacy.)
 #
 # Portable a Bash 3.2 (el /bin/bash de macOS): sin arrays asociativos. Este
 # script es gate en CLAUDE.md — nunca debe salir 0 sin ejecutar los tests.
@@ -15,9 +15,6 @@ set -uo pipefail
 SMOKE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 tests=(
-    "install-on-empty-repo.sh"
-    "install-preserves-claudemd.sh"
-    "specify-after-install.sh"
     "test-factuality.sh"
     "vivarium-e2e.sh"
     "estudio-e2e.sh"

@@ -60,7 +60,8 @@ Recorrido paso a paso: [`writeonmars/docs/tutorial-primera-guia.md`](writeonmars
   como ejecutor orquestado de referencia, Paperclip archivado).
 - **Contrato de citación**: v1.0 · **Manifest**: v1.0.
 
-> `install.sh` queda como vía legacy; la distribución canónica es el preset.
+> La vía legacy `install.sh` se retiró del árbol (2026-07-09; vive en la
+> historia de git). La distribución canónica es el preset.
 > El spec `002-wom-cli` queda **superseded** (el `wom` CLI se descartó: `status.py`
 > y `close.py` cubren su función). El spec `001-framework-architecture` es la base.
 

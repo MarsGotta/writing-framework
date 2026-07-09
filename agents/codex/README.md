@@ -25,10 +25,10 @@ mantenedora que quiera completar el adaptador.
    `writeonmars-*` consultan `.writeonmars-manifest.json` (signing matrix,
    research mode, etc.). Si Codex no permite leer arbitrariamente el
    workspace del proyecto, declarar la fricción.
-4. **Adaptar `install/install.sh`** para registrar el contexto del agente en
-   `AGENTS.md` en lugar de `CLAUDE.md` cuando se pase `--agent codex`. El
-   instalador ya reconoce el flag; solo falta el render exacto del bloque
-   `<!-- WRITEONMARS START --> ... <!-- WRITEONMARS END -->`.
+4. **(Resuelto por la vía preset)** El instalador legacy `install/install.sh`
+   se retiró del árbol (2026-07-09). El contexto por agente lo cubren
+   `specify preset add` + los symlinks de contexto de `tools/new-guide.sh`
+   (`AGENTS.md` para agentes no-Claude).
 5. **Correr smoke tests adaptados** al agente: T024–T027 deberían poder
    ejecutarse contra Codex sin modificación, salvo el archivo de contexto
    (`AGENTS.md` en vez de `CLAUDE.md`).
