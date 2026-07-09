@@ -1,0 +1,62 @@
+# Gates del repo en CI. Espeja los gates locales de CLAUDE.md:
+#   python3 -m pytest tests/unit  +  bash tests/smoke/run-all.sh
+# (más cargo test del workspace de Vivarium). Los smokes usan stubs
+# deterministas y PDFs falsos: no requieren agentes, pandoc ni Chrome.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    name: pytest (scripts del preset)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Dependencias (pytest + opcionales de los scripts)
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest -r writeonmars/scripts/requirements.txt
+      - name: Tests unitarios
+        run: python -m pytest tests/unit -q
+
+  preset-smoke:
+    name: smoke hermético del preset
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Dependencias opcionales de los scripts
+        run: pip install -r writeonmars/scripts/requirements.txt
+      - name: Smoke del preset (proyecto demo en tmp)
+        run: bash writeonmars/smoke-test.sh
+
+  gates:
+    name: cargo test + smokes (run-all)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: jsonschema para la validación del manifest en los smokes
+        run: pip install jsonschema
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: vivarium
+      - name: Tests de Vivarium
+        run: cargo test --workspace --manifest-path vivarium/Cargo.toml
+      - name: Smoke tests (factualidad + vivarium-e2e + estudio-e2e)
+        run: bash tests/smoke/run-all.sh
