@@ -50,3 +50,6 @@ release/
 *.rs.bk
 *.rlib
 *.prof*
+
+# === Papelera del puente Cowork (mover en vez de borrar; vaciar a mano) ===
+/_to_delete/

@@ -1,21 +1,15 @@
-# Skills de este repo: dónde se edita cada cosa
+# Skills de este directorio
 
-Aviso para quien edite aquí. En esta carpeta conviven tres familias y solo una
-se edita directamente:
+Aquí solo viven las skills `speckit-*` de la integración de Spec Kit, que se
+usan para desarrollar el framework en este repo (specs, plan, tasks, git).
 
-1. **`writeonmars-*`**: copias compiladas para Claude de las referencias
-   agnósticas del preset. **La fuente de verdad es
-   `writeonmars/references/metodo/<mismo-nombre>/SKILL.md`**: edita allí y
-   propaga aquí. Editar solo esta copia rompe el agnosticismo (los demás
-   agentes leen las referencias del preset, no estas skills).
-2. **`marcela-prose` y `technical-guide-design`**: skills bundled históricas de
-   voz y didáctica. Su contenido agnóstico vive hoy en
-   `writeonmars/references/voz/` y `writeonmars/references/didactica/`; misma
-   regla, la referencia manda.
-3. **`speckit-*`**: skills core de Spec Kit (y sus extensiones git). No son
-   nuestras; se actualizan con Spec Kit, no a mano.
+**El método editorial no vive aquí.** La fuente única de la voz, la didáctica
+y el método es `writeonmars/references/` (prosa, registros, voz, didactica,
+metodo, sectores), que viaja dentro del preset y cualquier agente lee por ruta
+(ver `writeonmars/AGENTS.md`).
 
-En un proyecto editorial instalado, la propagación la cubre
-`/speckit-update` (smoke test: `tests/smoke/update-skill-on-installed-project.sh`).
-
-(Nota del 2026-07-04, tras la auditoría de estructura del repo.)
+Las copias históricas (`marcela-prose`, `technical-guide-design`,
+`writeonmars-*`) se retiraron el 2026-07-09: habían divergido de la fuente
+canónica y un agente trabajando en este repo podía autocargar reglas
+obsoletas. Si necesitas la voz como skill global para trabajo a mano,
+sincronízala desde `writeonmars/references/voz/` hacia `~/.claude/skills/`.
