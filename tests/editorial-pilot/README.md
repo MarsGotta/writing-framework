@@ -1,5 +1,10 @@
 # Piloto editorial de Write.OnMars
 
+> **Nota (2026-07-09)**: este README describe el arnés de los pilotos de mayo
+> de 2026, que instalaban con el `install.sh` legacy (retirado del árbol; vive
+> en la historia de git). Un piloto nuevo se monta con `specify preset add`
+> o `tools/new-guide.sh`. La evidencia archivada en `evidence/` no se toca.
+
 ## Propósito
 
 Este directorio aloja el piloto editorial que valida manualmente la User

@@ -31,7 +31,7 @@ ese caso `/speckit-specify` opera con la plantilla clásica.
 
 1. Verifica que existe `.writeonmars-manifest.json` y que
    `project_type` esté presente. Si falta, propone correr
-   `writeonmars-install --reconfigure`.
+   `speckit.setup` (o `scripts/bootstrap.py`) para materializarlo.
 2. Lanza un cuestionario en español que cubre los **ocho campos descriptivos**:
    audiencia, problema, resultado_esperado, nivel, conceptos_obligatorios,
    ejemplo_recurrente, riesgos, acciones_practicas. El **tono NO se pregunta**:
@@ -102,7 +102,7 @@ ese caso `/speckit-specify` opera con la plantilla clásica.
 - Conflicto con un brief previo: si `spec.md` ya tiene una sección Brief,
   la skill genera un diff y pide confirmación antes de sobrescribir.
 - `project_type` no declarado en el manifiesto: la skill se detiene y
-  sugiere `writeonmars-install --reconfigure`.
+  sugiere `speckit.setup` (o `scripts/bootstrap.py`).
 - Bloque `<!-- WRITEONMARS START -->` ausente en `CLAUDE.md`: la skill lo
   añade respetando contenido previo del archivo.
 
