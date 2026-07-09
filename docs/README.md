@@ -26,6 +26,11 @@ how-to, referencia, arquitectura). Aquí queda solo lo transversal al repo:
 - `graphify-vs-codegraph.md`: qué grafo usa el agente para navegar el repo
   (CodeGraph para código, Graphify para prosa). Distinto de
   `graphify-evaluacion.md`, que evalúa graphify como motor de producto.
+- `comparativa-bookwright-sloop.md` y `comparativa-bmad.md`: análisis de
+  métodos hermanos previos a las features 005 y 006 (qué validan de nuestro
+  diseño, qué adoptamos, qué evitamos).
+- `inspiracion-bookwright-profundizada.md`: diseños de adopción derivados de
+  Bookwright (biblia narrativa en `roots/`, candidata a spec 007).
 - `maintenance/`: procedimientos (actualización de la constitución).
 - `citation-contract.md` y `manifest-schema.md`: **punteros**, la fuente es
   `writeonmars/contracts/`.

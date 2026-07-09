@@ -143,7 +143,7 @@ Y, ya en Paperclip:
    y versionar releases. (Licencia elegida: Apache-2.0, 2026-07-09.)
 8. **Inspiración externa** (análisis 2026-07-08, ver
    `docs/comparativa-bookwright-sloop.md` y diseños de adopción en
-   `docs/inspiracion-bookwright-profundizada.md` — candidata a spec 006:
+   `docs/inspiracion-bookwright-profundizada.md` — candidata a spec 007:
    biblia narrativa en roots/ + ejes de continuidad): firma de fallo repetida como
    clasificador transitorio/determinista en el runner de Vivarium (S|Loop);
    late binding de prompts de capítulo contra estado real + decisions.jsonl
@@ -151,6 +151,14 @@ Y, ya en Paperclip:
    (Bookwright); hallazgo-vs-ancla con umbral de fiabilidad para el índice de
    factualidad (Bookwright); plantillas de fichas narrativas en `roots/` con
    "diálogo de muestra" para el modo estudio con novela (Bookwright).
+
+9. **Pista corta editorial**: spec 006 **en borrador** (2026-07-09,
+   `specs/006-pista-corta-editorial/`) — ceremonia adaptativa a escala para
+   piezas únicas (artículo, post, tutorial breve), adoptada del análisis de
+   BMAD v6 (`docs/comparativa-bmad.md`): `track` en el manifiesto, temario
+   degenerado de una fila, dos relevos de revisión (combinada 1·2·3·5 +
+   precisión 4) y escalado corta→estandar que conserva el trabajo. Camino
+   feliz objetivo: ≤ 8 despachos frente a ~13.
 
 ## Bugs de orquestación — primera corrida real (guide-nlp, 2026-06-20)
 
