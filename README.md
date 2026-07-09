@@ -86,4 +86,4 @@ alcance" y § IV "Precisión léxica".
 
 ## Licencia
 
-TBD. Pendiente de elegir antes de la release v1.0.0.
+[Apache-2.0](LICENSE) (elegida el 2026-07-09; hasta entonces figuraba TBD).

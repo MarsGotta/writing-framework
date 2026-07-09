@@ -17,7 +17,7 @@ preset:
     Agente-agnóstico: ver AGENTS.md de este preset.
   author: "Marcela Gotta"
   repository: "https://github.com/MarsGotta/writing-framework"
-  license: "TBD"
+  license: "Apache-2.0"
 
 requires:
   # specify >= 0.5.0 introduce el mecanismo de presets (`specify preset add`).
