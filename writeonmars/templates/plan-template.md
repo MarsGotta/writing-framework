@@ -42,7 +42,7 @@ design.*
 
 <!--
   La tabla siguiente verifica conformidad con los seis principios editoriales
-  (constitución v1.6.0). Cuando `project_type=software`, sustituye o amplía
+  (constitución vigente: `.specify/memory/constitution.md`). Cuando `project_type=software`, sustituye o amplía
   esta tabla con los principios técnicos del proyecto.
 -->
 

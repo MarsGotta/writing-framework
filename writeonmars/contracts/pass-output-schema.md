@@ -1,6 +1,6 @@
 <!-- Mirror of specs/001-framework-architecture/contracts/pass-output-schema.md (single source of truth). Re-run T011 to refresh. -->
 
-# Pass Output Schema v1.1
+# Pass Output Schema v1.2
 
 **Status**: stable for Write.OnMars v1.
 **Cobertura de spec**: FR-018, FR-019, FR-020, FR-020a · feature 003 (FR-005, FR-008, FR-015).
@@ -10,6 +10,11 @@
 > `claim-record.schema.json`), y sus findings pueden trazar el `claim_id` afectado. Un
 > `findings.md` v1.0 sigue siendo conforme; `status.py` tolera ambas versiones (v1.0 sin claims
 > → factualidad "no medida").
+
+> **v1.2 (MINOR, feature 005-modo-estudio-pipeline)** — añade el modo estudio:
+> estado `aplazado`, DispositionRecord obligatorio para transiciones humanas en
+> estudio, huellas de contenido por bloque y cláusulas de no edición del
+> manuscrito para las pasadas.
 
 Este contrato define el formato unificado que cada una de las cinco pasadas del Principio V produce. Toda skill `writeonmars-pasada-N` MUST emitir su salida bajo este esquema para que (a) la consolidación en `findings.md` sea automatizable, (b) el cierre del proyecto pueda evaluar la matriz de firmas declarada en el manifiesto, y (c) un mantenedor pueda auditar pasadas históricas sin reconstruir contexto.
 
@@ -69,10 +74,10 @@ Un único `findings.md` por proyecto editorial, ubicado en `specs/[###-feature]/
 | `frase_original` | string | sí | Cita literal del texto problemático. Cuando aplica a estructura global (sin frase concreta), usar `null` y explicar en `problema`. |
 | `problema` | string | sí | Qué falla y por qué (referenciar el principio o regla violada cuando se conozca). |
 | `reescritura_sugerida` | string | sí, salvo `severidad = bajo` con decisión de no reescribir | Versión propuesta o paso accionable. |
-| `estado` | enum | sí | `abierto` \| `resuelto` \| `desviacion_justificada`. |
+| `estado` | enum | sí | `abierto` \| `resuelto` \| `desviacion_justificada` \| `aplazado`. |
 | `referencias_cita` | lista de `citation_id` | sí cuando `pasada = 4_precision` | Enlaces al `research.md` que sustentan o contradicen la afirmación. |
 | `claim_id` | string | no (v1.1; recomendado en `pasada = 4_precision`) | Trazabilidad al `ClaimRecord` de `claims.md` afectado por el hallazgo. Alternativa sin romper la tabla: listar `claim:<id>` en la columna `Citas`. |
-| `decision_humana` | string | si `estado = desviacion_justificada` | Razón firmada por un operador humano para no resolver. |
+| `decision_humana` | string | si `estado = desviacion_justificada` | Razón firmada por un operador humano para no resolver. En la tabla markdown viaja como **novena columna opcional** (`Decisión humana`): `dispose.py --rechazar` la añade a la fila si no existe. |
 
 ---
 
@@ -105,13 +110,60 @@ Los bloques de pasada 4 emitidos bajo esta versión llevan `<!-- pass-output-sch
 ## Reglas de transición de estado
 
 ```text
-abierto ───(reescritura aplicada)───→ resuelto
-abierto ───(operador firma desviación)───→ desviacion_justificada
+Modo produccion:
+  abierto ───(reescritura aplicada)───→ resuelto
+  abierto ───(operador firma desviación)───→ desviacion_justificada
+
+Modo estudio (solo vía scripts/dispose.py):
+  abierto  ──aceptar──→ resuelto
+  abierto  ──rechazar─→ desviacion_justificada
+  abierto  ──aplazar──→ aplazado
+  aplazado ──aceptar──→ resuelto
+  aplazado ──rechazar─→ desviacion_justificada
+
 resuelto ──(no permitido volver a abierto sin nuevo finding)
 ```
 
 - Un finding `resuelto` no se borra; queda registrado para trazabilidad.
 - Reabrir un finding requiere crear uno nuevo (`F-N.M+1`) con referencia al anterior.
+- En modo estudio, toda transición MUST tener su DispositionRecord en
+  `specs/<feature>/disposiciones.jsonl`. Transición sin registro =
+  inconsistencia: `status.py` la reporta como warning y sigue contando el
+  hallazgo como pendiente.
+- `aplazado` es deuda declarada: no cuenta como pendiente ni bloquea el cierre,
+  pero `close.py` lo enumera en el resumen.
+
+## Huellas de contenido por bloque (v1.2)
+
+Cada bloque de pasada 1-5 emitido bajo v1.2 termina con:
+
+```html
+<!-- huellas: {"<capitulo>": "<sha256-hex>", ...} -->
+```
+
+- En pasadas locales, la clave es el ordinal del capítulo (`"1"`, `"2"`).
+- En pasada 5, la clave es `"global"` y el valor es
+  `sha256(concat(sha256(cap_i)))` en orden ordinal.
+- La emisión es **obligatoria en ambos modos** (los comandos de pasada la
+  calculan siempre): deja el terreno preparado para verificar también en
+  producción sin invalidar pasadas históricas.
+- En modo estudio, `status.py` solo cuenta la pasada para un capítulo si la
+  huella registrada coincide con el contenido actual de `chapters/NNN-*.md`.
+  Huella ausente o distinta reabre la revisión del capítulo.
+- En modo producción, las huellas no se verifican (retrocompatibilidad: los
+  bloques v1.1 sin huella siguen contando).
+
+## Cláusula de modo para pasadas
+
+En proyectos con `mode: estudio`, las pasadas operan sobre texto escrito por
+humanos. Está prohibido editar cualquier archivo bajo `chapters/` o `README.md`:
+la salida de los agentes es el bloque de hallazgos en `findings.md` y, cuando
+aplique, `claims.md`. También está prohibido cambiar el `estado` de hallazgos
+existentes; las transiciones son exclusivas de `scripts/dispose.py`.
+
+En la pasada 4 de estudio, si `roots/` no contiene fichas de fuente aplicables,
+el bloque declara "no evaluable contra fuentes: roots/ sin fichas aplicables"
+en notas en vez de emitir 0 hallazgos como si se hubiera verificado.
 
 ---
 
@@ -151,8 +203,11 @@ Historial:
 - **v1.1** (feature 003-atribucion-factualidad, MINOR, aditivo) — la pasada 4 emite también
   `claims.md` (`ClaimRecord` v1.0); campo opcional `claim_id` de trazabilidad en findings de
   pasada 4. Sin eliminar ni reordenar campos v1.0.
+- **v1.2** (feature 005-modo-estudio-pipeline, MINOR, aditivo) — estado
+  `aplazado`, DispositionRecord humano, huellas de contenido y cláusulas de
+  modo estudio.
 
-Cada bloque de pasada en `findings.md` MUST incluir un comentario HTML con la versión del schema usada: `<!-- pass-output-schema: v1.0 -->` (o `v1.1` para bloques de pasada 4 que emiten claims).
+Cada bloque de pasada en `findings.md` MUST incluir un comentario HTML con la versión del schema usada: `<!-- pass-output-schema: v1.0 -->`, `v1.1` para bloques de pasada 4 que emiten claims o `v1.2` para bloques con huellas.
 
 ---
 

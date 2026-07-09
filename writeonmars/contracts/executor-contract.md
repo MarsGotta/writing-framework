@@ -98,3 +98,25 @@ quedan registrados de forma auditable (en Vivarium: `decisions.jsonl`).
 Implementaciones conocidas: **Vivarium** (`vivarium/`, primera implementación
 conforme, feature 004); Paperclip (archivada, referencia histórica:
 `paperclip/FLOW-CONTRACT.md` § 3-6 documenta su mapeo).
+
+## 6. Modo estudio
+
+Delta para proyectos con `.writeonmars-manifest.json` declarando
+`mode: estudio`:
+
+- `status.py --json` puede devolver `next_step = "write"` cuando faltan
+  capítulos del temario. El ejecutor MUST mapearlo a checkpoint humano
+  (exit 10), no a despacho: mensaje recomendado "faltan capítulos por escribir
+  (modo estudio)".
+- `status.py --json` puede devolver `next_step = "dispose"` cuando hay
+  hallazgos accionables a la espera de disposición humana. El ejecutor MUST
+  mapearlo a checkpoint humano (exit 10), no a despacho: mensaje recomendado
+  "hallazgos a la espera de disposición humana (scripts/dispose.py)".
+- En etapa global, si falta `README.md`, el paso `intro` también es checkpoint
+  humano en estudio. El README de presentación es prosa publicada.
+- El guardarraíl de modo no se elimina: si por un estado imposible el ejecutor
+  llega a despachar `implement`, `revise` o `intro` en estudio, sigue aplicando
+  el bloqueo de modo (exit 11).
+- Si un ejecutor comitea trabajo de agentes, el autor del commit MUST usar la
+  convención `<rol>@agents.writeonmars.invalid` para que
+  `scripts/authorship.py` pueda clasificar la procedencia.

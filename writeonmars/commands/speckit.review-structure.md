@@ -37,3 +37,16 @@ Estructura` y `## Pasada 2 — Utilidad`— conforme a
 dimensiones en una sola ejecución, según el `signing_matrix`: `pasada_1_estructura`
 y `pasada_2_utilidad`). Modo autónomo, incidencias `flagged` por severidad. No
 reescribes voz; si una frase falla de voz, lo dejas para la pasada de naturalidad.
+## Huellas (ambos modos)
+
+Todo bloque emitido MUST incluir `<!-- pass-output-schema: v1.2 -->` y terminar
+con `<!-- huellas: {"<capitulo>": "<sha256-hex>"} -->` calculado sobre los bytes
+actuales del capítulo.
+
+## Modo estudio
+
+Si el manifiesto declara `mode: estudio`, esta pasada opera sobre texto humano.
+PROHIBIDO editar `chapters/` o `README.md`; la única salida es el bloque de
+hallazgos en `findings.md`. PROHIBIDO cambiar `estado` de hallazgos existentes:
+las transiciones son exclusivas de `scripts/dispose.py`.
+

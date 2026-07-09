@@ -20,6 +20,7 @@ tests=(
     "specify-after-install.sh"
     "test-factuality.sh"
     "vivarium-e2e.sh"
+    "estudio-e2e.sh"
 )
 
 results=()

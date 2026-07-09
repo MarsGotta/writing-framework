@@ -19,6 +19,7 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS_DIR = REPO_ROOT / "writeonmars" / "scripts"
 FIXTURES_003 = REPO_ROOT / "tests" / "fixtures" / "003-factualidad"
+FIXTURES_005 = REPO_ROOT / "tests" / "fixtures" / "005-estudio"
 
 # Separador canónico de los encabezados de pasada en findings.md reales (la raya,
 # escapada a propósito). El parser también acepta "-", que es lo que usan los
@@ -72,6 +73,16 @@ def bootstrap_mod():
 @pytest.fixture(scope="session")
 def close_mod():
     return _load_script("close", "wom_close")
+
+
+@pytest.fixture(scope="session")
+def dispose_mod():
+    return _load_script("dispose", "wom_dispose")
+
+
+@pytest.fixture(scope="session")
+def authorship_mod():
+    return _load_script("authorship", "wom_authorship")
 
 
 @pytest.fixture(scope="session")
@@ -270,3 +281,10 @@ def fact_project(tmp_path: Path):
         return dst
 
     return _make
+
+
+@pytest.fixture
+def estudio_project(tmp_path: Path) -> Path:
+    dst = tmp_path / "estudio"
+    shutil.copytree(FIXTURES_005 / "project", dst)
+    return dst

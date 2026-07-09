@@ -10,6 +10,41 @@ trayectorias paralelas: framework (`vX.Y.Z` del repo) y constitución
 
 ## [Unreleased] — refactor a preset agente-agnóstico
 
+### Modo estudio operativo (feature 005, 2026-07-08)
+
+- `status.py` entiende `mode: estudio`: expone `mode`, `pending_chapters`,
+  `pending_dispositions`, `deferred_findings` y `reopened_chapters`, y enruta
+  `write`/`dispose` como checkpoints humanos.
+- Añadidos `dispose.py` (disposición humana auditable) y `authorship.py`
+  (informe determinista desde git + `decisions.jsonl`).
+- Publicado `pass-output-schema` v1.2, `disposition-record.schema.json` y la
+  sección "Modo estudio" del contrato del ejecutor.
+- Vivarium mapea `write`, `dispose` e `intro` en estudio como checkpoints
+  humanos sin tocar el guardarraíl exit 11.
+- **Revisión adversarial (2026-07-09, 8 ángulos)**: corregidas 3 regresiones de
+  retrocompatibilidad (FR-011) reproducidas en vivo — cuenta de pendientes en
+  produccion vuelve a ser por ficheros (un `intro.md` no reabre `implement`),
+  `disposiciones.jsonl` solo se lee en estudio (una línea corrupta ya no tumba
+  la brújula en produccion), `mode` desconocido en manifiesto legado degrada a
+  produccion; y bugs de contrato: `dispose --rechazar` escribe el motivo en
+  `decision_humana` (9ª columna), edición byte-intacta de findings.md (CRLF y
+  padding preservados), resolución de spec-dir unificada en `findings_lib`
+  (dispose usaba el spec más viejo), cierre en estudio anclado a la huella
+  (editar un capítulo aprobado lo vuelve no-cerrable), sin livelock cuando un
+  agente deja un estado incoherente, y `authorship.py` robusto a monorepos,
+  renames y timestamps naive. Smoke `estudio-e2e` ampliado a 2 capítulos (SC-002)
+  con `close.py` real e idempotencia verificada.
+
+### Constitución v1.6.1 (2026-07-08, lente de modo en Estándares editoriales)
+
+- **PATCH 1.6.0 → 1.6.1**: los bullets "Fuentes por capítulo" y "Atribución por
+  afirmación" (texto de la era 003, previo a los modos) ganan la lente de modo
+  que § Modos de proyecto ya establecía: el MUST de `claims.md` es del modo
+  produccion; en estudio la pasada 4 verifica consistencia contra las fuentes
+  del proyecto y `claims.md` solo se exige con umbral declarado. Detectado como
+  conflicto C1 por el `/speckit-analyze` de la feature 005 (Codex). Las
+  referencias de versión en plan-template pasan a ser agnósticas (anti-fósil).
+
 ### Vivarium headless (feature 004, 2026-07-07)
 
 - Añadido workspace Rust `vivarium/` con `vivarium-core` y `vivarium-cli`:

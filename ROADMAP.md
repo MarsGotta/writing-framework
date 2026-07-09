@@ -1,6 +1,6 @@
 # Write.OnMars — Roadmap y estado
 
-> Estado al **2026-07-07**. Resumen de lo construido, lo validado de verdad y lo
+> Estado al **2026-07-08**. Resumen de lo construido, lo validado de verdad y lo
 > que queda. Punto de retorno para no perder el hilo entre sesiones.
 
 ## En una frase
@@ -12,6 +12,11 @@ como **comandos**; lo determinista, como **scripts**. La orquestación de
 referencia ya es **Vivarium headless** (`vivarium/`): bootstrap, runner por
 estados, BYOM, modos y contrato publicado. Paperclip queda archivado como
 referencia histórica.
+
+El pipeline de **modo estudio** ya está operativo en el preset: `status.py`
+propone checkpoints humanos de escritura y disposición, `dispose.py` registra
+decisiones auditables, `authorship.py` emite el informe de autoría humana y
+Vivarium espera en `write`/`dispose`/`intro` sin despachar redacción.
 
 ## Cómo está montado (capas)
 
@@ -48,11 +53,12 @@ referencia histórica.
     `review-precision` / `review-global` (sueltos, un modelo por pasada) + `revise`
     (aplica los hallazgos al texto y cierra el loop)
   - operación: `status`, `export`, `feedback`, `close`, `memory`
-- **6 scripts deterministas**: `bootstrap`, `status`, `export`, `feedback_intake`,
-  `close`, `index`. `status.py` ahora expone **`--json`** con el campo `next_step`
+- **8 scripts deterministas**: `bootstrap`, `status`, `dispose`, `authorship`,
+  `export`, `feedback_intake`, `close`, `index`. `status.py` ahora expone **`--json`** con el campo `next_step`
   (`setup` → `constitution` → `specify` → `research` → `plan` → `implement` →
-  `review` → `revise` → `close`): la **brújula del heartbeat** del orquestador.
-  Tolera la ausencia de `specs/` y detecta `sector=null` → `constitution`.
+  `review` → `revise` → `close`; en estudio también `write` y `dispose`): la
+  **brújula del heartbeat** del orquestador. Tolera la ausencia de `specs/` y
+  detecta `sector=null` → `constitution`.
 - **`references/`**: voz (`marcela-prose`), didáctica (`technical-guide-design`),
   método (`writeonmars-*`), **sectores** (`sectores/<slug>.md`: defaults por dominio
   para las adendas; hoy `tecnologia`, ampliable con solo añadir un archivo).
@@ -115,7 +121,7 @@ Y, ya en Paperclip:
 - Comandos editoriales **reemplazan** (`replaces`) a los core → sin ambigüedad.
 - Sin `wom` CLI (lo cubren `status.py` / `close.py`); spec `002-wom-cli` superseded.
 - `speckit-setup` para lo que el preset no puede instalar (constitución, manifest).
-- Constitución **v1.6.0** (Principio V 3+1; Principio VI neutralidad de modelo;
+- Constitución **v1.6.1** (Principio V 3+1; Principio VI neutralidad de modelo;
   desde v1.6.0: modos de proyecto `produccion`/`estudio` y § Ejecutores del
   método — Vivarium reemplaza a Paperclip como ejecutor orquestado).
 
@@ -135,6 +141,16 @@ Y, ya en Paperclip:
    varios proyectos a la vez.
 7. **Distribución**: elegir licencia, publicar el preset
    (`specify preset add --from <github>`), versionar releases.
+8. **Inspiración externa** (análisis 2026-07-08, ver
+   `docs/comparativa-bookwright-sloop.md` y diseños de adopción en
+   `docs/inspiracion-bookwright-profundizada.md` — candidata a spec 006:
+   biblia narrativa en roots/ + ejes de continuidad): firma de fallo repetida como
+   clasificador transitorio/determinista en el runner de Vivarium (S|Loop);
+   late binding de prompts de capítulo contra estado real + decisions.jsonl
+   (S|Loop); protocolo `[PENDING]` de tres sistemas para adendas/claims
+   (Bookwright); hallazgo-vs-ancla con umbral de fiabilidad para el índice de
+   factualidad (Bookwright); plantillas de fichas narrativas en `roots/` con
+   "diálogo de muestra" para el modo estudio con novela (Bookwright).
 
 ## Bugs de orquestación — primera corrida real (guide-nlp, 2026-06-20)
 

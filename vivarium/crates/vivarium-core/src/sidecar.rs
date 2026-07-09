@@ -49,6 +49,8 @@ pub struct Gates {
 pub struct Status {
     pub spec: String,
     #[serde(default)]
+    pub mode: Option<String>,
+    #[serde(default)]
     pub chapters: Vec<String>,
     pub chapters_written: u32,
     pub chapters_expected: u32,
@@ -59,6 +61,14 @@ pub struct Status {
     pub revise_pending: u32,
     #[serde(default)]
     pub revise_by_chapter: HashMap<String, u32>,
+    #[serde(default)]
+    pub pending_chapters: Vec<u32>,
+    #[serde(default)]
+    pub pending_dispositions: Vec<String>,
+    #[serde(default)]
+    pub deferred_findings: Vec<String>,
+    #[serde(default)]
+    pub reopened_chapters: Vec<String>,
     pub advisory_open_bajo: u32,
     #[serde(default)]
     pub sign_violations: Vec<String>,
@@ -182,6 +192,7 @@ mod tests {
     fn deserializa_contrato_status() {
         let json = r#"{
           "spec":"001-demo",
+          "mode":"estudio",
           "chapters":["01-a.md"],
           "chapters_written":1,
           "chapters_expected":1,
@@ -190,6 +201,10 @@ mod tests {
           "open_findings_total":0,
           "revise_pending":0,
           "revise_by_chapter":{},
+          "pending_chapters":[],
+          "pending_dispositions":[],
+          "deferred_findings":[],
+          "reopened_chapters":[],
           "advisory_open_bajo":0,
           "sign_violations":[],
           "gates":{"no_open_criticals":true,"human_signatures":true,"guide_complete":true,"factuality":null},
@@ -203,5 +218,6 @@ mod tests {
         let status: Status = serde_json::from_str(json).unwrap();
         assert!(status.by_chapter["1"].approved);
         assert_eq!(status.next_step, "close");
+        assert_eq!(status.mode.as_deref(), Some("estudio"));
     }
 }

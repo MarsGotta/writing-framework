@@ -1,0 +1,88 @@
+{
+  "advisory_open_bajo": 1,
+  "all_chapters_approved": false,
+  "by_chapter": {
+    "1": {
+      "advisory": 1,
+      "approved": false,
+      "drafted": true,
+      "passes_done": [
+        1
+      ],
+      "revise_pending": 2
+    },
+    "2": {
+      "advisory": 0,
+      "approved": false,
+      "drafted": false,
+      "passes_done": [],
+      "revise_pending": 0
+    },
+    "3": {
+      "advisory": 0,
+      "approved": false,
+      "drafted": false,
+      "passes_done": [],
+      "revise_pending": 0
+    }
+  },
+  "chapters": [
+    "001-uno-humano.md"
+  ],
+  "chapters_expected": 3,
+  "chapters_written": 1,
+  "closeable": false,
+  "criticals_open": 1,
+  "deferred_details": [],
+  "deferred_findings": [],
+  "factuality_by_chapter": {},
+  "factuality_global": null,
+  "factuality_mode": null,
+  "factuality_pending": {},
+  "factuality_unmeasured": [],
+  "gates": {
+    "factuality": null,
+    "guide_complete": false,
+    "human_signatures": true,
+    "no_open_criticals": false
+  },
+  "has_manifest": true,
+  "mode": "estudio",
+  "next_detail": "2 hallazgo(s) accionable(s) a la espera de disposición humana: F-1.1, F-1.2",
+  "next_step": "dispose",
+  "open_findings_total": 3,
+  "passes": [
+    {
+      "abiertos": 3,
+      "actor": "mesa-stub",
+      "estado": "passed",
+      "firma": "autonomous",
+      "firma_disp": "autonomous",
+      "name": "Estructura",
+      "num": 1,
+      "required": "autonomous",
+      "severidades": {
+        "bajo": 1,
+        "critico": 1,
+        "medio": 1
+      },
+      "signed": null
+    }
+  ],
+  "pending_chapters": [
+    2,
+    3
+  ],
+  "pending_dispositions": [
+    "F-1.1",
+    "F-1.2"
+  ],
+  "reopened_chapters": [],
+  "revise_by_chapter": {
+    "1": 2
+  },
+  "revise_pending": 2,
+  "sign_violations": [],
+  "spec": "001-estudio",
+  "warnings": []
+}

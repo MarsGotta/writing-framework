@@ -27,10 +27,15 @@ Thumbs.db
 
 # === Bash / scripts ===
 *.log
+.env*
 
 # === Python (scripts del preset writeonmars) ===
 __pycache__/
 *.pyc
+.venv/
+venv/
+dist/
+*.egg-info/
 .pytest_cache/
 
 # === Caché generada por el preset (reconstruible desde el repo) ===
@@ -39,3 +44,9 @@ __pycache__/
 
 # === Rust ===
 /vivarium/target/
+target/
+debug/
+release/
+*.rs.bk
+*.rlib
+*.prof*

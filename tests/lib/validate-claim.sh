@@ -50,10 +50,19 @@ resolve_framework_home() {
 # validate_with_ajv <schema_path> <data_path>
 # Requiere ajv-formats (los schemas usan format: date/uri) y --strict=false
 # (el modo estricto de ajv rechaza construcciones válidas de draft 2020-12).
+# Para que los smoke tests sean deterministas/offline, solo usa un `ajv`
+# instalado localmente. El fallback histórico con npx queda opt-in.
 validate_with_ajv() {
     local schema_path="$1"
     local data_path="$2"
-    if ! command -v npx >/dev/null 2>&1; then
+    if command -v ajv >/dev/null 2>&1; then
+        ajv validate --spec=draft2020 --strict=false -c ajv-formats \
+            -s "$schema_path" -d "$data_path" >/dev/null 2>&1 && return 0
+        ajv validate --spec=draft2020 --strict=false -c ajv-formats \
+            -s "$schema_path" -d "$data_path" >&2 || return 1
+    fi
+
+    if [[ "${WRITEONMARS_ALLOW_NPX:-0}" != "1" ]] || ! command -v npx >/dev/null 2>&1; then
         return 127
     fi
     if npx --yes -p ajv-cli -p ajv-formats ajv validate \
@@ -173,7 +182,10 @@ main() {
         fi
     fi
 
-    if command -v npx >/dev/null 2>&1; then
+    # ajv local no necesita npx: el gate anterior (command -v npx) dejaba el
+    # validador local inalcanzable en máquinas con ajv pero sin node/npx.
+    if command -v ajv >/dev/null 2>&1 \
+        || { [[ "${WRITEONMARS_ALLOW_NPX:-0}" == "1" ]] && command -v npx >/dev/null 2>&1; }; then
         if validate_with_ajv "$schema_path" "$data_path"; then
             echo "valid"
             exit 0

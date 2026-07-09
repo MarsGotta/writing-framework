@@ -20,10 +20,50 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+if str(HERE) not in sys.path:
+    sys.path.insert(0, str(HERE))
+
+import findings_lib  # noqa: E402
+from findings_lib import parse_findings  # noqa: E402
 
 
 def run(script: str, extra: list[str]) -> int:
     return subprocess.run([sys.executable, str(HERE / script), *extra]).returncode
+
+
+def _spec_dir(project: Path, override: str | None) -> Path | None:
+    # Resolución canónica compartida (findings_lib). Un --spec con typo ya lo
+    # atrapa ruidosamente el gate (status.py --gate falla antes de llegar aquí);
+    # en el reporte de deuda basta con no inventar nada.
+    try:
+        return findings_lib.newest_spec_dir(project, override)
+    except ValueError:
+        return None
+
+
+def deferred_debt(project: Path, spec: str | None) -> list[dict]:
+    spec_dir = _spec_dir(project, spec)
+    if spec_dir is None:
+        return []
+    out = []
+    for block in parse_findings(spec_dir / "findings.md"):
+        for finding in block["hallazgos"]:
+            if finding.get("estado") == "aplazado":
+                out.append({
+                    "id": finding.get("id", ""),
+                    "severidad": finding.get("severidad", ""),
+                    "capitulo": finding.get("capitulo", ""),
+                })
+    return out
+
+
+def print_deferred_debt(project: Path, spec: str | None) -> None:
+    debt = deferred_debt(project, spec)
+    if not debt:
+        return
+    print("\n== Deuda declarada ==")
+    for item in debt:
+        print(f"- {item['id']} · {item['severidad']} · capítulo {item['capitulo']}")
 
 
 def main() -> None:
@@ -43,6 +83,7 @@ def main() -> None:
     if gate != 0:
         print("\n[close] BLOQUEADO: no se exporta. Resuelve los blockers de arriba.", file=sys.stderr)
         sys.exit(1)
+    print_deferred_debt(Path(args.project_dir).resolve(), args.spec)
 
     if args.no_export:
         print("\n[close] CERRABLE. (--no-export: no se genera PDF.)")
