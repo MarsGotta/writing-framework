@@ -53,3 +53,6 @@ release/
 
 # === Papelera del puente Cowork (mover en vez de borrar; vaciar a mano) ===
 /_to_delete/
+
+# === Salidas de herramientas de exploración (regenerables; la caché vive solo en local) ===
+/graphify-out/
