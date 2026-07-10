@@ -36,12 +36,16 @@ solo habla con el método vía archivos + scripts + comandos. `paperclip/` queda
 `paperclip/FLOW-CONTRACT.md` (§§ 0-2 = contrato agnóstico del ejecutor).
 Scaffolding de una guía nueva en un comando: `tools/new-guide.sh`.
 
-**Feature activa**: ninguna. Próximos pasos (ver ROADMAP.md): validación BYOM
-del modo estudio con agentes reales (pendiente), biblia narrativa en `roots/` +
-ejes de continuidad (candidata a spec 007, ver
-`docs/inspiracion-bookwright-profundizada.md`), pista corta editorial
-(spec 006 en borrador: `specs/006-pista-corta-editorial/`), interfaz Tauri
-sobre `vivarium-core`.
+**Feature activa**: **006-pista-corta-editorial** (planificada 2026-07-10).
+Plan: `specs/006-pista-corta-editorial/plan.md` · Decisiones: `research.md`
+(R1-R10) · Contratos: `contracts/{manifest-v1.4.0-delta,track-cli,ceremonia-corta}.md`
+· Validación: `quickstart.md`. Siguiente paso: `/speckit-tasks`.
+La implementación la hará **un agente distinto** del que redactó spec y plan.
+
+Otros próximos pasos (ver ROADMAP.md): validación BYOM del modo estudio con
+agentes reales (pendiente), biblia narrativa en `roots/` + ejes de continuidad
+(candidata a spec 007, ver `docs/inspiracion-bookwright-profundizada.md`),
+interfaz Tauri sobre `vivarium-core`.
 
 Specs (referencia, NO activas):
 - 001-framework-architecture: base del harness editorial (v1.0.0). Vive en `specs/001-framework-architecture/`.
@@ -57,8 +61,10 @@ Specs (referencia, NO activas):
   estudio en el preset (`dispose.py`, `authorship.py`, huellas, checkpoints
   write/dispose). Revisada (8 ángulos, 10 correcciones). Validación BYOM con
   agentes reales aún pendiente.
-- 006-pista-corta-editorial: **borrador** (2026-07-09) — ceremonia adaptativa
+- 006-pista-corta-editorial: **planificada** (2026-07-10) — ceremonia adaptativa
   para piezas únicas (`track: corta`: temario degenerado, pasada combinada
-  1·2·3·5 + precisión, escalado sin tirar trabajo). Fundamento:
-  docs/comparativa-bmad.md. Pendiente: clarify → plan → implement.
+  1·2·3·5 + precisión, escalado sin tirar trabajo vía `scripts/track.py`).
+  Fundamento: docs/comparativa-bmad.md. spec → clarify → **plan** hechos;
+  pendiente: tasks → implement. Enmienda la constitución a v1.7.0 (§ "Pistas
+  de ceremonia") y el manifest-schema a v1.4.0 (`track`, `track_history`).
 <!-- SPECKIT END -->
