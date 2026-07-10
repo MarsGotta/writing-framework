@@ -10,6 +10,79 @@ trayectorias paralelas: framework (`vX.Y.Z` del repo) y constitución
 
 ## [Unreleased] — refactor a preset agente-agnóstico
 
+### Pista corta editorial (feature 006, 2026-07-10)
+
+- **Pista de ceremonia (`track`)**: el manifiesto gana el campo opcional `track`
+  (`estandar` | `corta`; ausencia = `estandar`, valor desconocido = error claro,
+  espejo de `mode`) y el historial append-only `track_history` (de, a, fecha,
+  actor humano). La pista es ortogonal al modo (005): gobierna *cuánto rito*, no
+  *quién escribe*. `manifest-schema` sube a **v1.4.0** (MINOR, aditivo: `track` y
+  `track_history`).
+- **Ceremonia corta = pieza única**: temario degenerado de una fila que
+  materializa la firma del brief (no un paso `plan`), revisión en **dos relevos**
+  —pasada combinada 1·2·3·5, vehiculada por `speckit.review-structure`, +
+  precisión 4 en relevo aparte con otro rol/modelo—, sin `constitution` (el
+  sector fija adendas), sin `plan` y sin `intro`, con export de pieza única
+  (portada compacta —título, autora, fecha—, sin índice; la sección Fuentes
+  conserva el estilo `.chapter-sources`). Camino feliz: **6 despachos**
+  (`research`, `implement`, `review-1` combinada, `review-4` precisión, `export`,
+  `close`) frente a los **11** de la ceremonia estándar sobre la misma pieza;
+  umbral SC-001 ≤ 8, contado en `decisions.jsonl` (`event == "dispatch"`).
+- **`scripts/track.py`** (nuevo, patrón `dispose.py`): único camino para cambiar
+  de pista. Escalado `corta → estandar` (siempre legal, no mueve un solo archivo:
+  la pieza ya es el capítulo 1 del temario ampliado y findings/claims conservan
+  sus bloques), des-escalado `estandar → corta` (solo con temario ≤ 1 fila y sin
+  capítulos de ordinal ≥ 2) y `--check`. Identidad humana desde git config, con
+  rechazo de identidades de agente (exit 3), y escritura atómica del manifiesto.
+  Ningún agente cambia `track`.
+- **`bootstrap.py`** gana `--track` / `WRITEONMARS_TRACK` (default `estandar`) y
+  `--sector` / `WRITEONMARS_SECTOR`. Con `--sector`, fija `sector` y `registro`
+  en el manifiesto y materializa las adendas del sector **por referencia** tras
+  el centinela `WRITEONMARS:ADENDAS` (un script determinista no destila prosa;
+  Principio VI), con lo que la brújula omite `constitution`.
+- **Comandos conscientes de pista**: `speckit.specify` captura los ocho campos
+  más título y promesa en una ronda y materializa el temario degenerado;
+  `speckit.review-structure` vehicula la combinada (bloques 1·2·3·5 en un run);
+  `speckit.review` agrupa combinada + precisión; `intro` se auto-anula;
+  `review-voice`/`review-global`/`review-precision` quedan como red de
+  reparación; `plan` preserva el temario existente si se invoca a mano.
+- **`status.py` solo expone `track`** en `--json` (clave aditiva) y añade avisos
+  advisory al canal `warnings` en pista corta; **su lógica de estado no cambia**
+  (`next_step`, `next_detail`, `gates`, `closeable`, `by_chapter` intactos;
+  dashboard byte-idéntico en `estandar`, SC-003). `count_temario` y
+  `drafted_ordinals` se mudan a `findings_lib.py` sin cambiar ninguna salida.
+- **Vivarium**: `Status` deserializa `track` (`#[serde(default)]`, tolerante a
+  `status.py` antiguos) y suma **un único cambio de comportamiento** —
+  `plan_global` omite el bloque `intro`/README cuando `track == corta`, en ambos
+  modos—. El escalado no vive en el ejecutor (Principio VI).
+- **Ortogonalidad `track × mode`**: en `corta`+`estudio`, los checkpoints
+  `write`/`dispose`/`feedback`, las huellas sha256 y el guardarraíl exit 11
+  operan sin cambios; `intro` se omite en ambos modos.
+- **Contrato `pass-output-schema` intacto en v1.2**: la combinada extiende el
+  precedente de `speckit.review-structure` (que ya emitía dos bloques en un run),
+  no abre un contrato nuevo. `executor-contract.md` gana la § 7 "Pista corta".
+- Smoke `tests/smoke/corta-e2e.sh` (stubs distinguibles por rol; skip 99 sin
+  cargo), dado de alta en `run-all.sh`. Suite unitaria: **169 → 213** tests;
+  ninguna aserción previa modificada (FR-010), con la única excepción de una
+  línea de *dato* en el oráculo de la 005 (`"track": "estandar"`).
+- Fundamento: `docs/comparativa-bmad.md` (pistas de ceremonia de BMAD v6,
+  Quick Flow / Method / Enterprise) y la evidencia de coste propia (26 despachos
+  para 2 capítulos, BYOM 2026-07-08).
+
+### Constitución v1.7.0 (2026-07-10, pistas de ceremonia)
+
+- **MINOR 1.6.1 → 1.7.0**: nueva sección "Pistas de ceremonia", paralela a
+  "Modos de proyecto" — todo proyecto declara una **pista** (`estandar` |
+  `corta`) que gobierna *cuánto rito*, ortogonal al modo (que gobierna *quién
+  escribe*). En pista corta las cinco dimensiones del Principio V se verifican en
+  **dos relevos** (combinada 1·2·3·5 + precisión 4) sin debilitar ningún NO
+  NEGOCIABLE: voz ≠ precisión, escribe-uno-revisa-otro y detector ≠ corrector se
+  preservan. Defaults opinados sin candados; el cambio de pista es solo humano y
+  registrado (`scripts/track.py`, identidad git humana obligatoria).
+- Sync impact report en la cabecera (v1.6.1 → v1.7.0) y fila **"Pista de
+  ceremonia"** propagada al Constitution Check de `plan-template.md` (preset y
+  copia de dogfooding). Las dos copias de la constitución quedan byte-idénticas.
+
 ### Mantenimiento (2026-07-09, limpieza de la casa)
 
 - **Copias muertas de skills retiradas**: `.agents/skills/` y `.claude/skills/`

@@ -60,6 +60,33 @@ Todos son comandos de este preset, con nombres que **no colisionan** con los cor
 de Spec Kit (`specify`, `plan`, `tasks`, `implement`, `clarify`, `analyze`…), que
 siguen disponibles si los quieres. El pipeline editorial usa los de arriba.
 
+## Pista corta
+
+El manifiesto puede declarar la **pista de ceremonia** en el campo `track`
+(`estandar` | `corta`; su ausencia equivale a `estandar`). Lee `track` de
+`status.py --json` —donde siempre está presente— o del manifiesto, igual que lees
+`mode`; **nunca lo asumas**. En pista corta la ceremonia se dimensiona para una
+pieza única: sin paso `plan` (el temario tiene una sola fila), sin `constitution`
+en el camino feliz (`bootstrap --sector` ya dejó las adendas) y con la revisión en
+dos relevos.
+
+- **Pasada combinada.** En `track: corta`, el despacho de la pasada 1
+  (`speckit.review-structure`, rol editora de mesa) vehicula la pasada combinada:
+  en un único run verifica y registra cuatro bloques pass-output estándar —
+  `## Pasada 1 — Estructura`, `## Pasada 2 — Utilidad` y `## Pasada 3 — Naturalidad`
+  (los tres con `**Capítulos cubiertos**: 1`), más `## Pasada 5 — Formato` (con
+  `global`). **No** registres ahí la dimensión 4 (precisión): viaja en un relevo
+  aparte, con otro rol y modelo (`documentalista`), por la regla dura
+  **voz ≠ precisión**. El esquema `pass-output` no cambia: son los bloques de
+  siempre.
+- **`intro` no aplica.** Una pieza única no tiene README de presentación. No lo
+  despaches ni exijas `README.md` antes del export en ningún modo; `export.py`
+  produce la portada compacta.
+- **Ningún agente cambia `track`.** El escalado `corta → estandar` y el des-escalado
+  viven en `scripts/track.py`, que exige identidad humana desde `git config` y
+  rechaza las de agente. No reescribas `track` ni `track_history` en el manifiesto:
+  hacerlo a mano viola el Principio VI.
+
 ## Dos puntos donde para un humano (no automatizar del todo)
 
 1. **Brief + investigación**: el agente formula preguntas y espera la firma

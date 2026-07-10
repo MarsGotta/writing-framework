@@ -349,12 +349,12 @@ movido por el escalado.
 
 ## Phase 6: Integración con el ejecutor (depende de US1)
 
-- [ ] T019 `vivarium/crates/vivarium-core/src/sidecar.rs`: `Status` gana
+- [X] T019 `vivarium/crates/vivarium-core/src/sidecar.rs`: `Status` gana
   `#[serde(default)] pub track: Option<String>`. Fontanería de deserialización,
   tolerante a `status.py` antiguos (`None` ⇒ ceremonia estándar). Test:
   `status_sin_track_deserializa` — un JSON de `status.py` sin la clave `track`
   deserializa con `track == None`.
-- [ ] T020 `vivarium/crates/vivarium-core/src/runner.rs` según
+- [X] T020 `vivarium/crates/vivarium-core/src/runner.rs` según
   `contracts/ceremonia-corta.md` § 5 y research R6 — **único cambio de
   comportamiento del ejecutor**: helper `is_corta(status)` espejo de
   `is_estudio(status)`, y en `plan_global` guardar el bloque del README con
@@ -368,7 +368,7 @@ movido por el escalado.
   `plan_global_omite_intro_en_corta` (⇒ `Act(export)`),
   `plan_global_omite_intro_en_corta_estudio` (⇒ `Act(export)`, **no**
   `Checkpoint{step:"intro"}`), `plan_global_sigue_pidiendo_intro_en_estandar`.
-- [ ] T021 [P] Tests de integración del ejecutor en
+- [X] T021 [P] Tests de integración del ejecutor en
   `vivarium/crates/vivarium-cli/tests/runner.rs` (stubs de `tests/common/mod.rs`):
   `vivarium run` sobre un proyecto `track: corta` sin `README.md` con la pasada 5
   registrada ⇒ despacha `export`, nunca `intro`; y ante la combinada registrada,
@@ -392,13 +392,13 @@ movido por el escalado.
   despachos nuevos. Repetir en `mode: estudio`: checkpoints `write`, `dispose` y
   `feedback`, jamás `intro`, guardarraíl exit 11 intacto. Cerrar con
   `track.py --escalar` sobre el proyecto cerrado: solo el manifiesto cambia.
-- [ ] T023 [P] Crear `writeonmars/docs/how-to-pista-corta.md` (hermano de
+- [X] T023 [P] Crear `writeonmars/docs/how-to-pista-corta.md` (hermano de
   `how-to-modo-estudio.md`): cuándo elegir pista corta, cómo declararla
   (`--track`/`--sector` o las env vars), qué pasos desaparecen y por qué, cómo
   corren los dos relevos, cómo escalar con `track.py` y qué se conserva. Añadir la
   sección de pista a `writeonmars/AGENTS.md` (contrato del agente: leer `track` del
   manifiesto; la combinada; `intro` no aplica; ningún agente cambia `track`).
-- [ ] T024 [P] Docs del repo: entrada de la feature en `CHANGELOG.md`; estado en
+- [X] T024 [P] Docs del repo: entrada de la feature en `CHANGELOG.md`; estado en
   `ROADMAP.md` (pista corta operativa; nota pendiente de retro-modificar
   `mode_history` con `actor`, research R8); actualizar `CLAUDE.md` (constitución
   v1.7.0, spec 006 integrada) y `writeonmars/README.md` si enumera scripts.

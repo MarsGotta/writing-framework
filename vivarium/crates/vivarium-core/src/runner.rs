@@ -235,6 +235,10 @@ fn is_estudio(status: &Status) -> bool {
     status.mode.as_deref() == Some("estudio")
 }
 
+fn is_corta(status: &Status) -> bool {
+    status.track.as_deref() == Some("corta")
+}
+
 fn checkpoint_write() -> Planned {
     Planned::Checkpoint {
         step: "write",
@@ -288,7 +292,10 @@ fn plan_global(project: &Path, status: &Status) -> Result<Planned> {
             kind: ActionKind::Agent,
         }));
     }
-    if !project.join("README.md").is_file() {
+    // Pista corta (R6, FR-007): una pieza única no tiene README de presentación.
+    // El salto aplica en AMBOS modos — en corta+estudio un checkpoint `intro`
+    // sobre un artefacto inexistente sería un callejón sin salida.
+    if !is_corta(status) && !project.join("README.md").is_file() {
         if is_estudio(status) {
             return Ok(Planned::Checkpoint {
                 step: "intro",
@@ -820,6 +827,50 @@ mod tests {
         status.mode = Some("estudio".to_string());
         let planned = plan_global(tmp.path(), &status).unwrap();
         assert!(matches!(planned, Planned::Checkpoint { step: "intro", .. }));
+    }
+
+    #[test]
+    fn plan_global_omite_intro_en_corta() {
+        // track: corta sin README.md ni PDF → salta intro y va directo a export.
+        let tmp = tempfile::tempdir().unwrap();
+        let mut status = status_closeable();
+        status.track = Some("corta".to_string());
+        let planned = plan_global(tmp.path(), &status).unwrap();
+        match planned {
+            Planned::Act(action) => assert_eq!(action.step, "export"),
+            other => panic!("esperaba Act(export), fue {other:?}"),
+        }
+    }
+
+    #[test]
+    fn plan_global_omite_intro_en_corta_estudio() {
+        // corta + estudio: tampoco hay checkpoint `intro` (R6). Va a export.
+        let tmp = tempfile::tempdir().unwrap();
+        let mut status = status_closeable();
+        status.track = Some("corta".to_string());
+        status.mode = Some("estudio".to_string());
+        let planned = plan_global(tmp.path(), &status).unwrap();
+        assert!(
+            !matches!(planned, Planned::Checkpoint { step: "intro", .. }),
+            "corta+estudio no debe producir checkpoint intro"
+        );
+        match planned {
+            Planned::Act(action) => assert_eq!(action.step, "export"),
+            other => panic!("esperaba Act(export), fue {other:?}"),
+        }
+    }
+
+    #[test]
+    fn plan_global_sigue_pidiendo_intro_en_estandar() {
+        // track: None (estándar) en produccion sin README → sigue despachando intro.
+        let tmp = tempfile::tempdir().unwrap();
+        let status = status_closeable();
+        assert!(status.track.is_none());
+        let planned = plan_global(tmp.path(), &status).unwrap();
+        match planned {
+            Planned::Act(action) => assert_eq!(action.step, "intro"),
+            other => panic!("esperaba Act(intro), fue {other:?}"),
+        }
     }
 
     #[test]

@@ -70,15 +70,26 @@ recoge en una sola ronda y su firma materializa el temario degenerado.
   ni los "mejoras". Con esa fila, `chapters_expected == 1` y el paso `plan` desaparece
   del ciclo sin tocar `status.py`.
 
-**Resolución del tono.** Cuando `bootstrap --sector` fija las adendas **por
-referencia**, el bloque `### Tono calibrado` de `.specify/memory/constitution.md`
-remite al sector en lugar de escribir el tono palabra por palabra. Si ese bloque
-declara las adendas por referencia, sigue su puntero hasta
-`.specify/presets/writeonmars/references/sectores/<slug>.md` —secciones
-`## Tono por defecto` y `## Persona gramatical y registro`— y refleja ese tono como
-eco en el campo 5. El bloque de adendas nombra la base en forma corta
-(`references/sectores/<slug>.md`); la ruta de arriba es la que resuelve dentro de un
-proyecto con el preset instalado. Mientras `manifest.sector` tenga valor, **no
-sugieras correr `/speckit-constitution`**: el sector ya dejó la capa normativa escrita
-y la pista corta omite ese paso. Es el mismo patrón con el que
-`speckit.review-voice` resuelve su registro desde el default del sector.
+**Resolución del tono.** Mientras `manifest.sector` tenga valor, resuelve el campo 5
+así, en este orden:
+
+1. Si `.specify/memory/constitution.md` trae un bloque `### Tono calibrado` con el
+   tono escrito palabra por palabra, úsalo.
+2. Si ese bloque declara las adendas **por referencia**, o si el bloque de adendas
+   **no existe**, lee
+   `.specify/presets/writeonmars/references/sectores/<manifest.sector>.md`
+   —secciones `## Tono por defecto` y `## Persona gramatical y registro`— y refleja
+   ese tono como eco en el campo 5.
+
+El caso 2 cubre dos situaciones reales. Una: `bootstrap --sector` deja las adendas
+por referencia, y el bloque nombra la base en forma corta
+(`references/sectores/<slug>.md`), mientras que la ruta de arriba es la que resuelve
+dentro de un proyecto con el preset instalado. Otra: algunos ejecutores escriben
+`sector` en el manifiesto sin materializar adenda alguna, y entonces el bloque falta
+por completo.
+
+**Nunca sugieras correr `/speckit-constitution` mientras `manifest.sector` tenga
+valor**: la brújula no despacha ese paso con el sector fijado, así que la sugerencia
+dejaría el checkpoint humano 1 en un callejón sin salida. El sector basta para
+resolver el tono. Es el mismo patrón con el que `speckit.review-voice` resuelve su
+registro desde el default del sector cuando el manifiesto no lo declara.

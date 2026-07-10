@@ -51,6 +51,8 @@ pub struct Status {
     #[serde(default)]
     pub mode: Option<String>,
     #[serde(default)]
+    pub track: Option<String>,
+    #[serde(default)]
     pub chapters: Vec<String>,
     pub chapters_written: u32,
     pub chapters_expected: u32,
@@ -219,5 +221,31 @@ mod tests {
         assert!(status.by_chapter["1"].approved);
         assert_eq!(status.next_step, "close");
         assert_eq!(status.mode.as_deref(), Some("estudio"));
+    }
+
+    #[test]
+    fn status_sin_track_deserializa() {
+        // Un `status.py` anterior a la pista corta no emite la clave `track`:
+        // el campo debe caer a `None` (ceremonia estándar) sin romper la lectura.
+        let json = r#"{
+          "spec":"001-demo",
+          "mode":"produccion",
+          "chapters":[],
+          "chapters_written":0,
+          "chapters_expected":1,
+          "passes":[],
+          "criticals_open":0,
+          "open_findings_total":0,
+          "revise_pending":0,
+          "advisory_open_bajo":0,
+          "gates":{"no_open_criticals":true,"human_signatures":true,"guide_complete":false},
+          "closeable":false,
+          "has_manifest":true,
+          "all_chapters_approved":false,
+          "next_step":"research",
+          "next_detail":"falta research"
+        }"#;
+        let status: Status = serde_json::from_str(json).unwrap();
+        assert_eq!(status.track, None);
     }
 }

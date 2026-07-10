@@ -1,6 +1,6 @@
 # Write.OnMars — Roadmap y estado
 
-> Estado al **2026-07-09**. Resumen de lo construido, lo validado de verdad y lo
+> Estado al **2026-07-10**. Resumen de lo construido, lo validado de verdad y lo
 > que queda. Punto de retorno para no perder el hilo entre sesiones.
 
 ## En una frase
@@ -17,6 +17,17 @@ El pipeline de **modo estudio** ya está operativo en el preset: `status.py`
 propone checkpoints humanos de escritura y disposición, `dispose.py` registra
 decisiones auditables, `authorship.py` emite el informe de autoría humana y
 Vivarium espera en `write`/`dispose`/`intro` sin despachar redacción.
+
+La **pista corta editorial** (spec 006, integrada 2026-07-10) también está
+operativa: un proyecto declara `track: corta` en el manifiesto y recorre una
+ceremonia adaptada a pieza única —temario degenerado de una fila, revisión en
+dos relevos (combinada 1·2·3·5 + precisión 4), sin `constitution`, sin `plan` y
+sin `intro`, con export compacto—. Camino feliz: **6 despachos** frente a **11**
+de la ceremonia estándar sobre la misma pieza. El escalado `corta → estandar`
+(`scripts/track.py`) conserva el 100 % del trabajo. Ortogonal al modo. Enmienda
+la constitución a v1.7.0 (§ "Pistas de ceremonia") y el `manifest-schema` a
+v1.4.0. Validación con stubs deterministas (smoke `corta-e2e.sh`); BYOM con
+agentes reales, pendiente.
 
 ## Cómo está montado (capas)
 
@@ -53,8 +64,9 @@ Vivarium espera en `write`/`dispose`/`intro` sin despachar redacción.
     `review-precision` / `review-global` (sueltos, un modelo por pasada) + `revise`
     (aplica los hallazgos al texto y cierra el loop)
   - operación: `status`, `export`, `feedback`, `close`, `memory`
-- **8 scripts deterministas**: `bootstrap`, `status`, `dispose`, `authorship`,
-  `export`, `feedback_intake`, `close`, `index`. `status.py` ahora expone **`--json`** con el campo `next_step`
+- **9 scripts deterministas**: `bootstrap`, `status`, `dispose`, `authorship`,
+  `export`, `feedback_intake`, `close`, `index`, `track` (escalado de pista;
+  desde la spec 006). `status.py` ahora expone **`--json`** con el campo `next_step`
   (`setup` → `constitution` → `specify` → `research` → `plan` → `implement` →
   `review` → `revise` → `close`; en estudio también `write` y `dispose`): la
   **brújula del heartbeat** del orquestador. Tolera la ausencia de `specs/` y
@@ -121,9 +133,10 @@ Y, ya en Paperclip:
 - Comandos editoriales **reemplazan** (`replaces`) a los core → sin ambigüedad.
 - Sin `wom` CLI (lo cubren `status.py` / `close.py`); spec `002-wom-cli` superseded.
 - `speckit-setup` para lo que el preset no puede instalar (constitución, manifest).
-- Constitución **v1.6.1** (Principio V 3+1; Principio VI neutralidad de modelo;
+- Constitución **v1.7.0** (Principio V 3+1; Principio VI neutralidad de modelo;
   desde v1.6.0: modos de proyecto `produccion`/`estudio` y § Ejecutores del
-  método — Vivarium reemplaza a Paperclip como ejecutor orquestado).
+  método — Vivarium reemplaza a Paperclip como ejecutor orquestado; desde v1.7.0:
+  § "Pistas de ceremonia" `estandar`/`corta`, ortogonal al modo).
 
 ## Pendiente (orden sugerido)
 
@@ -152,13 +165,11 @@ Y, ya en Paperclip:
    factualidad (Bookwright); plantillas de fichas narrativas en `roots/` con
    "diálogo de muestra" para el modo estudio con novela (Bookwright).
 
-9. **Pista corta editorial**: spec 006 **en borrador** (2026-07-09,
-   `specs/006-pista-corta-editorial/`) — ceremonia adaptativa a escala para
-   piezas únicas (artículo, post, tutorial breve), adoptada del análisis de
-   BMAD v6 (`docs/comparativa-bmad.md`): `track` en el manifiesto, temario
-   degenerado de una fila, dos relevos de revisión (combinada 1·2·3·5 +
-   precisión 4) y escalado corta→estandar que conserva el trabajo. Camino
-   feliz objetivo: ≤ 8 despachos frente a ~13.
+9. **Pista corta editorial — validación BYOM**: la spec 006 está **integrada**
+   (2026-07-10, `specs/006-pista-corta-editorial/`; ver el resumen de arriba y el
+   CHANGELOG). Falta validarla con agentes reales: hoy el smoke `corta-e2e.sh` la
+   ejerce con stubs deterministas. Va de la mano con la validación BYOM pendiente
+   del modo estudio (punto de arranque común).
 
 ## Bugs de orquestación — primera corrida real (guide-nlp, 2026-06-20)
 
@@ -326,6 +337,39 @@ sin avisos. Confirma SC-001/SC-004 (0 tipos/estados/routines nuevos de Paperclip
 - **`guia-prueba`**: su `findings.md` quedó con numeración mezclada de pruebas
   previas; se limpia al re-correr `review` con el preset corregido.
 - **`install.sh`**: retirado del árbol (2026-07-09; vive en la historia de git). La vía canónica es el preset.
+- **Derivas preexistentes detectadas al implementar la spec 006** (fuera de su
+  alcance; anotadas para no perderlas):
+  - **`plan-template.md` no es byte-idéntico entre copias**: `.specify/templates/`
+    conserva texto fósil ("plantilla de nueve secciones", "brief de nueve campos")
+    que `writeonmars/templates/` ya actualizó.
+  - **`.specify/templates/spec-template.md:16`** cita la constitución **v1.2.0**
+    (referencia de versión fósil).
+  - **`mode` no figura** en la lista de campos garantizados de
+    `executor-contract.md` § 3, aunque `status.py` lo emite desde la 004.
+  - **`speckit.constitution.md` (líneas 40 y 45)** referencia
+    `references/sectores/*.md` en **forma corta**, que no resuelve desde la raíz
+    de un proyecto con el preset instalado
+    (`.specify/presets/writeonmars/references/…`); las pasadas de revisión ya usan
+    la forma larga.
+  - **`vivarium new` fija `sector` sin materializar adendas** (la más seria; viene
+    de la 004). `bootstrap.rs:92-98` escribe `sector` en el manifiesto **después**
+    de correr `bootstrap.py`, sin pasarle `--sector`, y `default_sector_for` lo fija
+    a `tecnologia` por defecto para `--kind guia` en producción. Consecuencia
+    verificada el 2026-07-10: el proyecto queda con `sector` pero **sin adendas y
+    sin `registro`**; como `_next_step` solo mira `manifest.sector`, la brújula deja
+    de pedir `constitution` y la capa 2 de la pirámide de prosa nunca se declara.
+    El flag `--sector` del ejecutor tiene el mismo efecto. Solo
+    `WRITEONMARS_SECTOR=<slug> vivarium new …` materializa las adendas, porque la
+    variable sí llega a `bootstrap.py`. Afectó a la validación BYOM del 2026-07-08.
+    Mitigado en el preset (`speckit.specify` resuelve el tono desde el sector aunque
+    falten las adendas) y documentado en `writeonmars/docs/how-to-pista-corta.md`;
+    **la cura está en el ejecutor**: `run_bootstrap_py` debería pasar `--sector`, o
+    `bootstrap.rs` dejar de escribir el campo por su cuenta. Fuera del alcance de la
+    006, que tiene prohibido tocar el ejecutor más allá de `plan_global` (FR-007).
+- **`mode_history` sin `actor`** (research R8): `track_history` registra el
+  `actor` humano que FR-008 exige, pero `mode_history` (de la 004) solo tiene
+  `{from, to, date}`. Candidata a **retro-modificar** `mode_history` para simetría
+  de auditoría, en otra feature — fuera del alcance de la 006.
 
 ## Cómo retomar (mínimo)
 

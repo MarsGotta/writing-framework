@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
 **Foco actual**: el preset agente-agnóstico `writeonmars/`
 **Preset**: writeonmars/preset.yml · **Contrato del agente**: writeonmars/AGENTS.md
-**Constitution**: .specify/memory/constitution.md (v1.6.1)
+**Constitution**: .specify/memory/constitution.md (v1.7.0)
 
 Write.OnMars se distribuye y ejecuta como un preset de Spec Kit. La lógica vive en
 comandos (`writeonmars/commands/speckit.*`) y las reglas en referencias
@@ -36,16 +36,11 @@ solo habla con el método vía archivos + scripts + comandos. `paperclip/` queda
 `paperclip/FLOW-CONTRACT.md` (§§ 0-2 = contrato agnóstico del ejecutor).
 Scaffolding de una guía nueva en un comando: `tools/new-guide.sh`.
 
-**Feature activa**: **006-pista-corta-editorial** (planificada 2026-07-10).
-Plan: `specs/006-pista-corta-editorial/plan.md` · Decisiones: `research.md`
-(R1-R10) · Contratos: `contracts/{manifest-v1.4.0-delta,track-cli,ceremonia-corta}.md`
-· Validación: `quickstart.md`. Siguiente paso: `/speckit-tasks`.
-La implementación la hará **un agente distinto** del que redactó spec y plan.
-
-Otros próximos pasos (ver ROADMAP.md): validación BYOM del modo estudio con
-agentes reales (pendiente), biblia narrativa en `roots/` + ejes de continuidad
-(candidata a spec 007, ver `docs/inspiracion-bookwright-profundizada.md`),
-interfaz Tauri sobre `vivarium-core`.
+**Feature activa**: ninguna. Próximos pasos (ver ROADMAP.md): validación BYOM
+de la pista corta y del modo estudio con agentes reales (pendiente), biblia
+narrativa en `roots/` + ejes de continuidad (candidata a spec 007, ver
+`docs/inspiracion-bookwright-profundizada.md`), interfaz Tauri sobre
+`vivarium-core`.
 
 Specs (referencia, NO activas):
 - 001-framework-architecture: base del harness editorial (v1.0.0). Vive en `specs/001-framework-architecture/`.
@@ -61,10 +56,14 @@ Specs (referencia, NO activas):
   estudio en el preset (`dispose.py`, `authorship.py`, huellas, checkpoints
   write/dispose). Revisada (8 ángulos, 10 correcciones). Validación BYOM con
   agentes reales aún pendiente.
-- 006-pista-corta-editorial: **planificada** (2026-07-10) — ceremonia adaptativa
-  para piezas únicas (`track: corta`: temario degenerado, pasada combinada
-  1·2·3·5 + precisión, escalado sin tirar trabajo vía `scripts/track.py`).
-  Fundamento: docs/comparativa-bmad.md. spec → clarify → **plan** hechos;
-  pendiente: tasks → implement. Enmienda la constitución a v1.7.0 (§ "Pistas
-  de ceremonia") y el manifest-schema a v1.4.0 (`track`, `track_history`).
+- 006-pista-corta-editorial: **integrada** (2026-07-10) — ceremonia adaptativa
+  para piezas únicas. Campo `track` (`estandar`/`corta`) en el manifiesto +
+  `track_history`; temario degenerado de una fila, pasada combinada 1·2·3·5 +
+  precisión 4, sin `constitution`/`plan`/`intro`, export compacto. Escalado
+  `corta → estandar` sin tirar trabajo vía `scripts/track.py` (identidad humana,
+  atómico). Camino feliz: 6 despachos frente a 11. Ortogonal al modo (005).
+  Enmienda la constitución a v1.7.0 (§ "Pistas de ceremonia") y el
+  `manifest-schema` a v1.4.0. `pass-output-schema` y la lógica de estado de
+  `status.py` intactos. Fundamento: docs/comparativa-bmad.md. Validación BYOM
+  con agentes reales aún pendiente.
 <!-- SPECKIT END -->

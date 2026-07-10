@@ -24,7 +24,7 @@ skills de un proveedor. Se instala con `specify preset add`.
 |---|---|---|
 | Plantillas editoriales | `templates/` | spec/plan/tasks/checklist/constitution + adendas, en modo editorial |
 | Comandos (ciclo + operación) | `commands/` | `speckit.setup/constitution/specify/research/plan/implement/intro/review (+pasadas)/revise` + `status/export/feedback/close/memory` |
-| Scripts deterministas | `scripts/` | bootstrap, export, status, feedback, close, index |
+| Scripts deterministas | `scripts/` | bootstrap, status, dispose, authorship, export, feedback, close, index, track |
 | Referencias neutrales de modelo | `references/` | voz (`voz/`), didáctica (`didactica/`), método (`metodo/`), sectores (`sectores/`) que cualquier agente aplica |
 | Contrato del agente | `AGENTS.md` | reglas para ejecutar el pipeline con cualquier modelo |
 
@@ -97,7 +97,7 @@ así que se llaman `/speckit-setup`, `/speckit-specify`, etc. (no con punto).
 ## Estado
 
 Probado de punta a punta en un proyecto real (`guia-prueba`). **6 plantillas +
-18 comandos + 6 scripts**, neutral de modelo. Instala con `specify preset add
+18 comandos + 9 scripts**, neutral de modelo. Instala con `specify preset add
 --dev ./writeonmars`.
 
 Ciclo editorial: `speckit.setup` → `speckit.constitution` (sector + adendas) →
