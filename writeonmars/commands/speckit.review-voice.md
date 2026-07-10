@@ -65,3 +65,12 @@ PROHIBIDO editar `chapters/` o `README.md`; la única salida es el bloque de
 hallazgos en `findings.md`. PROHIBIDO cambiar `estado` de hallazgos existentes:
 las transiciones son exclusivas de `scripts/dispose.py`.
 
+## Pista corta
+
+Si el manifiesto declara `track: corta` (`.writeonmars-manifest.json`), la
+naturalidad viaja normalmente en la **pasada combinada**
+(`speckit.review-structure`), que registra el bloque `## Pasada 3 — Naturalidad`.
+Este comando queda operativo como **red de reparación** (FR-006): si la combinada
+se quedó a medias y no registró ese bloque, el ejecutor despacha esta pasada suelta
+y rellena el hueco. La combinada es una comodidad, no un punto único de fallo.
+

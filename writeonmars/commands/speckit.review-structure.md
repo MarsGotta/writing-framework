@@ -50,3 +50,36 @@ PROHIBIDO editar `chapters/` o `README.md`; la única salida es el bloque de
 hallazgos en `findings.md`. PROHIBIDO cambiar `estado` de hallazgos existentes:
 las transiciones son exclusivas de `scripts/dispose.py`.
 
+## Pista corta
+
+Si el manifiesto declara `track: corta` (`.writeonmars-manifest.json`), este
+comando **vehicula la pasada combinada**: un único run verifica y registra
+**cuatro bloques** de pasada en `specs/<###-feature>/findings.md`, en lugar de
+dos. Ese run viaja por el despacho de la pasada 1 de siempre; el ejecutor no
+cambia, porque ve el bloque 1 registrado y pasa a la pasada 4.
+
+Los cuatro bloques, cada uno con su `<!-- pass-output-schema: v1.2 -->` y su
+huella, son:
+
+- `## Pasada 1 — Estructura`, `## Pasada 2 — Utilidad` y `## Pasada 3 —
+  Naturalidad`, los tres con `**Capítulos cubiertos**: 1` y huella
+  `<!-- huellas: {"1": "<sha256>"} -->` sobre los bytes actuales de
+  `chapters/01-*.md`.
+- `## Pasada 5 — Formato`, con `**Capítulos cubiertos**: global` y huella
+  `<!-- huellas: {"global": "<sha256>"} -->`, cuyo valor es
+  `sha256(concat(sha256(cap_i)))` en orden ordinal —con un solo capítulo,
+  `sha256(sha256(cap_1))`—.
+
+Cada dimensión se verifica con el criterio de su pasada suelta: la naturalidad
+con la pirámide de prosa de `speckit.review-voice` y el formato con
+`speckit.review-global`. La coherencia entre capítulos de la dimensión 5 es vacua
+en pieza única, porque no hay dos capítulos entre los que contradecirse, así que
+el bloque 5 verifica solo formato. Respeta la `signing_matrix`: una pasada que
+exige firma `human` no se cierra como `autonomous`.
+
+La **dimensión 4 (precisión) no va en la combinada**. Corre en relevo aparte, con
+otro rol y otro modelo (`documentalista`): es la regla dura **voz ≠ precisión**
+del Principio V, que separa reescribir prosa de contrastar datos. El esquema
+pass-output no se toca; este comando ya emitía dos bloques en un run y la
+combinada extiende ese precedente a cuatro dimensiones.
+

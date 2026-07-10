@@ -62,3 +62,20 @@ PROHIBIDO editar `chapters/` o `README.md`; la única salida es el bloque de
 hallazgos en `findings.md`. PROHIBIDO cambiar `estado` de hallazgos existentes:
 las transiciones son exclusivas de `scripts/dispose.py`.
 
+## Pista corta
+
+Si el manifiesto declara `track: corta` (`.writeonmars-manifest.json`), la
+revisión corre en **dos relevos** en lugar de cuatro pasadas:
+
+1. **Pasada combinada** → `speckit.review-structure`, rol `editora_mesa`: un único
+   run verifica y registra las dimensiones 1·2·3·5 (estructura, utilidad,
+   naturalidad y formato).
+2. **Precisión** → `speckit.review-precision`, rol `documentalista` y **otro
+   modelo**: la dimensión 4, que en producción emite además `claims.md`.
+
+Las cinco dimensiones quedan en `findings.md` con los bloques de pasada de
+siempre. **MUST**: la configuración BYOM (`.vivarium/config.toml`) asigna
+`roles.editora_mesa` y `roles.documentalista` a modelos distintos. Un ejecutor que
+los colapse en el mismo modelo viola **voz ≠ precisión** (Principio V), porque
+mezcla reescribir prosa con contrastar datos.
+

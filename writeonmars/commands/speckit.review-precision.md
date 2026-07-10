@@ -91,3 +91,12 @@ hallazgos en `findings.md` y, si procede, `claims.md`. PROHIBIDO cambiar
 Si `roots/` no contiene fichas aplicables, declara
 "no evaluable contra fuentes: roots/ sin fichas aplicables" en notas en vez de
 emitir 0 hallazgos como si la verificación hubiera ocurrido.
+
+## Pista corta
+
+Si el manifiesto declara `track: corta` (`.writeonmars-manifest.json`), esta pasada
+**no cambia**: la precisión es siempre un **relevo aparte**, en pista corta y en
+estándar. La combinada (`speckit.review-structure`) nunca la absorbe, porque la
+dimensión 4 y la naturalidad MUST correr en modelos separados —regla dura
+**voz ≠ precisión** del Principio V—. El ejecutor despacha esta pasada con el rol
+`documentalista` en cuanto ve el bloque de la pasada 1 registrado.

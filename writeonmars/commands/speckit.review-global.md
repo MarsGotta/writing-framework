@@ -44,3 +44,13 @@ PROHIBIDO editar `chapters/` o `README.md`; la única salida es el bloque de
 hallazgos en `findings.md`. PROHIBIDO cambiar `estado` de hallazgos existentes:
 las transiciones son exclusivas de `scripts/dispose.py`.
 
+## Pista corta
+
+Si el manifiesto declara `track: corta` (`.writeonmars-manifest.json`), el formato
+viaja en la **pasada combinada** (`speckit.review-structure`), que registra el
+bloque `## Pasada 5 — Formato` con `**Capítulos cubiertos**: global`. La mitad de
+coherencia entre capítulos es vacua en pieza única —hay un solo capítulo—, así que
+el bloque solo cubre formato. Este comando queda operativo como **red de
+reparación** (FR-006): si la combinada no registró el bloque 5, el ejecutor
+despacha esta pasada suelta y lo escribe.
+
