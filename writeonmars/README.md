@@ -13,6 +13,7 @@ Organizada por lo que necesitas en cada momento (modelo Diátaxis):
 | Resolver una tarea concreta | [docs/how-to.md](docs/how-to.md) |
 | Consultar comandos, flags y esquemas | [docs/referencia.md](docs/referencia.md) |
 | Entender las decisiones de diseño | [docs/arquitectura.md](docs/arquitectura.md) |
+| Ver cómo encaja todo el repositorio | [../docs/como-funciona.md](../docs/como-funciona.md) |
 
 ## Qué empaqueta este preset
 
@@ -52,22 +53,24 @@ por encima para volumen (ver abajo).
 
 ## Capa de orquestación (opcional, por encima)
 
-El preset es agente-agnóstico y se basta solo. Por encima, **opcional**, hay un
-primer corte de la capa de orquestación que vive en la **raíz del repo**
-`writing-framework` (no dentro de este preset):
+El preset es agente-agnóstico y se basta solo. Por encima, **opcional**, vive la capa
+de orquestación en la **raíz del repo** `writing-framework` (no dentro de este preset):
 
-- [`../paperclip/`](../paperclip/) — modelo de orquestación sobre Paperclip: una
-  Company «Write.OnMars» (la casa) y cada guía como un Project (workspace local),
-  con un equipo de 4 roles editoriales por oficio (Editora jefa como orquestador,
-  Documentalista, Redactora, Editora de mesa). El modelo, el flujo, el grafo y los
-  bundles de instrucciones están en [`../paperclip/README.md`](../paperclip/README.md);
-  `../paperclip/hire-team.sh` contrata el equipo por el CLI de Paperclip.
+- [`../vivarium/`](../vivarium/) — **el ejecutor orquestado de referencia** (Rust
+  headless, desde 2026-07-07). Recorre el ciclo solo (`vivarium new|check|run|step` y
+  `vivarium mode set`), lanzando un CLI de agente por rol editorial (redactora, editora
+  de mesa, documentalista) según `.vivarium/config.toml`. Sale con código 10 en cada
+  checkpoint humano. Ver [`../vivarium/README.md`](../vivarium/README.md).
 - [`../tools/new-guide.sh`](../tools/new-guide.sh) — scaffolding de una guía en un
   comando: repo + `specify init` + `preset add` + bootstrap + symlinks de contexto
   + commit de referencia base.
+- [`../paperclip/`](../paperclip/) — **archivado** (2026-07-07). Fue el primer corte de
+  la capa de orquestación, con una Company «Write.OnMars» y un equipo de 4 roles por
+  oficio. Sus §§ 0-2 de `FLOW-CONTRACT.md` sobreviven como el contrato agnóstico del
+  ejecutor que Vivarium implementa.
 
-Ambos son una capa **por encima** del preset, no un sustituto: el preset se instala
-igual (`specify preset add`) lo uses con o sin orquestación.
+Son una capa **por encima** del preset, no un sustituto: el preset se instala igual
+(`specify preset add`) lo uses con o sin orquestación.
 
 ## Instalación
 

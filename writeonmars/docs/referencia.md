@@ -66,6 +66,27 @@ La plantilla de la capa por guía es `templates/adendas-template.md`.
 
 ## Scripts (deterministas, sin agente)
 
+Son nueve, más `findings_lib.py` (librería compartida: parser de `findings.md`,
+manifiesto, temario; no es CLI).
+
+### `bootstrap.py`
+
+Instala lo que el preset no puede: copia el núcleo de la constitución a
+`.specify/memory/` y crea el `.writeonmars-manifest.json`. Se corre una vez, tras
+`specify preset add`. Equivale a `/speckit-setup`.
+
+| Flag | Default | Descripción |
+|---|---|---|
+| `--project-dir` | `.` | Raíz del proyecto. |
+| `--operator`, `--email` | de `git config` | Identidad del operador. |
+| `--mode` | `produccion` | `produccion` o `estudio` (env `WRITEONMARS_MODE`). |
+| `--track` | `estandar` | `estandar` o `corta` (env `WRITEONMARS_TRACK`). |
+| `--sector` | ninguno (`null`) | Slug de sector; fija `registro` y materializa las adendas (env `WRITEONMARS_SECTOR`). |
+| `--force` | off | Regenera constitución y manifiesto existentes (preserva las adendas). |
+
+Sin `--force`, sobre un proyecto ya bootstrapeado **no cambia nada**: `--track` y
+`--sector` solo surten efecto al crear.
+
 ### `export.py`
 
 Genera el PDF. Reutiliza `assets/style.css` (motor de `markdown-to-pdf`).
@@ -82,6 +103,9 @@ Genera el PDF. Reutiliza `assets/style.css` (motor de `markdown-to-pdf`).
 | `--output` | `<slug-título>.pdf` | Ruta del PDF. |
 | `--chrome` | autodetecta (`WOM_CHROME`) | Binario de Chrome/Chromium. |
 | `--keep-temp` | off | Conserva el HTML intermedio. |
+| `--strict-claims` | off | Falla si `claims.md` no cuadra con los capítulos. |
+
+En `track: corta` detecta la pista solo y produce una portada compacta, sin índice.
 
 ### `status.py`
 
@@ -90,7 +114,7 @@ Genera el PDF. Reutiliza `assets/style.css` (motor de `markdown-to-pdf`).
 | `--project-dir` | Raíz del proyecto. |
 | `--spec` | Spec a evaluar. |
 | `--gate` | Exit 1 si el proyecto NO cierra. |
-| `--json` | Emite el estado completo del proyecto en JSON, incluido el campo `next_step` (`setup`→`constitution`→`specify`→`research`→`plan`→`implement`→`review`→`revise`→`close`) que el orquestador (heartbeat de Paperclip) usa para decidir a qué rol delegar. |
+| `--json` | Emite el estado completo del proyecto en JSON, incluido el campo `next_step` (`setup`→`constitution`→`specify`→`research`→`plan`→`implement`→`review`→`revise`→`close`; en estudio, también `write` y `dispose`) que el ejecutor orquestado usa para decidir a qué rol delegar. |
 
 ### `feedback_intake.py`
 
@@ -118,10 +142,56 @@ index.py query "<texto>" [--top 5] [--project-dir .]
 
 Genera/usa `.writeonmars-index.json` (caché reconstruible).
 
+### `dispose.py` (solo en `mode: estudio`)
+
+Registra tu decisión sobre un hallazgo abierto: edita la celda `estado` de `findings.md`
+y añade una línea a `disposiciones.jsonl`. **Exige identidad humana**: la lee de
+`git config` y rechaza las identidades de agente.
+
+```
+dispose.py F-1.1 --aceptar
+dispose.py F-1.2 --rechazar --motivo "no aplica a este género"
+dispose.py F-1.3 --aplazar
+```
+
+| Flag | Descripción |
+|---|---|
+| `--aceptar` / `--rechazar` / `--aplazar` | Exclusivos; uno es obligatorio. |
+| `--motivo` | Obligatorio con `--rechazar` (mín. 3 caracteres). |
+| `--nota` | Anotación libre opcional. |
+| `--project-dir`, `--spec`, `--json` | Proyecto, spec y salida JSON. |
+
+*Aceptar* significa que ya aplicaste tú la corrección. *Aplazar* deja deuda declarada:
+no bloquea el cierre, pero `close.py` la enumera.
+
+### `track.py`
+
+Único camino para cambiar la pista de ceremonia. Escritura atómica del manifiesto más
+una entrada en `track_history`. **Exige identidad humana**; ningún agente cambia `track`.
+
+| Flag | Descripción |
+|---|---|
+| `--escalar` | `corta → estandar`. Siempre legal. No mueve ningún archivo. |
+| `--desescalar` | `estandar → corta`. Solo con temario de ≤1 fila y sin capítulos de ordinal ≥2. |
+| `--check` | Valida el invariante de pieza única. Read-only. |
+| `--project-dir`, `--spec`, `--json` | Proyecto, spec y salida JSON. |
+
+### `authorship.py`
+
+Informe determinista de autoría humana frente a IA, por capítulo: cruza los commits de
+git sobre `chapters/` (identidad del autor y ventanas de despacho de `decisions.jsonl`).
+Emite un veredicto por capítulo (`humana`, `ia`, `mixta`) y uno global.
+
+| Flag | Default | Descripción |
+|---|---|---|
+| `--project-dir` | `.` | Raíz del proyecto. |
+| `--out` | `specs/<spec>/authorship-report.md` | Ruta del informe. |
+| `--json` | off | Salida JSON. |
+
 ## Herramientas de scaffolding y orquestación
 
-Viven en la raíz del repo del framework (fuera del preset). Levantan una guía nueva
-y contratan el equipo ejecutor en Paperclip.
+Viven en la raíz del repo del framework (fuera del preset). Levantan un proyecto
+editorial nuevo y lo recorren desatendido.
 
 ### `tools/new-guide.sh`
 
@@ -138,22 +208,44 @@ base ref. El destino está siempre fuera del repo del framework.
 | `--operator` | de `git config` | Id del operador. |
 | `--email` | de `git config` | Email del operador. |
 
-### `paperclip/hire-team.sh`
+La **pista** y el **sector** se declaran por entorno, porque el script no tiene flags
+propios para ellos y `bootstrap.py` los toma como valores por defecto:
+`WRITEONMARS_TRACK=corta WRITEONMARS_SECTOR=tecnologia bash tools/new-guide.sh <dir>`.
+Solo surten efecto **al crear**: sobre un proyecto ya bootstrapeado no cambian nada
+(para eso está `track.py`).
 
-Contrata el equipo ejecutor (Documentalista, Redactora, Editora de mesa) en la Company
-de Paperclip vía su CLI. Idempotente; modelos cruzados (Redactora = Opus, revisoras =
-Sonnet).
+### `vivarium` (ejecutor orquestado)
 
-| Flag | Default | Descripción |
-|---|---|---|
-| `--no-headless` | off | Crea los agentes sin `dangerouslySkipPermissions`. |
-| `--company` | `Write.OnMars` | Nombre de la Company. |
+Binario headless en Rust (`vivarium/`). Recorre el ciclo solo, despachando cada paso al
+CLI de agente que declare `.vivarium/config.toml`. Lee el estado con `status.py --json`;
+nunca lo calcula por su cuenta.
 
-### Capa `paperclip/`
+| Comando | Descripción |
+|---|---|
+| `vivarium new <dir> --kind <kind>` | Crea el proyecto: git, `specify init`, preset, bootstrap y commit base. |
+| `vivarium check` | Valida manifiesto, config BYOM y binarios de cada rol. No ejecuta nada. |
+| `vivarium status` | Estado combinado (el de `status.py` + modo + despachos en vuelo). Read-only. |
+| `vivarium step` | Ejecuta un solo paso. |
+| `vivarium run` | Avanza hasta bloqueo o cierre. |
+| `vivarium mode set <modo> --yes` | Cambia `produccion`/`estudio` con registro en el manifiesto. |
 
-Modelo de orquestación sobre Paperclip: una Company **Write.OnMars** (la casa), cada
-guía es un **Project** (workspace local) y un roster de 4 roles editoriales con bundles
-de instrucciones en `paperclip/agents/<rol>/`. Detalle en `paperclip/README.md`.
+Códigos de salida: `0` progreso o cierre · `10` checkpoint humano · `11` guardarraíl de
+modo estudio · `12` despacho fallido · `6` lock tomado · `2` uso inválido · `3` falta un
+binario · `4` falta `--yes` · `5` validación.
+
+Roles del BYOM y sus pasos: `redactora` (`plan`, `implement`, `revise`, `intro`),
+`editora_mesa` (pasadas 1, 2, 3 y 5), `documentalista` (`constitution`, `research`,
+pasada 4) y `sidecar` (`setup`, `export`, `close`: scripts, sin modelo).
+
+> `vivarium new --sector` escribe el sector *después* del bootstrap y deja el proyecto sin
+> adendas ni registro. Usa `WRITEONMARS_SECTOR`. Deuda anotada en el ROADMAP.
+
+### Capa `paperclip/` (archivada)
+
+Fue el primer ejecutor orquestado: una Company **Write.OnMars** con un roster de 4 roles
+editoriales. **Archivada el 2026-07-07**; `hire-team.sh` y los bundles de
+`paperclip/agents/` ya no se usan. Sus §§ 0-2 de `paperclip/FLOW-CONTRACT.md` sobreviven
+como el contrato agnóstico del ejecutor que Vivarium implementa.
 
 ## Etiquetas de feedback (en los comentarios del PDF)
 

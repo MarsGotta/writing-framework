@@ -20,6 +20,10 @@ la raíz del repo; se eliminaron).
 La documentación de uso del preset vive en `writeonmars/docs/` (tutorial,
 how-to, referencia, arquitectura). Aquí queda solo lo transversal al repo:
 
+- `como-funciona.md`: **plano del repositorio y de los flujos.** Cómo encajan el
+  preset, los scripts y el ejecutor; la brújula (`status.py`), los gates, los tres
+  flujos (estándar, pista corta, modo estudio) y la frontera dura con Vivarium.
+  Empieza aquí si vienes a mantener o extender el framework.
 - `compatibility-matrix.md`: agentes y MCPs soportados.
 - `contributing.md`: cómo contribuir.
 - `memory-external.md` y `parallel-execution.md`: notas técnicas.

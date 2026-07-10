@@ -94,5 +94,5 @@ dos relevos.
 2. **PDF anotado**: el humano anota; `feedback_intake.py` traduce; el agente
    aplica solo lo señalado.
 
-Todo lo demás corre desatendido (apto para orquestación tipo Paperclip lanzando
-estos comandos con el modelo que sea).
+Todo lo demás corre desatendido (apto para un ejecutor orquestado como Vivarium,
+que lanza estos comandos con el modelo que sea).

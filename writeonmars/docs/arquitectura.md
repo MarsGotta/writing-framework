@@ -1,80 +1,71 @@
 # Arquitectura y decisiones
 
 Por qué el preset está montado así. Esto no enseña a usarlo (para eso está el
-[tutorial](tutorial-primera-guia.md)); explica las decisiones para quien lo
-mantiene o lo extiende.
+[tutorial](tutorial-primera-guia.md)) ni describe el repositorio pieza a pieza (para
+eso, [cómo funciona por dentro](../../docs/como-funciona.md)): explica las
+**decisiones** para quien lo mantiene o lo extiende.
 
 ## Un método, dos ejecutores
 
 El método editorial es uno solo: el ciclo Spec Kit en modo editorial más las
-skills de voz y método. Se ejecuta de dos formas, con el mismo código debajo:
+referencias de voz y método. Se ejecuta de dos formas, con el mismo código debajo:
 
-- **Directo**: tú con Claude Code y los comandos `speckit.*`. Para guías donde
+- **Directo**: tú con un agente y los comandos `speckit.*`. Para piezas donde
   quieres mimar la voz.
-- **Orquestado**: Paperclip lanza Claude Code como proceso hijo en heartbeats.
-  Para producir varias guías sin estar delante.
+- **Orquestado**: **Vivarium** (`vivarium/`, Rust headless) recorre el ciclo solo,
+  lanzando un CLI de agente por rol. Para producir sin estar delante.
 
-No hay dos pipelines que mantener: Paperclip envuelve el mismo método. Por eso los
+No hay dos pipelines que mantener: el ejecutor envuelve el mismo método. Por eso los
 scripts son deterministas y no asumen un agente delante.
 
 ## La capa de orquestación: el equipo y el reparto
 
-El ejecutor orquestado dejó de ser abstracto. La capa concreta (en `paperclip/`)
-monta una **casa editorial** con equipo permanente, no un montaje desechable por
-guía. Dos decisiones la sostienen.
+El ejecutor orquestado de referencia es **Vivarium** desde el 2026-07-07. Paperclip
+fue el primer corte y queda **archivado** en `paperclip/`; sus §§ 0-2 de
+`FLOW-CONTRACT.md` sobrevivieron como el contrato agnóstico del ejecutor, que es
+justo lo que Vivarium implementa.
 
-La primera es de unidad. Hay **una sola Company de Paperclip, "Write.OnMars"** —el
-equipo permanente, contratado una vez—, y **cada guía es un Project** dentro de la
-casa con su propio goal, su workspace y su tablero. Así el equipo acumula la voz y
-el método entre guías en lugar de re-instanciarse cada vez, y producir en volumen es
-abrir varios Projects en paralelo bajo la misma casa. El workspace de una guía es el
-repo **local** (Paperclip acepta `sourceType=local_path`): no hace falta GitHub para
-arrancar, basta el repo en disco.
+La decisión que sostiene la capa es de **reparto**: el equipo son cuatro roles
+agrupados **por oficio**, no una tarea por paso. Agrupar por oficio da menos relevos y
+un contexto coherente por rol. Y ese reparto es justo el que preserva las reglas duras
+del método —escribe uno, revisa otro (`writer ≠ reviewer`); voz separada de precisión;
+detector distinto de corrector—, a nivel de roles y modelos cruzados en vez de a nivel
+de pasada:
 
-La segunda es de reparto. El equipo son cuatro roles agrupados **por oficio**, no
-una tarea-por-paso. Agrupar por oficio da menos relevos y un contexto coherente por
-rol: quien investiga es quien verifica, quien escribe es quien corrige. Y ese reparto
-es justo el que preserva las reglas duras del método —escribe uno, revisa otro
-(`writer ≠ reviewer`); voz separada de precisión; detector distinto de corrector—,
-ahora a nivel de roles y modelos cruzados en vez de a nivel de pasada:
+- **Documentalista**: `constitution`, `research` y la pasada 4 (precisión). Corre en
+  otro proveedor (p. ej. Codex) para reforzar la independencia frente a quien escribe.
+- **Redactora**: `plan`, `implement`, `revise` e `intro`.
+- **Editora de mesa**: pasadas 1, 2, 3 y 5, con un modelo **distinto** al de la
+  Redactora.
+- **Sidecar**: `setup`, `export` y `close` — los scripts de Python, sin modelo.
 
-- **Editora jefa** = el orquestador (el "CEO" de Paperclip). Posee `constitution`,
-  `specify`, `plan`, `intro`, los gates y `close`. **No escribe prosa**: hasta el
-  temario decide el siguiente paso y delega; con el temario listo hace **un único
-  fan-out** (1 tarea padre = el libro + 1 hija por capítulo) y luego solo vuelve a
-  actuar para las etapas globales, cuando la última hija `done` la despierta. Su
-  heartbeat es event-driven —despierta cuando se le asigna o reasigna una tarea, no
-  por reloj.
-- **Documentalista**: `research` (las `resources/` locales más web rigurosa de alta
-  veracidad) y la pasada 4 (precisión). Puede correr en otro proveedor (p. ej. Codex)
-  para reforzar la independencia frente a quien escribe.
-- **Redactora**: `implement` (capítulos, en paralelo) y `revise`.
-- **Editora de mesa**: pasadas 1/2/3/5, con un modelo **distinto** al de la Redactora.
+Ese mapeo de paso a rol vive cableado en el runner (`vivarium-core/src/runner.rs`), y
+los binarios concretos los declara el proyecto en `.vivarium/config.toml` (BYOM: un
+CLI por rol). Que la Redactora y la Editora de mesa apunten a modelos distintos no es
+una preferencia de estilo; es lo que hace estructural el `writer ≠ reviewer`.
 
-El reparto no es una tarea-por-paso ni una tarea-por-pasada (ese modelo perdía el
-hilo del capítulo entre relevos). Es **una tarea por capítulo que se mueve por
-estados**: la hija arranca `in_progress` con la Redactora, pasa a `in_review` con la
-Editora de mesa (pasadas 1·2·3), luego `in_review` con la Documentalista (pasada 4,
-que **decide**), y de ahí vuelve `in_progress` a la Redactora si hay accionables
-(revise) o cierra en `done` si no los hay. El ciclo es **peer-to-peer** entre los
-tres roles —cada relevo es un cambio de estado+asignado de la misma tarea—; la jefa
-no participa hasta que todos los capítulos quedan aprobados. Política de severidad:
-**crítico+medio fuerzan revise; bajo es aviso** y no bloquea.
+La pieza que hace todo esto barato es `status.py --json`. El ejecutor **no razona sobre
+prosa**: sigue `next_step`, calculado desde el estado en disco (el manifest, `chapters/`
+contra el temario, `findings.md`). El estado por capítulo lo expone `by_chapter`
+(`drafted`, `passes_done`, `revise_pending`, `approved`) —que también deja el ciclo
+seguible por un solo agente sin ejecutor—, y `all_chapters_approved` es la señal de que
+tocan las etapas globales. Es la **brújula del flujo**: una máquina de estados sin
+memoria, que delega y vuelve a leer del disco en vez de acumular en su contexto el
+ruido de la redacción.
 
-La pieza que hace todo esto barato es `status.py --json`. La Editora jefa no razona
-sobre prosa: hasta el fan-out sigue `next_step` (`setup` → `constitution` →
-`specify` → `research` → `plan`), calculado desde el estado en disco (el manifest,
-`chapters/` contra el temario, `findings.md`). A partir del fan-out, el estado por
-capítulo lo expone `by_chapter` (`drafted`, `passes_done`, `revise_pending`,
-`approved`) —que también deja el ciclo seguible por un solo agente sin Paperclip—, y
-`all_chapters_approved` es la señal que despierta a la jefa para las globales. Es la
-**brújula del flujo**: una máquina de estados sin memoria, que delega y vuelve a leer
-del disco en vez de acumular en su contexto el ruido de la redacción.
+Política de severidad: **crítico y medio desvían la brújula a `revise`; bajo es aviso**.
+Solo el crítico baja `closeable` en producción (ver «Gates de cierre» en la referencia).
 
-El detalle operativo —el modelo Company/Project completo, el flujo en actos, el grafo
-de tareas y el mapeo con Paperclip— vive en `paperclip/README.md`, y la spec del
-flujo por capítulo (mapeo exacto a la API de Paperclip) en
-`paperclip/FLOW-CONTRACT.md`.
+### La frontera dura
+
+Vivarium habla con el método **solo por archivos, scripts y comandos**. Nunca computa
+estado editorial propio: cuando quiere saber qué toca, ejecuta `status.py --json`. El
+reparto exacto es que **la verdad de estado la produce el método** y **el cómo
+despachar cada paso lo conoce el ejecutor**. Mientras esa frontera aguante, sacar
+`vivarium/` a su propio repositorio es mover carpetas, no refactorizar.
+
+El detalle del ejecutor está en `vivarium/README.md` y en
+[`docs/como-funciona.md`](../../docs/como-funciona.md).
 
 ## Agente-agnóstico: la lógica en comandos, no en skills
 
@@ -172,6 +163,63 @@ corrección queda cerrado y auditable.
 Detectas el fallo temprano y barato, los capítulos se paralelizan, y la coherencia
 del conjunto se revisa una vez al cierre.
 
+## Dos ejes ortogonales: el modo y la pista
+
+El manifiesto declara dos campos que gobiernan cosas distintas y **no se estorban**:
+
+- **`mode`** (`produccion` | `estudio`) responde a *quién escribe la prosa*.
+- **`track`** (`estandar` | `corta`) responde a *cuánto rito paga la pieza*.
+
+Mantenerlos ortogonales fue deliberado: las cuatro combinaciones son legales y ninguna
+necesita código especial. Un artículo escrito a mano es `corta` + `estudio`; un libro
+redactado por la IA es `estandar` + `produccion`.
+
+### El modo: quién escribe (constitución v1.6.0)
+
+En `estudio`, la prosa del manuscrito la escribe la persona y la IA no la toca. La
+decisión de diseño interesante es **dónde se pone el freno**. No basta con pedirle al
+agente que no escriba: el pipeline convierte los pasos de redacción en checkpoints
+(`implement` → `write`, `revise` → `dispose`), y el ejecutor añade un guardarraíl que
+rechaza cualquier despacho que escriba manuscrito estando en estudio.
+
+Dos consecuencias que valen la pena:
+
+- **Las huellas.** Cada bloque de pasada registra el sha256 del capítulo que revisó. Si
+  el capítulo cambia después, la pasada se invalida sola y el capítulo se reabre. Una
+  revisión de un texto que ya no existe no vale nada.
+- **La disposición es humana.** Las transiciones de estado de un hallazgo son exclusivas
+  de `dispose.py`, que exige identidad humana desde `git config` y rechaza las de agente.
+  En estudio, aceptar un hallazgo significa «ya lo he corregido yo».
+
+`authorship.py` cierra el círculo: cruza los commits de git sobre `chapters/` con las
+ventanas de despacho de `decisions.jsonl` y emite un veredicto de procedencia por
+capítulo. La afirmación «lo escribí yo» deja de ser una promesa y pasa a ser evidencia.
+
+### La pista: cuánto rito (constitución v1.7.0)
+
+En `corta`, una pieza única cuesta **6 despachos** en vez de 11. La decisión de diseño
+que más nos gusta es que **`status.py` no sabe nada de la pista**: no hay ni una rama por
+`track` en la máquina de estados. Los pasos desaparecen *por construcción*.
+
+- `plan` no se pide porque al firmar el brief ya se escribió un temario de una fila:
+  `chapters_expected == 1`, y la guarda del temario vacío nunca dispara.
+- `constitution` no se pide porque `bootstrap --sector` dejó el sector fijado, y la guarda
+  mira si el sector es nulo.
+- `intro` se auto-anula en el propio comando: una pieza única no tiene presentación.
+- Las pasadas 3 y 5 no se despachan sueltas porque las registra la **pasada combinada**,
+  que viaja en el despacho de la pasada 1 y emite los cuatro bloques `pass-output` de
+  siempre. El esquema no cambia.
+
+La precisión (dimensión 4) **nunca** se absorbe en la combinada: sigue en relevo aparte,
+con otro rol y otro modelo. Es la regla dura «voz ≠ precisión» sobreviviendo a la
+compresión de la ceremonia. Cuando algo se recorta, lo que se conserva revela qué es
+esencial.
+
+Escalar `corta → estandar` no mueve un solo archivo: la pieza ya es el capítulo 1 del
+temario ampliado, y los hallazgos y las claims conservan sus bloques. Por eso el consejo
+operativo es empezar en corta ante la duda. `track.py` es el único camino, y exige
+identidad humana: **ningún agente cambia la pista**.
+
 ## Por qué el PDF es el motor de markdown-to-pdf
 
 Ya tenías una skill `markdown-to-pdf` (pandoc + Chrome headless, estilo editorial
@@ -206,6 +254,12 @@ Esto también sustituye al `wom` CLI que estuvo planificado: `status.py` cubre
 `wom status` y el gate de `wom close`; `close.py` añade el export. No hace falta una
 CLI aparte.
 
+Hay una excepción a «determinista = sin criterio»: `dispose.py` y `track.py` son
+scripts, pero **exigen identidad humana**. Leen `git config` y rechazan las identidades
+de agente. No están automatizando una decisión: están registrando la tuya, con
+escritura atómica y un historial append-only. Un script es aquí la forma de garantizar
+que nadie más la tome.
+
 ## El re-despacho quirúrgico
 
 `feedback_intake.py` ata cada anotación a la frase resaltada y busca esa frase en
@@ -216,7 +270,7 @@ anclado, no por número de página, que es frágil.
 ## Fuentes del diseño
 
 Diátaxis (estructura de esta documentación y de las guías), la constitución del
-framework (`.specify/memory/constitution.md`, v1.3.0), el contrato pass-output v1.0
-y el manifest v1.0, y el patrón del preset de ficción de la comunidad
+framework (`.specify/memory/constitution.md`, **v1.7.0**), el contrato pass-output
+**v1.2** y el manifest **v1.4.0**, y el patrón del preset de ficción de la comunidad
 (`speckit-preset-fiction-book-writing`) para el empaquetado y los comandos
 neutrales de género.

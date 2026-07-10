@@ -54,13 +54,13 @@ Recorrido paso a paso: [`writeonmars/docs/tutorial-primera-guia.md`](writeonmars
 
 - **Preset `writeonmars`**: v0.1.0, agente-agnóstico, probado de punta a punta
   (incluida una corrida BYOM real con dos agentes cruzados, 2026-07-08).
-  6 plantillas + 18 comandos + 8 scripts.
+  6 plantillas + 18 comandos + 9 scripts.
 - **Framework**: v1.0.0 etiquetada (2026-05-06); el refactor a preset sigue en
   `main` como Unreleased.
-- **Constitución**: v1.6.1 (modos de proyecto `produccion`/`estudio` con cambio
-  explícito y consecuencias de procedencia; § Ejecutores del método — Vivarium
-  como ejecutor orquestado de referencia, Paperclip archivado).
-- **Contrato de citación**: v1.0 · **Manifest**: v1.0.
+- **Constitución**: v1.7.0 (§ «Pistas de ceremonia» `estandar`/`corta`, ortogonal
+  al modo; desde v1.6.0: modos de proyecto `produccion`/`estudio` y § Ejecutores
+  del método — Vivarium como ejecutor orquestado de referencia, Paperclip archivado).
+- **Contrato de citación**: v1.0 · **Manifest**: v1.4.0 · **pass-output**: v1.2.
 
 > La vía legacy `install.sh` se retiró del árbol (2026-07-09; vive en la
 > historia de git). La distribución canónica es el preset.
@@ -70,6 +70,7 @@ Recorrido paso a paso: [`writeonmars/docs/tutorial-primera-guia.md`](writeonmars
 ## Enlaces principales
 
 - **Estado y roadmap**: [`ROADMAP.md`](ROADMAP.md) — empieza aquí para retomar.
+- **Cómo está construido todo**: [`docs/como-funciona.md`](docs/como-funciona.md) — el plano del repo y de los flujos.
 - Preset (unidad instalable): [`writeonmars/`](writeonmars/) · [README](writeonmars/README.md) · [AGENTS.md](writeonmars/AGENTS.md)
 - **Documentación de uso (canónica)**: [`writeonmars/docs/`](writeonmars/docs/) — tutorial, how-to, referencia, arquitectura
 - Constitución: [`writeonmars/memory/constitution.md`](writeonmars/memory/constitution.md) (núcleo) — las adendas por guía las fija `/speckit-constitution`

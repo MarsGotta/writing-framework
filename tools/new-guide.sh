@@ -247,10 +247,9 @@ cat <<EOF
 [new-guide] base ref listo en $target_abs
 Agentes compatibles: $agents (contexto unificado vía AGENTS.md + symlinks)
 Siguiente:
-  1. (opcional) crea un remoto y empuja:   git remote add origin <url> && git push -u origin main
-  2. En Paperclip: nuevo Project → conecta este repo (base ref: main)
-     · provisioning sugerido:  pip install pymupdf rank-bm25
-     · goal del Project: el tema/brief de la guía
-  3. La Editora jefa arranca en 'speckit.constitution' (adendas: sector + tono).
-  4. (opcional) slash-commands nativos en otro agente:  specify init --here --integration <agente>
+  1. Arranca el ciclo con tu agente:  /speckit-constitution  (adendas: sector + tono)
+     · en pista corta ese paso ya está hecho: sigue en  /speckit-specify
+  2. (opcional) dependencias de export y feedback:  pip install pymupdf rank-bm25
+  3. (opcional) para correrlo desatendido, configura .vivarium/config.toml y usa 'vivarium run'
+  4. (opcional) crea un remoto y empuja:  git remote add origin <url> && git push -u origin main
 EOF

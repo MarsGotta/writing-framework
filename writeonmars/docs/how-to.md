@@ -35,7 +35,7 @@ En un comando, el script: crea la carpeta y hace `git init`; corre `specify init
 `bootstrap.py` (= `speckit.setup`: constitución núcleo + manifest); cablea el contexto
 multi-agente (un `AGENTS.md` canónico, con `CLAUDE.md` y `GEMINI.md` como symlinks; las
 carpetas de comandos **no** se symlinkean porque los formatos difieren —Claude usa `.md`,
-Gemini `.toml`); y hace el commit inicial, que es el **base ref** que Paperclip conecta.
+Gemini `.toml`); y hace el commit inicial, que queda como **base ref** del proyecto.
 El operador y el email se heredan de tu `git config`.
 
 Es idempotente: puedes repetirlo sin romper nada. Flags útiles:
@@ -108,8 +108,8 @@ encaje (ejemplo sobre el capítulo 3):
 ```
 
 Como el estado vive en archivos, el modelo revisor lee el capítulo y escribe su
-bloque en `findings.md` sin depender del que lo escribió. En orquestación (Paperclip),
-manda la redacción a un modelo y cada pasada a otro.
+bloque en `findings.md` sin depender del que lo escribió. En orquestación (Vivarium),
+cada rol declara su propio CLI, así que la redacción va a un modelo y las pasadas a otro.
 
 ## Cómo correr la review completa en otro agente (Codex/Gemini)
 
@@ -166,7 +166,7 @@ python3 writeonmars/scripts/export.py \
 Sin flags, el título sale del brief y el nombre del archivo del título. El índice
 sale siempre del temario de `plan.md`.
 
-## Cómo exportar en Linux o en Paperclip (sin Chrome de macOS)
+## Cómo exportar en Linux (sin Chrome de macOS)
 
 Indica el binario de Chromium:
 
@@ -198,8 +198,8 @@ Evalúa los gates y, si pasa, genera el PDF. Para solo comprobar sin exportar:
 python3 writeonmars/scripts/close.py --no-export
 ```
 
-Sale con código 1 si el proyecto está bloqueado (útil en CI o en un check de
-Paperclip).
+Sale con código 1 si el proyecto está bloqueado (útil en CI o en un check previo al
+cierre).
 
 ## Cómo aplicar el feedback de un PDF anotado
 
@@ -231,95 +231,100 @@ python3 writeonmars/scripts/index.py query "context window" --top 5
 Útil antes de redactar (¿este término ya se definió?) o en la pasada de precisión
 (¿este dato ya tiene cita?). Reconstruye el índice tras cambios grandes.
 
-## Cómo correr todo desatendido bajo Paperclip
+## Cómo correr todo desatendido con Vivarium
 
-La capa `paperclip/` envuelve el método en una **Company de Paperclip**: una casa
-editorial "Write.OnMars" (una sola, no una por guía) con un equipo de cuatro roles y
-un tablero de tareas. Cada guía es un **Project** con workspace **local**
-(`sourceType=local_path`: no necesita GitHub). El modelo de flujo es **una tarea por
-capítulo que se mueve por estados** (no una tarea por paso). La especificación
-detallada está en `paperclip/FLOW-CONTRACT.md`; el panorama, en `paperclip/README.md`.
+**Vivarium** (`vivarium/`) es el ejecutor orquestado de referencia: un binario headless
+en Rust que recorre el ciclo solo, lanzando un CLI de agente por rol editorial. No
+sustituye al método, lo conduce: cuando quiere saber qué toca, ejecuta `status.py --json`.
 
-**1. Crea la guía (base ref).** Es el scaffold del Project: lo prepara
-`tools/new-guide.sh` (ver arriba), que deja el repo con el preset, la constitución
-núcleo y el commit inicial. Pon los materiales fuente en `<guía>/resources/` (uno por
-clase, numerados `01-`, `02-`…).
-
-**2. Monta o sincroniza el equipo.** Paperclip se opera por su CLI `paperclipai`. La
-Company y la Editora jefa (orquestadora) se crean una vez (asistente de onboarding);
-los tres ejecutores se contratan —y sus bundles se (re)cargan— con:
+**1. Crea el proyecto.** Con el ejecutor, en un solo comando:
 
 ```bash
-bash paperclip/hire-team.sh                # idempotente; modelos cruzados
-bash paperclip/hire-team.sh --no-headless  # modo seguro (sin saltar permisos)
+vivarium new ~/Projects/mi-guia --kind guia --preset ~/Projects/writing-framework/writeonmars
 ```
 
-Contrata a la **Documentalista** (research + pasada 4 de precisión + **decisión** del
-ciclo; puede correr en Codex), la **Redactora** (escribe y aplica revise) y la
-**Editora de mesa** (pasadas 1·2·3 + pasada 5, con un modelo **distinto** al de la
-Redactora). El equipo es **permanente**: persiste entre guías. Cada rol lleva su
-bundle en `paperclip/agents/<rol>/`. **Si actualizas el método**, recarga los bundles:
-`hire-team.sh` recarga los tres ejecutores; la **Editora jefa** se recarga aparte
-(`paperclipai agent instructions-file:put <jefa> --path HEARTBEAT.md --content-file
-paperclip/agents/editora-jefa/HEARTBEAT.md`, ídem `AGENTS.md`). La jefa lleva
-`maxConcurrentRuns:1` (evita el doble despacho).
-
-**3. Conecta el Project.** Crea el Project de la guía y conéctale el repo como
-workspace local; fija el goal.
-
-**4. Arranca: fan-out único.** Crea la **tarea padre** (el libro) asignada a la
-Editora jefa: eso la despierta sobre el Project. Ella avanza los pasos que son suyos
-—`constitution` → `specify` (**checkpoint 1**) → `research` → `plan`— y, con plan +
-research OK, hace el **fan-out ÚNICO**: **1 tarea padre + 1 hija por capítulo**
-(`in_progress`, asignadas a la Redactora). No crea una tarea por estado ni por pasada.
-
-**5. El ciclo por capítulo (peer-to-peer, sin la jefa).** Cada hija es el capítulo
-entero moviéndose por estados; los workers se la pasan entre ellos:
-
-```text
-Redactora (in_progress: escribe / aplica revise)
-  → in_review + Editora de mesa   (pasadas 1·2·3: estructura, utilidad, voz)
-    → in_review + Documentalista   (pasada 4: precisión) → DECIDE:
-        ≥1 accionable (crítico+medio) → in_progress + Redactora (revise)  ⟲
-        0 accionables                 → done  (capítulo APROBADO)
-```
-
-El relevo es cambiar `status` + `assigneeAgentId` (reasignar despierta al siguiente);
-el comentario de la tarea es un **puntero** a `findings.md` (la fuente de verdad), no
-una copia. Severidad: **crítico+medio fuerzan revise; bajo = aviso**. El estado real
-vive en disco: `python3 .../status.py --project-dir . --json` expone `by_chapter`
-(por capítulo: `drafted`, `passes_done`, `revise_pending`, `approved`) y
-`all_chapters_approved`.
-
-**6. Etapas globales.** Cuando **todas** las hijas están `done`
-(`all_chapters_approved`), el que cierra la última despierta a la jefa (`agent wake`),
-que avanza: **pasada 5 global** (Mesa) → **export PDF** (`speckit.intro` + `export.py`)
-→ **checkpoint 2** (PDF anotado: el único revisor humano, una `approval` de board) →
-feedback → `close.py`.
-
-Los **dos checkpoints humanos** no cambian: **checkpoint 1** = firmas el brief
-(`specify`); **checkpoint 2** = anotas el PDF (`feedback_intake.py` lo traduce y la
-Redactora aplica el re-despacho quirúrgico).
-
-Todo es **event-driven**: los agentes se crean con `heartbeat.enabled:false` +
-`wakeOnDemand:true` (sin polling ciego; ningún heartbeat por timer). No se usan
-*routines* (no tienen trigger por evento) ni los campos "Reviewers/Approvers" del
-issue (son del board humano; reservados al checkpoint del PDF).
-
-## Cómo autenticar un agente Codex con tu suscripción
-
-Si pones a la Documentalista (u otro rol) a correr en Codex con tu suscripción de
-ChatGPT, ten en cuenta que Paperclip **aísla el `CODEX_HOME` por agente**: ese Codex
-no ve tu `~/.codex/` y arranca sin sesión. Siémbralo enlazando tus credenciales al
-`CODEX_HOME` aislado del agente:
+Para una **pieza única**, declara la pista y el sector con variables de entorno
+(no con el flag `--sector` del ejecutor; ver el aviso más abajo):
 
 ```bash
-ln -s ~/.codex/auth.json   "$CODEX_HOME/auth.json"
-ln -s ~/.codex/config.toml "$CODEX_HOME/config.toml"
+WRITEONMARS_TRACK=corta WRITEONMARS_SECTOR=tecnologia \
+  vivarium new ~/Projects/mi-articulo --kind guia --preset ~/Projects/writing-framework/writeonmars
 ```
 
-(`$CODEX_HOME` es la ruta que Paperclip asigna a ese agente.) Con el symlink, el Codex
-del agente hereda tu suscripción sin copiar el secreto.
+Pon los materiales fuente en `<proyecto>/resources/` (uno por clase, numerados `01-`, `02-`…).
+
+**2. Declara tus modelos (BYOM).** En `.vivarium/config.toml`, un CLI por rol. Vivarium
+lanza esos binarios como subprocesos, **heredando tu entorno**: si ya tienes sesión
+iniciada en `claude` o en `codex`, funcionan sin configurar credenciales.
+
+```toml
+version = 1
+[roles.redactora]                                  # plan, implement, revise, intro
+command = ["claude", "-p", "--permission-mode", "acceptEdits"]
+stdin = "prompt_file"
+[roles.editora_mesa]                               # pasadas 1, 2, 3 y 5
+command = ["codex", "exec", "--cd", "{project_dir}", "--sandbox", "workspace-write", "-"]
+stdin = "prompt_file"
+[roles.documentalista]                             # constitution, research, pasada 4
+command = ["codex", "exec", "--cd", "{project_dir}", "--sandbox", "workspace-write", "-"]
+stdin = "prompt_file"
+```
+
+Que la **redactora** y la **editora de mesa** apunten a modelos distintos no es una
+preferencia: es lo que hace estructural el `writer ≠ reviewer`. Y la **documentalista**
+(precisión) debe ser distinta de la editora de mesa, por la regla `voz ≠ precisión`.
+
+Los `setup`, `export` y `close` no llevan rol: son scripts de Python (*sidecar*), sin modelo.
+
+**3. Valida antes de gastar tokens.**
+
+```bash
+vivarium check      # manifiesto, config BYOM y binarios de cada rol; no ejecuta nada
+```
+
+**4. Corre el ciclo.**
+
+```bash
+vivarium run        # avanza hasta que necesita a un humano
+```
+
+Lee el **código de salida**, que es la interfaz:
+
+| Código | Qué significa | Qué haces |
+|---|---|---|
+| `0` | Progresó, o el proyecto quedó cerrado | Nada, o vuelve a lanzarlo |
+| `10` | **Checkpoint humano** | Firma el brief, escribe el capítulo o anota el PDF, y relanza |
+| `11` | Guardarraíl de modo estudio | Revisa por qué se intentó despachar prosa de manuscrito |
+| `12` | Un despacho falló | Mira `decisions.jsonl`; el disco quedó intacto, es seguro reintentar |
+| `6` | Otro runner tiene el lock | Espera a que termine |
+
+`vivarium step` hace un solo paso, útil para depurar. `vivarium status` imprime el estado
+combinado (el de `status.py`, más el modo y los despachos en vuelo) sin efectos laterales.
+
+**5. Los dos checkpoints humanos no cambian.** El **1** es firmar el brief; el **2**,
+anotar el PDF. Entre ellos, el ejecutor no te necesita.
+
+### Si un despacho se interrumpe
+
+No pasa nada: relanza `vivarium run`. Al arrancar, la **reconciliación** revisa los
+despachos que quedaron sin cerrar y mira el disco. Si el efecto está (el capítulo se
+escribió, el bloque llegó a `findings.md`), lo cierra como `ok`; si no está, lo cierra
+como `failed` y lo vuelve a despachar. Un runner muerto nunca deja el proyecto bloqueado.
+
+> **Aviso: `vivarium new --sector` no hace lo que parece.** Escribe el sector en el
+> manifiesto *después* del bootstrap, así que el proyecto se queda con sector pero **sin
+> adendas y sin registro**: la brújula deja de pedir `constitution` y la capa 2 de la
+> pirámide de prosa nunca se materializa. Usa `WRITEONMARS_SECTOR` (y `WRITEONMARS_TRACK`),
+> que sí llegan a `bootstrap.py`. Está anotado en el ROADMAP como deuda del ejecutor.
+
+El detalle interno del ejecutor está en [`../../docs/como-funciona.md`](../../docs/como-funciona.md)
+y en [`../../vivarium/README.md`](../../vivarium/README.md).
+
+> **Nota histórica.** El primer ejecutor orquestado corrió sobre **Paperclip** (una
+> Company con cuatro roles y un tablero de tareas). Quedó **archivado** el 2026-07-07:
+> vive en `paperclip/`, y sus §§ 0-2 de `FLOW-CONTRACT.md` son el contrato agnóstico del
+> ejecutor que Vivarium implementa. Si vienes de aquel montaje, `hire-team.sh` y los
+> bundles de `paperclip/agents/` ya no se usan.
 
 ## Cómo cambiar la política de firmas
 
