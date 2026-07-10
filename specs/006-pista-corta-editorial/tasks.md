@@ -128,7 +128,7 @@ jamás vale `plan` ni `constitution` en ningún estado intermedio;
 `chapters_expected == 1`; el HTML de export no contiene `toc-page`. El recuento
 de despachos (≤ 8) se verifica en la Phase 7, que necesita el ejecutor.
 
-- [ ] T005 [US1] `writeonmars/scripts/bootstrap.py` según `contracts/track-cli.md`
+- [X] T005 [US1] `writeonmars/scripts/bootstrap.py` según `contracts/track-cli.md`
   § 2 y research R2/R3: argumentos `--track {estandar,corta}` (default
   `os.environ.get("WRITEONMARS_TRACK", "estandar")`) y `--sector <slug>` (default
   `os.environ.get("WRITEONMARS_SECTOR")`). **Revalidar `--track` fuera de
@@ -145,7 +145,7 @@ de despachos (≤ 8) se verifica en la Phase 7, que necesita el ejecutor.
   `<!-- WRITEONMARS:ADENDAS -->`. Si el centinela ya existe, **no reescribir** —
   respeta adendas calibradas a mano — e imprimir aviso. Sin `--sector`:
   comportamiento actual intacto (`sector: null`).
-- [ ] T006 [P] [US1] `tests/unit/test_bootstrap.py`: añadir casos (sin editar los
+- [X] T006 [P] [US1] `tests/unit/test_bootstrap.py`: añadir casos (sin editar los
   existentes) — `--track corta` escribe la clave; `WRITEONMARS_TRACK=corta` la
   escribe; `WRITEONMARS_TRACK=rapida` falla con exit 1 y mensaje claro;
   `--sector tecnologia` escribe `sector` + `registro: "tecnico-divulgativo"` y deja
@@ -253,7 +253,7 @@ es `true` y `closeable` es `true`, todo con el parser actual. Sobre el fixture
 sigue ausente); **no** se comprueba `next_step`, que en produccion ya vale `close`
 (research R11).
 
-- [ ] T013 [US2] `writeonmars/commands/speckit.review-structure.md` (FR-005,
+- [X] T013 [US2] `writeonmars/commands/speckit.review-structure.md` (FR-005,
   `contracts/ceremonia-corta.md` § 2): sección `## Pista corta` — el comando se
   vuelve consciente de pista y en `corta` verifica y registra **cuatro bloques** en
   un único run: `## Pasada 1 — Estructura`, `## Pasada 2 — Utilidad` y
@@ -265,19 +265,19 @@ sigue ausente); **no** se comprueba `next_step`, que en produccion ya vale `clos
   voz ≠ precisión) y que la coherencia inter-capítulos de la dimensión 5 es vacua
   en pieza única. Respetar la `signing_matrix`. El esquema pass-output **no se
   toca**: el comando ya emitía dos bloques en un run y esto extiende el precedente.
-- [ ] T014 [US2] `writeonmars/commands/speckit.review.md`: sección `## Pista corta`
+- [X] T014 [US2] `writeonmars/commands/speckit.review.md`: sección `## Pista corta`
   — el agrupado ejecuta **dos** relevos en vez de cuatro: la combinada
   (`speckit.review-structure`, rol editora de mesa) y la precisión
   (`speckit.review-precision`, rol documentalista, **otro modelo**). Declarar MUST:
   la configuración BYOM asigna roles distintos; colapsarlos en el mismo modelo
   viola el Principio V.
-- [ ] T015 [P] [US2] Cláusula de red de reparación (FR-006) en
+- [X] T015 [P] [US2] Cláusula de red de reparación (FR-006) en
   `writeonmars/commands/speckit.review-voice.md` y `speckit.review-global.md`:
   en pista corta siguen operativos para rellenar los bloques 3 y 5 que la combinada
   dejara incompletos. `speckit.review-precision.md` gana una nota: siempre es
   relevo aparte, en corta y en estándar. La combinada es una comodidad, no un punto
   único de fallo.
-- [ ] T016 [P] [US2] Añadir a `tests/unit/test_status_corta.py`: (a) con el fixture
+- [X] T016 [P] [US2] Añadir a `tests/unit/test_status_corta.py`: (a) con el fixture
   `produccion` completo, `sorted(p["num"] for p in passes) == [1,2,3,4,5]`,
   `by_chapter["1"]["approved"] is True`, `closeable is True` y `claims.md` existe —
   **sin haber modificado `status.py` más allá de T007** (SC-002, SC-003);
@@ -311,7 +311,7 @@ aprobada, `track.py --escalar` deja `track: estandar` + entrada en
 modificado; tras ampliar el temario a 4 filas, el capítulo 1 conserva `approved` y
 `pending_chapters == [2,3,4]`.
 
-- [ ] T017 [US3] Crear `writeonmars/scripts/track.py` según `contracts/track-cli.md`
+- [X] T017 [US3] Crear `writeonmars/scripts/track.py` según `contracts/track-cli.md`
   § 1 y data-model § 6, patrón `dispose.py`: grupo mutuamente excluyente y
   obligatorio `--escalar | --desescalar | --check`, más `--project-dir`, `--spec`,
   `--json`. Identidad humana idéntica a `dispose.py:45` (`git config user.name` /
@@ -327,7 +327,7 @@ modificado; tras ampliar el temario a 4 filas, el capítulo 1 conserva `approved
   (corta ⟺ temario ≤ 1 fila ∧ sin capítulos de ordinal ≥ 2) con los exit codes y
   mensajes de la tabla del contrato § 1.5. Exit codes: 0 OK, 1 estado/legalidad,
   2 uso, 3 identidad no humana.
-- [ ] T018 [P] [US3] `tests/unit/test_track.py`: construye en tmp un repo git real
+- [X] T018 [P] [US3] `tests/unit/test_track.py`: construye en tmp un repo git real
   (`subprocess` git init/config/commit) — escalado legal registra `from`/`to`/`date`
   (termina en `Z`)/`actor` y el manifiesto valida contra el schema v1.4.0;
   des-escalado con temario de 4 filas ⇒ exit 1 con el mensaje del contrato;
