@@ -23,6 +23,7 @@ import os
 import re
 import shutil
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 PRESET = Path(__file__).resolve().parent.parent  # .../presets/writeonmars
@@ -59,7 +60,9 @@ def read_constitution_version() -> str:
 CONSTITUTION_VERSION = read_constitution_version()
 
 
-def default_manifest(operator: str, email: str, mode: str = "produccion") -> dict:
+def default_manifest(
+    operator: str, email: str, mode: str = "produccion", track: str = "estandar"
+) -> dict:
     op = {"id": operator, "role": "author"}
     if email:
         op["email"] = email
@@ -84,8 +87,12 @@ def default_manifest(operator: str, email: str, mode: str = "produccion") -> dic
         "citation_contract_version": "1.0",
         "project_type": "editorial",
         "mode": mode,
-        # El sector lo fija `/speckit-constitution` (primer paso del ciclo) a partir
-        # de las bases en references/sectores/. null = adendas aún sin configurar.
+        # La pista de ceremonia (constitución v1.7.0 § Pistas de ceremonia). Se
+        # escribe SIEMPRE, también con "estandar": explícito es mejor que implícito
+        # y el schema lo admite (ausencia = estandar).
+        "track": track,
+        # El sector lo fija `--sector` (o `/speckit-constitution`) a partir de las
+        # bases en references/sectores/. null = adendas aún sin configurar.
         "sector": None,
     }
 
@@ -114,6 +121,107 @@ def validate_manifest(manifest: dict) -> None:
         fail(f"el manifest generado no valida contra el schema: {exc.message}")
 
 
+def available_sectors() -> list[str]:
+    """Slugs de sector disponibles: todos los `*.md` de references/sectores/ salvo
+    el índice (`_index.md`). El comando de constitución usa el mismo criterio."""
+    sectores = PRESET / "references" / "sectores"
+    if not sectores.is_dir():
+        return []
+    return sorted(p.stem for p in sectores.glob("*.md") if p.stem != "_index")
+
+
+def extract_sector_name(sector_file: Path, slug: str) -> str:
+    """Nombre legible del sector: el `# Sector: <Nombre>` de la cabecera. Si no
+    aparece, cae al slug (nunca deja el bloque de adendas sin sector)."""
+    text = sector_file.read_text(encoding="utf-8")
+    m = re.search(r"^#\s+Sector:\s*(.+?)\s*$", text, re.MULTILINE)
+    return m.group(1).strip() if m else slug
+
+
+def extract_registro(sector_file: Path) -> "str | None":
+    """Slug del registro por defecto del sector: el primer texto entre backticks
+    bajo el encabezado `## Registro por defecto`. Devuelve None si no aparece
+    (registro es campo opcional; el bloque lo declara 'sin registro declarado')."""
+    text = sector_file.read_text(encoding="utf-8")
+    m = re.search(r"^##\s+Registro por defecto\s*$", text, re.MULTILINE)
+    if not m:
+        return None
+    bt = re.search(r"`([^`]+)`", text[m.end():])
+    return bt.group(1).strip() if bt else None
+
+
+def build_adendas_block(
+    sector_slug: str, sector_name: str, registro: "str | None", nucleo_version: str, fecha: str
+) -> str:
+    """Bloque de adendas POR REFERENCIA (research.md § R2). No destila prosa:
+    declara sector, registro, base aplicada y núcleo, y remite a la base del
+    sector. El encabezado `### Tono calibrado` es obligatorio (sin él,
+    speckit.specify se atasca en pista corta)."""
+    if registro:
+        registro_line = (
+            f"**Registro (capa 2)**: `{registro}` · Base aplicada:\n"
+            f"`references/registros/{registro}/SKILL.md`"
+        )
+        registro_ref = f"el registro `{registro}`"
+    else:
+        registro_line = "**Registro (capa 2)**: sin registro declarado"
+        registro_ref = "el registro por defecto del sector (sin registro declarado)"
+    return (
+        f"{ADENDAS_MARKER}\n"
+        "\n"
+        "## Adendas del proyecto\n"
+        "\n"
+        f"**Sector**: {sector_name} · **Base aplicada**: `references/sectores/{sector_slug}.md`\n"
+        f"{registro_line}\n"
+        f"**Núcleo vigente**: Write.OnMars Constitution v{nucleo_version}\n"
+        f"**Última edición de adendas**: {fecha}\n"
+        "\n"
+        "**Adendas aplicadas POR REFERENCIA.** Este proyecto adopta íntegros los valores\n"
+        "por defecto de la base del sector (tono calibrado, anglicismos admitidos,\n"
+        "matices léxicos, relajaciones estructurales, contrato terminológico inicial).\n"
+        f"Las pasadas de revisión cargan `references/sectores/{sector_slug}.md` directamente.\n"
+        "\n"
+        "### Tono calibrado\n"
+        "\n"
+        "**Por referencia**: el tono de esta guía es el de la sección\n"
+        f"`## Tono por defecto` de `references/sectores/{sector_slug}.md`, matizado por la\n"
+        "persona gramatical de su sección `## Persona gramatical y registro`. El marco\n"
+        f"general lo pone {registro_ref} (capa 2 de la pirámide de prosa).\n"
+        "\n"
+        "Quien necesite el tono —el brief (`/speckit-specify`, campo 5, que lo refleja\n"
+        "como eco) y la pasada de naturalidad— lo lee de ahí. Para fijarlo literalmente\n"
+        "aquí, corre `/speckit-constitution`.\n"
+        "\n"
+        "---\n"
+        "\n"
+        "Para calibrar cualquiera de esos valores a mano, corre `/speckit-constitution`:\n"
+        "reescribe este bloque con las respuestas del cuestionario, sin tocar el núcleo.\n"
+    )
+
+
+def materialize_adendas(dst: Path, slug: str, sector_file: Path, registro: "str | None") -> None:
+    """Añade el bloque de adendas por referencia al final de la constitución del
+    proyecto. Si el centinela ya existe, NO reescribe (respeta adendas calibradas
+    a mano) y solo avisa."""
+    current = dst.read_text(encoding="utf-8")
+    if ADENDAS_MARKER in current:
+        print(
+            f"[bootstrap] aviso: la constitución del proyecto ya trae el centinela "
+            f"{ADENDAS_MARKER}; conservo las adendas existentes (usa /speckit-constitution "
+            "para recalibrar a mano)"
+        )
+        return
+    sector_name = extract_sector_name(sector_file, slug)
+    fecha = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    block = build_adendas_block(slug, sector_name, registro, CONSTITUTION_VERSION, fecha)
+    dst.write_text(current.rstrip() + "\n\n" + block, encoding="utf-8")
+    detalle = f"registro: {registro}" if registro else "sin registro declarado"
+    print(
+        f"[bootstrap] adendas del sector '{slug}' aplicadas POR REFERENCIA "
+        f"({detalle}) → .specify/memory/constitution.md"
+    )
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="Bootstrap de un proyecto editorial Write.OnMars.")
     ap.add_argument("--project-dir", default=".")
@@ -125,6 +233,17 @@ def main() -> None:
         choices=["produccion", "estudio"],
         help="Modo del proyecto: produccion (default) o estudio.",
     )
+    ap.add_argument(
+        "--track",
+        default=os.environ.get("WRITEONMARS_TRACK", "estandar"),
+        choices=["estandar", "corta"],
+        help="Pista de ceremonia: estandar (default) o corta.",
+    )
+    ap.add_argument(
+        "--sector",
+        default=os.environ.get("WRITEONMARS_SECTOR"),
+        help="Slug del sector (references/sectores/<slug>.md). Fija adendas por referencia.",
+    )
     ap.add_argument("--force", action="store_true", help="Sobrescribe constitución y manifest existentes.")
     args = ap.parse_args()
 
@@ -133,9 +252,29 @@ def main() -> None:
     if args.mode not in ("produccion", "estudio"):
         fail(f"mode inválido: {args.mode!r} (esperado produccion|estudio; revisa WRITEONMARS_MODE)")
 
+    # Mismo bug para --track: un WRITEONMARS_TRACK con typo no lo caza argparse
+    # (no valida el default). Sin este guard acabaría escrito en el manifest.
+    if args.track not in ("estandar", "corta"):
+        fail(f"track inválido: {args.track!r} (esperado estandar|corta; revisa WRITEONMARS_TRACK)")
+
     proj = Path(args.project_dir).resolve()
     if not (proj / ".specify").is_dir():
         fail(f"{proj} no es un proyecto spec-kit (falta .specify/). Corre antes `specify init` y `specify preset add`.")
+
+    # Validación temprana del sector: si el slug no existe, fallar ANTES de tocar
+    # el disco (mismo criterio que los guards de --mode/--track). Registro se
+    # extrae aquí para usarlo tanto en el manifest como en las adendas.
+    sector_file = None
+    registro = None
+    if args.sector:
+        sector_file = PRESET / "references" / "sectores" / f"{args.sector}.md"
+        if not sector_file.is_file():
+            disponibles = available_sectors()
+            fail(
+                f"sector inválido: {args.sector!r}. "
+                f"Sectores disponibles: {', '.join(disponibles) or '(ninguno)'}"
+            )
+        registro = extract_registro(sector_file)
 
     # 1. Constitución
     src = PRESET / "memory" / "constitution.md"
@@ -161,12 +300,21 @@ def main() -> None:
             shutil.copyfile(src, dst)
             print(f"[bootstrap] núcleo sobrescrito (v{CONSTITUTION_VERSION}); no había adendas que preservar")
 
+    # 1b. Adendas por referencia (solo con --sector): se materializan tras el
+    # núcleo, empezando por el centinela. El centinela preexistente se respeta.
+    if args.sector:
+        materialize_adendas(dst, args.sector, sector_file, registro)
+
     # 2. Manifest
     man = proj / ".writeonmars-manifest.json"
     if man.exists() and not args.force:
         print("[bootstrap] .writeonmars-manifest.json ya existe; --force para regenerar")
     else:
-        manifest = default_manifest(args.operator, args.email, args.mode)
+        manifest = default_manifest(args.operator, args.email, args.mode, args.track)
+        if args.sector:
+            manifest["sector"] = args.sector
+            if registro:
+                manifest["registro"] = registro
         validate_manifest(manifest)
         man.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
         print(f"[bootstrap] manifest creado → .writeonmars-manifest.json (operador: {args.operator})")

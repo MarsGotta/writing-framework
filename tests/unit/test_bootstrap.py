@@ -86,6 +86,60 @@ class TestDefaultManifest:
         m = bootstrap_mod.default_manifest("op", "", mode=mode)
         assert m["mode"] == mode
 
+    def test_track_default_es_estandar(self, bootstrap_mod):
+        m = bootstrap_mod.default_manifest("op", "")
+        assert m["track"] == "estandar"
+
+    @pytest.mark.parametrize("track", ["estandar", "corta"])
+    def test_track_se_escribe_siempre(self, bootstrap_mod, track):
+        # default_manifest escribe `track` SIEMPRE, también con estandar.
+        m = bootstrap_mod.default_manifest("op", "", track=track)
+        assert m["track"] == track
+
+
+# ---------------------------------------------------------------------------
+# Helpers de sector (extracción de registro/nombre, listado, bloque de adendas)
+# ---------------------------------------------------------------------------
+class TestSectorHelpers:
+    @pytest.fixture
+    def tecnologia_md(self, repo_root) -> Path:
+        return repo_root / "writeonmars" / "references" / "sectores" / "tecnologia.md"
+
+    def test_available_sectors_incluye_tecnologia_y_excluye_index(self, bootstrap_mod):
+        slugs = bootstrap_mod.available_sectors()
+        assert "tecnologia" in slugs
+        assert "_index" not in slugs
+
+    def test_extract_registro_tecnologia(self, bootstrap_mod, tecnologia_md):
+        assert bootstrap_mod.extract_registro(tecnologia_md) == "tecnico-divulgativo"
+
+    def test_extract_sector_name_tecnologia(self, bootstrap_mod, tecnologia_md):
+        assert bootstrap_mod.extract_sector_name(tecnologia_md, "tecnologia") == "Tecnología"
+
+    def test_extract_sector_name_cae_al_slug_si_no_hay_cabecera(
+        self, bootstrap_mod, tmp_path
+    ):
+        f = tmp_path / "raro.md"
+        f.write_text("## Registro por defecto\n\n`x`\n", encoding="utf-8")
+        assert bootstrap_mod.extract_sector_name(f, "raro") == "raro"
+
+    def test_build_adendas_tiene_tono_calibrado_y_por_referencia(self, bootstrap_mod):
+        block = bootstrap_mod.build_adendas_block(
+            "tecnologia", "Tecnología", "tecnico-divulgativo", "1.7.0", "2026-07-10"
+        )
+        assert block.startswith(bootstrap_mod.ADENDAS_MARKER)
+        # El encabezado `### Tono calibrado` es OBLIGATORIO (research R2): sin él
+        # speckit.specify se atasca en pista corta.
+        assert "### Tono calibrado" in block
+        assert "POR REFERENCIA" in block
+        assert "`tecnico-divulgativo`" in block
+        assert "v1.7.0" in block
+
+    def test_build_adendas_sin_registro_lo_declara(self, bootstrap_mod):
+        block = bootstrap_mod.build_adendas_block("x", "X", None, "1.7.0", "2026-07-10")
+        assert "sin registro declarado" in block
+        assert "### Tono calibrado" in block
+
 
 # ---------------------------------------------------------------------------
 # validate_manifest
@@ -128,6 +182,21 @@ class TestValidateManifest:
     def test_manifest_sin_mode_sigue_validando(self, bootstrap_mod):
         m = bootstrap_mod.default_manifest("op", "")
         del m["mode"]
+        bootstrap_mod.validate_manifest(m)
+
+    @pytest.mark.skipif(not HAS_JSONSCHEMA, reason="requiere jsonschema instalado")
+    @pytest.mark.parametrize("track", ["estandar", "corta"])
+    def test_manifest_con_cada_track_valida_completo(self, bootstrap_mod, track):
+        # Contra el schema v1.4.0 (track + registro declarados).
+        m = bootstrap_mod.default_manifest("op", "", track=track)
+        m["sector"] = "tecnologia"
+        m["registro"] = "tecnico-divulgativo"
+        bootstrap_mod.validate_manifest(m)
+
+    @pytest.mark.skipif(not HAS_JSONSCHEMA, reason="requiere jsonschema instalado")
+    def test_manifest_sin_track_sigue_validando(self, bootstrap_mod):
+        m = bootstrap_mod.default_manifest("op", "")
+        del m["track"]
         bootstrap_mod.validate_manifest(m)
 
     def test_sin_schema_solo_avisa(self, bootstrap_mod, monkeypatch, tmp_path, capsys):
@@ -224,6 +293,164 @@ class TestMainEndToEnd:
         assert res.returncode == 1
         assert "mode inválido" in res.stderr
         assert not (proyecto_speckit / ".writeonmars-manifest.json").exists()
+
+    def test_track_corta_escribe_la_clave(
+        self, scripts_dir, proyecto_speckit, stub_sin_jsonschema
+    ):
+        res = self._run(scripts_dir, proyecto_speckit, stub_sin_jsonschema, "--track", "corta")
+        assert res.returncode == 0, res.stderr
+        m = json.loads(
+            (proyecto_speckit / ".writeonmars-manifest.json").read_text(encoding="utf-8")
+        )
+        assert m["track"] == "corta"
+        # Sin --sector: comportamiento actual intacto.
+        assert m["sector"] is None
+        assert "registro" not in m
+        const = (proyecto_speckit / ".specify" / "memory" / "constitution.md").read_text(
+            encoding="utf-8"
+        )
+        assert "<!-- WRITEONMARS:ADENDAS -->" not in const
+
+    def test_track_corta_por_entorno_escribe_la_clave(
+        self, scripts_dir, proyecto_speckit, stub_sin_jsonschema
+    ):
+        env = dict(
+            os.environ, PYTHONPATH=str(stub_sin_jsonschema), WRITEONMARS_TRACK="corta"
+        )
+        res = subprocess.run(
+            [sys.executable, str(scripts_dir / "bootstrap.py"),
+             "--project-dir", str(proyecto_speckit)],
+            capture_output=True, text=True, env=env,
+        )
+        assert res.returncode == 0, res.stderr
+        m = json.loads(
+            (proyecto_speckit / ".writeonmars-manifest.json").read_text(encoding="utf-8")
+        )
+        assert m["track"] == "corta"
+
+    def test_track_invalido_por_entorno_falla(
+        self, scripts_dir, proyecto_speckit, stub_sin_jsonschema
+    ):
+        """argparse no valida `choices` sobre el default: un WRITEONMARS_TRACK con
+        typo debe cazarlo el guard explícito antes de escribir el manifest."""
+        env = dict(
+            os.environ, PYTHONPATH=str(stub_sin_jsonschema), WRITEONMARS_TRACK="rapida"
+        )
+        res = subprocess.run(
+            [sys.executable, str(scripts_dir / "bootstrap.py"),
+             "--project-dir", str(proyecto_speckit)],
+            capture_output=True, text=True, env=env,
+        )
+        assert res.returncode == 1
+        assert "track inválido" in res.stderr
+        assert not (proyecto_speckit / ".writeonmars-manifest.json").exists()
+
+    def test_sector_escribe_sector_registro_y_adendas(
+        self, scripts_dir, proyecto_speckit, stub_sin_jsonschema
+    ):
+        res = self._run(
+            scripts_dir, proyecto_speckit, stub_sin_jsonschema, "--sector", "tecnologia"
+        )
+        assert res.returncode == 0, res.stderr
+        m = json.loads(
+            (proyecto_speckit / ".writeonmars-manifest.json").read_text(encoding="utf-8")
+        )
+        assert m["sector"] == "tecnologia"
+        assert m["registro"] == "tecnico-divulgativo"
+        const = (proyecto_speckit / ".specify" / "memory" / "constitution.md").read_text(
+            encoding="utf-8"
+        )
+        assert "<!-- WRITEONMARS:ADENDAS -->" in const
+        assert "POR REFERENCIA" in const
+        assert "### Tono calibrado" in const
+
+    def test_sector_por_entorno_tambien_aplica(
+        self, scripts_dir, proyecto_speckit, stub_sin_jsonschema
+    ):
+        env = dict(
+            os.environ,
+            PYTHONPATH=str(stub_sin_jsonschema),
+            WRITEONMARS_TRACK="corta",
+            WRITEONMARS_SECTOR="tecnologia",
+        )
+        res = subprocess.run(
+            [sys.executable, str(scripts_dir / "bootstrap.py"),
+             "--project-dir", str(proyecto_speckit)],
+            capture_output=True, text=True, env=env,
+        )
+        assert res.returncode == 0, res.stderr
+        m = json.loads(
+            (proyecto_speckit / ".writeonmars-manifest.json").read_text(encoding="utf-8")
+        )
+        assert m["track"] == "corta"
+        assert m["sector"] == "tecnologia"
+        assert m["registro"] == "tecnico-divulgativo"
+
+    def test_sector_inexistente_falla_listando_disponibles(
+        self, scripts_dir, proyecto_speckit, stub_sin_jsonschema
+    ):
+        res = self._run(
+            scripts_dir, proyecto_speckit, stub_sin_jsonschema, "--sector", "inventado"
+        )
+        assert res.returncode == 1
+        assert "sector inválido" in res.stderr
+        assert "Sectores disponibles" in res.stderr
+        assert "tecnologia" in res.stderr
+        # Falla antes de tocar el disco: ni manifest ni constitución.
+        assert not (proyecto_speckit / ".writeonmars-manifest.json").exists()
+        assert not (proyecto_speckit / ".specify" / "memory" / "constitution.md").exists()
+
+    def test_sector_no_reescribe_centinela_preexistente(
+        self, scripts_dir, proyecto_speckit, stub_sin_jsonschema
+    ):
+        """Adendas calibradas a mano (centinela ya presente) se respetan: el
+        bloque por referencia no se materializa y solo se avisa."""
+        memory = proyecto_speckit / ".specify" / "memory"
+        memory.mkdir(parents=True)
+        const = memory / "constitution.md"
+        const.write_text(
+            "# Núcleo\n\n**Version**: 1.7.0\n\n"
+            "<!-- WRITEONMARS:ADENDAS -->\n\n## Adendas del proyecto\n\n"
+            "TONO CALIBRADO A MANO por la operadora.\n",
+            encoding="utf-8",
+        )
+        res = self._run(
+            scripts_dir, proyecto_speckit, stub_sin_jsonschema, "--sector", "tecnologia"
+        )
+        assert res.returncode == 0, res.stderr
+        final = const.read_text(encoding="utf-8")
+        assert "TONO CALIBRADO A MANO" in final          # adendas a mano preservadas
+        assert "POR REFERENCIA" not in final             # no se re-materializó
+        assert final.count("<!-- WRITEONMARS:ADENDAS -->") == 1
+        assert "aviso" in res.stdout
+
+    @pytest.mark.skipif(not HAS_JSONSCHEMA, reason="requiere jsonschema instalado")
+    def test_manifest_corta_sector_generado_valida_contra_schema(
+        self, scripts_dir, repo_root, proyecto_speckit
+    ):
+        """El manifest generado por un run corta+sector valida contra el schema
+        v1.4.0 (sin el stub: entorno real con jsonschema)."""
+        import jsonschema
+
+        res = subprocess.run(
+            [sys.executable, str(scripts_dir / "bootstrap.py"),
+             "--project-dir", str(proyecto_speckit),
+             "--track", "corta", "--sector", "tecnologia"],
+            capture_output=True, text=True,
+        )
+        assert res.returncode == 0, res.stderr
+        manifest = json.loads(
+            (proyecto_speckit / ".writeonmars-manifest.json").read_text(encoding="utf-8")
+        )
+        schema = json.loads(
+            (repo_root / "writeonmars" / "contracts" / "manifest-schema.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        jsonschema.validate(instance=manifest, schema=schema)
+        assert manifest["track"] == "corta"
+        assert manifest["sector"] == "tecnologia"
+        assert manifest["registro"] == "tecnico-divulgativo"
 
     def test_sin_force_no_sobrescribe(
         self, scripts_dir, proyecto_speckit, stub_sin_jsonschema
