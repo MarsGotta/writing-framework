@@ -55,6 +55,7 @@ design.*
 | **V. Revisión multi-pasada** (NO NEGOCIABLE) | [pasa / desviación justificada] | [Cinco pasadas declaradas como tareas en `tasks.md`; matriz de firmas alineada con `.writeonmars-manifest.json`.] |
 | **VI. Neutralidad de agente y modelo** (NO NEGOCIABLE) | [pasa / desviación justificada] | [La lógica nueva vive en comandos/referencias/scripts del preset, no en skills de un proveedor ni en el ejecutor (§ Ejecutores del método).] |
 | **Modo de proyecto** (§ Modos de proyecto) | [pasa / desviación justificada] | [Modo declarado en el manifiesto (`produccion`/`estudio`; ausencia = `produccion`). En modo estudio, ninguna tarea del plan redacta prosa del manuscrito.] |
+| **Pista de ceremonia** (§ Pistas de ceremonia) | [pasa / desviación justificada] | [Pista declarada en el manifiesto (`estandar`/`corta`; ausencia = `estandar`). En pista corta las cinco dimensiones del Principio V se verifican en dos relevos sin debilitar ningún NO NEGOCIABLE; el cambio de pista es acción humana registrada.] |
 
 Cualquier desviación MUST registrarse en `Complexity Tracking` con justificación
 operativa (FR-011).

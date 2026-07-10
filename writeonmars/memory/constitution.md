@@ -1,6 +1,63 @@
 <!--
 SYNC IMPACT REPORT
 ==================
+Version change: 1.6.1 → 1.7.0
+Bump rationale: MINOR — nueva sección normativa "Pistas de ceremonia" (paralela
+a "Modos de proyecto"): la pista de ceremonia (campo `track`: `estandar` /
+`corta`) gobierna cuánto rito paga un proyecto, ortogonal al modo (que gobierna
+quién redacta la prosa). En pista corta las cinco dimensiones del Principio V se
+verifican en dos relevos (pasada combinada 1·2·3·5 + pasada de precisión 4) en
+vez de "3 locales + 1 global". Es expansión material del modelo de ejecución del
+Principio V, no redefinición: ninguna de las cinco dimensiones se retira y las
+tres reglas duras (voz ≠ precisión, escribe-uno-revisa-otro, detector ≠
+corrector) se conservan íntegras. Ningún NO NEGOCIABLE se debilita y no se
+invalida ninguna guía publicada (la ausencia de `track` equivale a `estandar`):
+por eso MINOR, no MAJOR; y no PATCH, porque añade material normativo. Feature
+006-pista-corta-editorial.
+
+Added sections:
+- "Pistas de ceremonia" — pista declarada en el manifiesto (campo `track`;
+  ausencia = `estandar`; valor desconocido = error claro, espejo de `mode`):
+  `estandar` (ceremonia completa vigente) vs `corta` (pieza única — temario
+  degenerado de una fila, revisión en dos relevos, `intro` omitido). Defaults
+  opinados sin candados; el cambio de pista es acción humana explícita,
+  registrada con actor en un historial append-only (`track_history`); el
+  escalado `corta → estandar` conserva todo el trabajo. Ortogonal a "Modos de
+  proyecto": matriz track × mode completa.
+
+Modified sections:
+- Governance § "Procedimiento de enmienda", punto 1 — pasa a describir la
+  práctica real del repositorio: la enmienda se documenta en un commit dedicado
+  sobre la rama de trabajo (históricamente `main`), y la feature en curso la
+  fija `.specify/feature.json`, no una rama. Una rama `constitution/` queda
+  opcional. El formato del mensaje de commit (punto 5) se conserva. Se salda la
+  divergencia entre procedimiento y práctica (v1.6.1 se enmendó en `main`).
+
+Modified principles: ninguno. El Principio V se extiende por referencia desde la
+nueva sección, que amplía su modelo de ejecución sin tocar su texto ni sus cinco
+dimensiones (mismo patrón con que "Modos de proyecto" extendió el Principio VI
+en v1.6.0).
+
+Trazabilidad (§ Arquitectura, "Trazabilidad documental"): decisión propia del
+proyecto con fundamento externo en el análisis de BMAD v6
+(`docs/comparativa-bmad.md`, § "Qué adoptamos YA (spec 006)": ceremonia
+adaptativa a escala —pistas Quick Flow / Method / Enterprise— con escalado que
+arrastra el trabajo hecho) y en evidencia de coste propia
+(`tests/editorial-pilot/evidence/2026-07-08-vivarium-byom/`: la validación BYOM
+real gastó 26 despachos para 2 capítulos, rito de libro sobre una pieza corta).
+
+Templates:
+- ✅ updated  writeonmars/templates/plan-template.md y
+  .specify/templates/plan-template.md — el Constitution Check gana la fila
+  "Pista de ceremonia" (paralela a "Modo de proyecto"). No citan número de
+  versión de la constitución (solo la ruta), así que no hay referencia de
+  versión que corregir.
+- sin cambios  pass-output-schema.md y demás contratos: esta enmienda no impone
+  cambios de contrato (el manifest-schema sube a v1.4.0 por la feature 006, no
+  por la constitución).
+
+Historial previo
+----------------
 Version change: 1.6.0 → 1.6.1
 Bump rationale: PATCH — clarificación de alcance, sin cambio de intención. Los
 bullets "Fuentes por capítulo" y "Atribución por afirmación" de Estándares
@@ -532,6 +589,83 @@ el cambio explícito evita que una obra pierda su elegibilidad de autoría
 humana por un descuido. Decisión propia del proyecto (`docs/vivarium.md`
 §§ 2, 4-5; `resources/write-onmars-editor-app-local-first.pdf`).
 
+## Pistas de ceremonia
+
+Todo proyecto editorial MAY declarar su **pista de ceremonia** en el manifiesto
+(`.writeonmars-manifest.json`, campo `track`; su ausencia se interpreta como
+`estandar`; un valor desconocido es error claro, espejo de `mode`). La pista
+determina *cuánto rito* paga el proyecto —cuántos pasos y relevos atraviesa una
+pieza antes de publicarse—; es ortogonal al modo, que determina *quién redacta*.
+La pista no cambia los principios: cambia la escala a la que se aplican.
+
+- **Pista estándar** (`track: estandar`): la ceremonia completa —adendas →
+  brief → research → temario → redacción por capítulo → 3 pasadas locales + 1
+  global → intro → export → feedback → close—. Default para guías, manuales y
+  libros de varios capítulos, donde el rito es la garantía de calidad. Es el
+  comportamiento vigente: toda guía existente opera en pista estándar (valor
+  implícito hasta declararse otra cosa).
+- **Pista corta** (`track: corta`): la ceremonia dimensionada para una pieza
+  única (artículo, post, tutorial breve, ensayo corto). Degenera artefactos sin
+  eliminar garantías: el temario se reduce a una fila (título y promesa
+  firmados en el brief del Principio III), la revisión corre en **dos relevos**
+  en lugar de cuatro y el paso `intro` (README de presentación) se omite. No
+  retira ninguna garantía del método —brief firmado, cinco dimensiones, dos
+  checkpoints humanos, gates deterministas, claims en producción—: paga menos
+  rito, no menos verificación.
+
+**El Principio V en pista corta** — las cinco dimensiones se verifican en dos
+relevos, no en cuatro pasadas:
+
+- La **pasada combinada** verifica estructura, utilidad, naturalidad y formato
+  (dimensiones 1, 2, 3 y 5; la coherencia entre capítulos es vacua en pieza
+  única) y las registra como los bloques de pasada estándar de siempre (esquema
+  `pass-output` sin cambios, un bloque por dimensión).
+- La **pasada de precisión** (dimensión 4) corre en relevo aparte, con otro rol
+  y modelo, y en producción emite `claims.md`.
+
+Las cinco dimensiones se verifican íntegras: lo que cambia es el *modelo de
+ejecución* del Principio V ("3 locales + 1 global" pasa a "1 combinada + 1 de
+precisión"), no el conjunto de dimensiones. Las tres reglas duras de los relevos
+(§ Arquitectura, "Ejecutores del método") se preservan sin excepción:
+**voz ≠ precisión** (la naturalidad va en la combinada; la precisión, en relevo
+aparte con otro modelo), **escribe-uno-revisa-otro** y **detector ≠ corrector**.
+La pasada combinada es una comodidad de ceremonia, no un punto único de fallo:
+si un relevo queda a medias, los comandos sueltos por dimensión rellenan los
+huecos.
+
+Reglas comunes a ambas pistas:
+
+- Los defaults de pista por tipo de proyecto son opinados, no candados: cambiar
+  de pista MUST ser una acción explícita del humano operador, nunca de un
+  agente (misma política que el cambio de modo).
+- El cambio de pista MUST registrarse en el manifiesto (pista de origen, pista
+  de destino, fecha y actor humano) en un historial append-only
+  (`track_history`), escrito solo por el script determinista de escalado y
+  nunca a mano.
+- El escalado `corta → estandar` MUST conservar todo el trabajo hecho: brief,
+  pieza (pasa a capítulo 1 del temario ampliado), findings, claims y pasadas
+  registradas. El des-escalado `estandar → corta` solo es legal mientras el
+  proyecto sea aún una pieza única (temario de una fila, sin capítulos de
+  ordinal ≥ 2); en caso contrario se rechaza con mensaje claro.
+- Ninguna configuración de pista MUST debilitar un principio NO NEGOCIABLE. La
+  pista corta amplía el modelo de ejecución del Principio V; no lo relaja.
+
+La pista es ortogonal al modo (§ Modos de proyecto): la matriz `track × mode` es
+completa. En `corta` + `estudio`, los checkpoints de escritura y disposición,
+las huellas de integridad y el guardarraíl de redacción operan sin cambios sobre
+la pieza única; los dos relevos producen solo hallazgos, nunca prosa.
+
+**Razón**: cobrar el mismo rito a un artículo de 2.000 palabras que a un libro
+de doce capítulos deja las piezas cortas fuera del método —se escriben a mano,
+sin voz calibrada, sin factualidad, sin registro— o malgasta despachos en pasos
+vacuos (temario multi-capítulo, README de presentación). Adaptar la ceremonia a
+la escala, conservando cada garantía, extiende el alcance del método sin
+rebajarlo. Decisión propia del proyecto con fundamento externo en el análisis de
+BMAD v6 (`docs/comparativa-bmad.md`: pistas Quick Flow / Method / Enterprise y
+escalado con arrastre de trabajo) y en evidencia de coste propia
+(`tests/editorial-pilot/evidence/2026-07-08-vivarium-byom/`: 26 despachos para 2
+capítulos).
+
 ## Flujo de producción editorial con Spec Kit
 
 Este framework reutiliza el ciclo Spec Kit (`/speckit-specify`, `/speckit-plan`,
@@ -666,7 +800,10 @@ cumplimiento explícito antes de cerrarse.
 
 **Procedimiento de enmienda**:
 
-1. Propuesta documentada en una rama dedicada con prefijo `constitution/`.
+1. Propuesta documentada en un commit dedicado sobre la rama de trabajo del
+   repositorio (históricamente `main`; la feature en curso la fija
+   `.specify/feature.json`, no una rama). Una rama con prefijo `constitution/`
+   es opcional.
 2. Revisión por la persona mantenedora del framework (actualmente Marcela
    Gotta) y, cuando aplique, por el equipo editorial extendido.
 3. Plan de migración cuando la enmienda afecte guías ya publicadas: lista de
@@ -695,4 +832,4 @@ cumplimiento explícito antes de cerrarse.
 - La guía operativa de runtime para agentes (p.ej., `CLAUDE.md`, `AGENTS.md`)
   MUST citar esta constitución como fuente de verdad editorial.
 
-**Version**: 1.6.1 | **Ratified**: 2026-05-06 | **Last Amended**: 2026-07-08
+**Version**: 1.7.0 | **Ratified**: 2026-05-06 | **Last Amended**: 2026-07-10
