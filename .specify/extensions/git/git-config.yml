@@ -10,6 +10,14 @@ init_commit_message: "[Spec Kit] Initial commit"
 # Auto-commit before/after core commands.
 # Set "default" to enable for all commands, then override per-command.
 # Each key can be true/false. Message is customizable per-command.
+#
+# AVISO (auto-commit.sh, 2026-07-10): al activarse, el script hace `git add .`
+# (barre todo lo no ignorado) y `git commit -m` con un mensaje de UNA línea, sin
+# cuerpo ni trailer `Co-Authored-By`. Rompe la convención de mensajes del repo
+# (`plan(006): … — detalle` + trailer), así que los commits automáticos son
+# puntos de guardado, no historia definitiva: reescríbelos con `git commit
+# --amend` o `git rebase -i` antes de publicar. `.gitignore` NO cubre `*.pdf`
+# ni `.vivarium/`; los smokes trabajan en `mktemp -d`, fuera del repo.
 auto_commit:
   default: false
   before_clarify:
@@ -46,11 +54,11 @@ auto_commit:
     enabled: false
     message: "[Spec Kit] Add implementation plan"
   after_tasks:
-    enabled: false
-    message: "[Spec Kit] Add tasks"
+    enabled: true
+    message: "tasks: desglose de tareas generado por /speckit-tasks"
   after_implement:
-    enabled: false
-    message: "[Spec Kit] Implementation progress"
+    enabled: true
+    message: "feat: implementación de /speckit-implement (pre-revisión; reescribe el mensaje antes de publicar)"
   after_checklist:
     enabled: false
     message: "[Spec Kit] Add checklist"
