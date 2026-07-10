@@ -67,9 +67,33 @@ por defecto de la base del sector (tono calibrado, anglicismos admitidos,
 matices léxicos, relajaciones estructurales, contrato terminológico inicial).
 Las pasadas de revisión cargan `references/sectores/<slug>.md` directamente.
 
+### Tono calibrado
+
+**Por referencia**: el tono de esta guía es el de la sección
+`## Tono por defecto` de `references/sectores/<slug>.md`, matizado por la
+persona gramatical de su sección `## Persona gramatical y registro`. El marco
+general lo pone el registro `<registro-slug>` (capa 2 de la pirámide de prosa).
+
+Quien necesite el tono —el brief (`/speckit-specify`, campo 5, que lo refleja
+como eco) y la pasada de naturalidad— lo lee de ahí. Para fijarlo literalmente
+aquí, corre `/speckit-constitution`.
+
+---
+
 Para calibrar cualquiera de esos valores a mano, corre `/speckit-constitution`:
 reescribe este bloque con las respuestas del cuestionario, sin tocar el núcleo.
 ```
+
+**El encabezado `### Tono calibrado` es obligatorio, no decorativo.**
+`writeonmars/commands/speckit.specify.md` (líneas 31-33) resuelve el campo 5 del
+brief leyendo `.specify/memory/constitution.md → Tono calibrado` y, si no lo
+encuentra, "sugiere correr `/speckit-constitution` primero" — justo el paso que
+la pista corta omite. Sin ese encabezado, el checkpoint humano 1 se atasca en
+pista corta y el Principio III queda sin satisfacer. `speckit.specify` gana la
+instrucción de seguir el puntero hasta la base del sector cuando las adendas
+estén por referencia. La pasada 3 (`speckit.review-voice.md`, líneas 26-28) ya
+resuelve así su registro (`registro` del manifiesto, con el default del sector
+como respaldo): esta decisión sigue ese precedente en lugar de inventar uno.
 
 `registro` se obtiene del propio archivo del sector: la sección
 `## Registro por defecto` abre con el slug entre backticks (en `tecnologia.md`,
@@ -152,9 +176,34 @@ byte-idéntica. Ambas no pueden ser ciertas del mismo flujo. La lectura coherent
 opinión"— es que `--json` gana un campo aditivo (como ya hizo `mode` en la 004)
 y el dashboard no cambia ni un carácter.
 
+### Consecuencia obligatoria: el oráculo de la 005 gana una clave
+
+`tests/unit/test_status_estudio.py:78-81` (`test_oraculo_json_estudio`) compara
+el dict **completo** de `--json` contra `tests/fixtures/005-estudio/expected-status.json`
+(30 claves; tiene `mode`, no tiene `track`). Añadir la clave `track` **rompe ese
+test**. No es un efecto colateral evitable: es la contrapartida exacta de FR-001.
+
+El oráculo MUST ganar `"track": "estandar"` y **nada más**. Esa edición es de
+*dato*, no de aserción: la aserción (`state == oracle`) no se toca, ni se
+debilita, ni se relaja el conjunto de claves comparadas. La regla de FR-010
+("ninguna aserción existente se edita") se lee como "ninguna aserción se
+**debilita**"; congelar un contrato con una clave nueva lo refuerza.
+
+Diff exacto y único admisible sobre el oráculo:
+
+```diff
+   "spec": "001-estudio",
+   "mode": "estudio",
++  "track": "estandar",
+```
+
+Si un implementador se ve editando cualquier otra línea de ese archivo, algo se
+torció.
+
 **Alternativas descartadas**: exponer `track` solo bajo un flag nuevo
-(`--json --with-track`) — el ejecutor necesita el campo siempre, y un flag
-condicional multiplicaría los caminos de deserialización de `Status`.
+(`--json --with-track`) — el ejecutor necesita el campo siempre, un flag
+condicional multiplicaría los caminos de deserialización de `Status`, y el
+oráculo quedaría igualmente desactualizado el día que el flag se vuelva default.
 
 ---
 
@@ -327,6 +376,64 @@ editar una sola aserción antes de tocar nada más.
 **Alternativas descartadas**: que `track.py` importe de `status.py` — arrastraría
 el `argparse` y el `sys.exit(2)` de `fail()` de un script pensado para correr
 como CLI.
+
+---
+
+## R11 — En produccion, `next_step` vale `close`, no `review`, en cuanto hay un bloque
+
+**Decisión**: ninguna aserción de esta feature comprueba `next_step == "review"`
+sobre un proyecto en produccion con pasadas parcialmente registradas. El estado
+de la revisión se comprueba con `all_chapters_approved` y `by_chapter[c].passes_done`.
+
+**Razón** (verificado empíricamente contra `status.py`, 2026-07-10, fixture corta
+en produccion con un capítulo y temario de una fila):
+
+| Bloques en `findings.md` | `next_step` | `closeable` | `all_chapters_approved` | `passes_done` |
+|---|---|---|---|---|
+| ninguno | `review` | `True` | `False` | `[]` |
+| 1, 2 (combinada a medias) | **`close`** | `True` | `False` | `[1, 2]` |
+| 1, 2, 3, 5 (combinada completa) | **`close`** | `True` | `False` | `[1, 2, 3]` |
+| 1, 2, 3, 5 + 4 | `close` | `True` | `True` | `[1, 2, 3, 4]` |
+
+En `_next_step`, la rama `if not blocks: return "review"` solo dispara con
+`findings.md` vacío. A partir del primer bloque, y sin críticos ni hallazgos
+accionables, los tres gates (`g1` sin críticos, `g2` firmas, `g3` capítulos ≥
+temario) están en verde y la función devuelve `close`. En produccion `closeable`
+**no** exige `all_chapters_approved`; solo lo exige en estudio.
+
+Lo que conduce el bucle de pasadas por capítulo es, por tanto, la **rama de
+normalización del ejecutor** (`runner.rs:162`):
+
+```rust
+if status.next_step == "close" && !status.all_chapters_approved {
+    …
+    if let Some(action) = choose_review_action(status)? { return Ok(Planned::Act(action)); }
+}
+```
+
+Su propio comentario lo dice: *"status.py puede decir 'close' con capítulos aún
+incompletos (va por delante del trabajo en vuelo): normaliza al paso por capítulo
+pendiente."*
+
+**Consecuencias para esta feature**:
+
+1. Tras la pasada combinada, el despacho de `review-4` llega por normalización,
+   no por la rama `"review"` de `plan_action`. El resultado es el mismo (6
+   despachos) y ningún archivo del ejecutor cambia — pero quien implemente debe
+   saberlo o escribirá tests que fallan.
+2. El fixture de combinada a medias (`medias/`) se verifica con
+   `all_chapters_approved is False` y `passes_done == [1, 2]`, **jamás** con
+   `next_step == "review"`.
+3. La degradación grácil (US2, escenario 4) sigue intacta: `choose_review_action`
+   encuentra la pasada 3 ausente y la despacha, se llegue por la rama que se
+   llegue.
+
+**Alternativas descartadas**: endurecer `closeable` en produccion para que exija
+`all_chapters_approved` — haría `next_step` más legible, pero es un cambio de la
+lógica de estado que SC-003 y FR-001 prohíben, rompería la retrocompatibilidad
+de todos los proyectos existentes y dejaría sin sentido la rama de normalización
+que el ejecutor ya tiene probada. Queda anotado en el ROADMAP como limpieza
+futura, fuera del alcance de esta feature.
 
 ---
 

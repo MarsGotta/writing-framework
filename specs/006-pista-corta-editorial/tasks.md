@@ -9,12 +9,28 @@
 > criterio verificable por script. Ante ambigüedad mandan `contracts/` y
 > `research.md`.
 >
-> **Regla transversal (FR-010)**: NINGUNA aserción de test existente se edita.
-> Los proyectos sin `track` o con `track: estandar` conservan su comportamiento
-> exacto. Baseline al planificar: **169 tests unitarios en verde**.
+> **Regla transversal (FR-010)**: ninguna aserción de test existente se
+> **debilita**. Los proyectos sin `track` o con `track: estandar` conservan su
+> comportamiento exacto. Baseline al planificar: **169 tests unitarios en verde**.
+>
+> **Única edición admitida sobre un artefacto de test existente** (research R4):
+> el fichero-oráculo `tests/fixtures/005-estudio/expected-status.json` gana la
+> línea `"track": "estandar"` y **nada más**. Es dato, no aserción: la
+> comparación `state == oracle` de `test_oraculo_json_estudio`
+> (`tests/unit/test_status_estudio.py:78-81`) no se toca ni se relaja. Sin esta
+> excepción el gate sería insatisfacible, porque ese test congela el dict
+> completo de `--json` y FR-001 obliga a añadirle una clave.
+>
+> **No compruebes `next_step == "review"`** (research R11): en produccion vale
+> `close` en cuanto `findings.md` tiene un bloque sin críticos. El estado de la
+> revisión se lee de `by_chapter[c].passes_done` y `all_chapters_approved`.
 >
 > **Invocador de pytest**: el `python3` del sistema no trae pytest. Usa
 > `uvx --with pytest --with pyyaml --with jsonschema python -m pytest tests/unit -q`.
+>
+> **`/speckit-implement` aborta en `main`**: `.specify/scripts/bash/check-prerequisites.sh`
+> valida el nombre de rama sin consultar `.specify/feature.json`. Ya alineado con
+> `setup-plan.sh`; si reaparece, exporta `SPECIFY_FEATURE=006-pista-corta-editorial`.
 >
 > **Contratos que NO se tocan**: `writeonmars/contracts/pass-output-schema.md`
 > queda en v1.2 sin una sola línea nueva (FR-005). `preset.yml` no necesita
@@ -40,7 +56,13 @@ testeable de forma independiente.
   `**Version**: 1.7.0 | … | **Last Amended**: <fecha>`. Propagar la fila
   **"Pista de ceremonia"** al Constitution Check de las **dos** copias de
   `plan-template.md` (`.specify/templates/` y `writeonmars/templates/`).
-  Gate: `python3 -c "import re,pathlib; a=pathlib.Path('.specify/memory/constitution.md').read_bytes(); b=pathlib.Path('writeonmars/memory/constitution.md').read_bytes(); assert a==b"`.
+  **Procedimiento de enmienda** (constitución § Governance): la enmienda va en
+  una rama `constitution/pistas-de-ceremonia` y su commit usa el formato
+  `docs: amend constitution to v1.7.0 (pistas de ceremonia)`. Si se decide
+  mantener la práctica actual del repo (enmendar en `main`, como hizo `b64759c`
+  con la v1.6.1), esta tarea MUST enmendar también el texto de § Governance para
+  que procedimiento y práctica coincidan — no dejar la divergencia tácita.
+  Gate: `python3 -c "import pathlib; a=pathlib.Path('.specify/memory/constitution.md').read_bytes(); b=pathlib.Path('writeonmars/memory/constitution.md').read_bytes(); assert a==b"`.
 - [ ] T002 [P] Publicar los contratos, aplicando los deltas de esta feature sobre
   la **fuente única** (`writeonmars/contracts/`; la raíz `contracts/` y
   `specs/001-*/contracts/` son punteros — no editar ahí):
@@ -63,9 +85,15 @@ testeable de forma independiente.
   `findings.md` con los bloques 1·2·3 (`Capítulos cubiertos: 1`), 5
   (`Capítulos cubiertos: global`) y 4, todos con `<!-- pass-output-schema: v1.2 -->`
   y huellas sha256 correctas, `claims.md`, y `chapters/01-la-pieza.md`.
-  Añadir dos fixtures degradados para los edge cases: `medias/` (combinada que solo
-  registró los bloques 1 y 2) e `incoherente/` (`track: corta` con temario de 3
-  filas y `chapters/02-*.md`).
+  Añadir tres fixtures degradados para los edge cases: `medias/` (combinada que
+  solo registró los bloques 1 y 2), `incoherente/` (`track: corta` con temario de
+  3 filas y `chapters/02-*.md`) y `legado/` (manifiesto **sin** el campo `track`,
+  temario de una fila, sin capítulos de ordinal ≥ 2 — para el des-escalado legal
+  de T018). **Antes de que T007 toque `status.py`**, capturar el oráculo del
+  dashboard con
+  `python3 writeonmars/scripts/status.py --project-dir tests/fixtures/003-factualidad > tests/fixtures/006-corta/expected-dashboard-estandar.txt`
+  (quickstart § 1a): es el fichero contra el que T008 verificará la byte-identidad,
+  y solo es válido si se genera con el `status.py` previo a la feature.
 
 ## Phase 2: Foundational (bloquea todas las stories)
 
@@ -132,6 +160,10 @@ de despachos (≤ 8) se verifica en la Phase 7, que necesita el ejecutor.
   **PROHIBIDO** tocar `_next_step` (ni sus ramas ni sus textos de `next_detail`),
   `_build_by_chapter`, `_passes_by_chapter`, `_passes_by_chapter_checked`, el
   cálculo de `gates`/`closeable`/`all_chapters_approved` ni `print_dashboard`.
+  (c) La clave nueva rompe `test_oraculo_json_estudio`: añadir **una sola línea**
+  (`"track": "estandar"`) a `tests/fixtures/005-estudio/expected-status.json`,
+  sin tocar la aserción ni ninguna otra línea del fichero (research R4). Es la
+  única edición admitida sobre un artefacto de test existente en toda la feature.
 - [ ] T008 [P] [US1] Tests de la brújula: (a) crear `tests/unit/test_status_corta.py`
   — con el fixture `006-corta/produccion`, `chapters_expected == 1`, `next_step`
   nunca vale `plan` ni `constitution` recorriendo los estados intermedios (sin
@@ -139,10 +171,12 @@ de despachos (≤ 8) se verifica en la Phase 7, que necesita el ejecutor.
   las dos entradas de `warnings` **sin** alterar `next_step`, `gates` ni
   `closeable`; manifiesto con `"track": "rapida"` ⇒ exit 2 y mensaje claro.
   (b) añadir a `tests/unit/test_status.py` (sin editar aserciones) un **test de
-  oráculo de retrocompatibilidad**: sobre un fixture `estandar`, la salida de
-  `print_dashboard` es byte-idéntica a la capturada antes de la feature, y el dict
-  de `--json` difiere de la referencia **exactamente** en la clave `track ==
-  "estandar"` y en nada más (SC-003, quickstart § 1).
+  oráculo de retrocompatibilidad**: sobre `tests/fixtures/003-factualidad`, la
+  salida de `print_dashboard` es byte-idéntica a
+  `tests/fixtures/006-corta/expected-dashboard-estandar.txt` (el fichero que T003
+  capturó antes de tocar `status.py`), y el dict de `--json` difiere de la
+  referencia **exactamente** en la clave `track == "estandar"` y en nada más
+  (SC-003, quickstart § 1).
 - [ ] T009 [US1] `writeonmars/commands/speckit.specify.md` (FR-003,
   `contracts/ceremonia-corta.md` § 1): sección `## Pista corta` — si el manifiesto
   declara `track: corta`, capturar los ocho campos descriptivos **más título y
@@ -152,6 +186,16 @@ de despachos (≤ 8) se verifica en la Phase 7, que necesita el ejecutor.
   `## Temario` de una fila (`| 1 | <título firmado> | <promesa firmada> |
   didactica_v1 |`). Título y promesa se copian **tal cual**: el agente no los
   reescribe. No materializar el temario antes de la firma.
+  **Resolución del tono con adendas por referencia** (research R2, hallazgo U1):
+  hoy el comando lee el campo 5 de `.specify/memory/constitution.md → Tono
+  calibrado` y, si no lo encuentra, "sugiere correr `/speckit-constitution`
+  primero" — justo el paso que la pista corta omite, con lo que el checkpoint
+  humano 1 se atascaría. Añadir la instrucción: si el bloque `### Tono calibrado`
+  declara las adendas **por referencia**, seguir el puntero hasta
+  `references/sectores/<slug>.md` §§ `Tono por defecto` y `Persona gramatical y
+  registro`, y reflejarlo como eco en el campo 5. Nunca sugerir
+  `/speckit-constitution` cuando `manifest.sector` no es nulo. (Precedente:
+  `speckit.review-voice.md:26-28` ya resuelve así su registro.)
 - [ ] T010 [P] [US1] Cláusulas de pista en el resto de comandos
   (`contracts/ceremonia-corta.md` § 1), sección `## Pista corta` en cada uno:
   `writeonmars/commands/speckit.research.md` (research exprés acotado a los
@@ -200,7 +244,9 @@ y la combinada no es un punto único de fallo.
 **Independent Test**: quickstart § 3 — sobre el fixture con la combinada y la
 precisión registradas, `passes` contiene `[1,2,3,4,5]`, `by_chapter["1"].approved`
 es `true` y `closeable` es `true`, todo con el parser actual. Sobre el fixture
-`medias/`, `next_step == "review"` y la pasada 3 sigue ausente.
+`medias/`, `all_chapters_approved is False` y `passes_done == [1, 2]` (la pasada 3
+sigue ausente); **no** se comprueba `next_step`, que en produccion ya vale `close`
+(research R11).
 
 - [ ] T013 [US2] `writeonmars/commands/speckit.review-structure.md` (FR-005,
   `contracts/ceremonia-corta.md` § 2): sección `## Pista corta` — el comando se
@@ -230,11 +276,16 @@ es `true` y `closeable` es `true`, todo con el parser actual. Sobre el fixture
   `produccion` completo, `sorted(p["num"] for p in passes) == [1,2,3,4,5]`,
   `by_chapter["1"]["approved"] is True`, `closeable is True` y `claims.md` existe —
   **sin haber modificado `status.py` más allá de T007** (SC-002, SC-003);
-  (b) con el fixture `medias/`, `next_step == "review"` y `4 not in
-  by_chapter["1"]["passes_done"]` ni `3`; (c) con un hallazgo `medio` abierto,
-  `next_step == "revise"` en produccion y `"dispose"` en estudio (fixture
-  `estudio/`); (d) matriz corta+estudio: las huellas de la 005 siguen invalidando
-  pasadas cuando el capítulo cambia.
+  (b) con el fixture `medias/`, `all_chapters_approved is False`,
+  `by_chapter["1"]["passes_done"] == [1, 2]` y `by_chapter["1"]["approved"] is
+  False`. **NO comprobar `next_step == "review"`**: en produccion vale `close` en
+  cuanto hay un bloque sin críticos (research R11, verificado empíricamente); el
+  despacho de la pasada ausente llega por la rama de normalización de
+  `plan_action` (`runner.rs:162`), no por la rama `"review"`.
+  (c) con un hallazgo `medio` abierto, `next_step == "revise"` en produccion y
+  `"dispose"` en estudio (fixture `estudio/`) — aquí sí, porque `revise_pending >
+  0` precede al `closeable` en `_next_step`; (d) matriz corta+estudio: las huellas
+  de la 005 siguen invalidando pasadas cuando el capítulo cambia.
 
 **Checkpoint US2**: quickstart § 3 reproducible; `status.py` sin más cambios que
 los de T007.
@@ -275,9 +326,13 @@ modificado; tras ampliar el temario a 4 filas, el capítulo 1 conserva `approved
   `redactora@agents.writeonmars.invalid` ⇒ exit 3; sin `user.name` ⇒ exit 3;
   atomicidad (fallo simulado en `os.replace` deja el manifiesto con sus bytes
   originales y sin `.tmp` huérfano); `--check` sobre el fixture `incoherente/` ⇒
-  exit 1; conservación del trabajo: tras escalar y ampliar el temario a 4 filas,
-  `status.py --json` da `by_chapter["1"]["approved"] is True` y
-  `pending_chapters == [2,3,4]` (SC-004).
+  exit 1; **des-escalado legal** sobre el fixture `legado/` (manifiesto sin campo
+  `track`, temario de una fila, sin capítulos de ordinal ≥ 2) ⇒ exit 0, con
+  `track: "corta"` y una entrada de historial cuyo `from` vale `"estandar"`
+  —la ausencia se resuelve vía `findings_lib.project_track` antes de escribir—
+  (edge case "proyecto legado que quiere volverse corta"); conservación del
+  trabajo: tras escalar y ampliar el temario a 4 filas, `status.py --json` da
+  `by_chapter["1"]["approved"] is True` y `pending_chapters == [2,3,4]` (SC-004).
 
 **Checkpoint US3**: `pytest tests/unit/test_track.py` verde; ningún archivo
 movido por el escalado.

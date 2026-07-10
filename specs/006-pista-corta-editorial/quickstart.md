@@ -48,26 +48,48 @@ El fixture `estandar` de referencia para las regresiones ya existe:
 comporta exactamente igual que antes de la feature.
 
 ```bash
-# 1a. El dashboard humano es BYTE-IDÉNTICO.
-python3 writeonmars/scripts/status.py --project-dir tests/fixtures/003-factualidad > /tmp/after.txt
-diff /tmp/before.txt /tmp/after.txt   # capturado antes de tocar nada → sin diferencias
+# 1a. Capturar el ORÁCULO DEL DASHBOARD **antes** de tocar status.py (lo hace T003).
+python3 writeonmars/scripts/status.py --project-dir tests/fixtures/003-factualidad \
+  > tests/fixtures/006-corta/expected-dashboard-estandar.txt
 ```
 
 ```bash
-# 1b. --json gana EXACTAMENTE una clave: "track": "estandar". Ninguna otra diferencia.
+# 1b. Tras la feature: el dashboard humano es BYTE-IDÉNTICO.
+python3 writeonmars/scripts/status.py --project-dir tests/fixtures/003-factualidad \
+  | diff - tests/fixtures/006-corta/expected-dashboard-estandar.txt   # sin diferencias
+```
+
+```bash
+# 1c. --json gana EXACTAMENTE una clave: "track": "estandar". Ninguna otra diferencia.
 python3 writeonmars/scripts/status.py --json --project-dir tests/fixtures/003-factualidad \
   | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["track"]=="estandar", d["track"]; print("OK")'
 ```
 
 ```bash
-# 1c. Ninguna aserción existente se edita.
+# 1d. Ninguna aserción existente se DEBILITA.
 uvx --with pytest --with pyyaml --with jsonschema python -m pytest tests/unit -q
 ```
 
-**Criterio**: 1a sin diferencias; 1b imprime `OK`; 1c en verde **sin haber
-modificado una sola línea de test preexistente**. La mudanza de `count_temario`
-y `drafted_ordinals` a `findings_lib.py` (R10) debe pasar este gate antes de
-tocar nada más.
+**Criterio**: 1b sin diferencias; 1c imprime `OK`; 1d en verde. La mudanza de
+`count_temario` y `drafted_ordinals` a `findings_lib.py` (R10) debe pasar este
+gate **antes** de tocar nada más, y el oráculo de 1a debe capturarse antes que
+ella.
+
+### La única edición admitida sobre un test existente (R4)
+
+`tests/unit/test_status_estudio.py::test_oraculo_json_estudio` compara el dict
+completo de `--json` contra `tests/fixtures/005-estudio/expected-status.json`.
+Añadir la clave `track` lo rompe. El **fichero-oráculo** (dato, no aserción) gana
+una línea y nada más:
+
+```diff
+   "spec": "001-estudio",
+   "mode": "estudio",
++  "track": "estandar",
+```
+
+La aserción (`state == oracle`) no se toca ni se relaja. Si te ves editando
+cualquier otra línea de ese archivo, para.
 
 Regresión adicional: `python3 status.py --json` sobre un manifiesto con
 `"track": "rapida"` falla con exit 2 y mensaje claro (espejo de `mode`).
@@ -146,13 +168,14 @@ Test unitario sin Chrome (`tests/unit/test_export.py`):
 
 ### 2.4 ≤ 8 despachos (AS-3, SC-001)
 
-Tras el `vivarium run` completo del smoke:
+Tras el `vivarium run` completo del smoke (delimitador **sin comillas** para que
+`$PROJECT` interpole; con `<<'PY'` llegaría literal y `open()` fallaría):
 
 ```bash
-python3 - <<'PY'
-import json
-n = sum(1 for line in open("$PROJECT/.vivarium/decisions.jsonl")
-        if json.loads(line).get("event") == "dispatch")
+PROJECT="$PROJECT" python3 - <<'PY'
+import json, os
+path = os.path.join(os.environ["PROJECT"], ".vivarium/decisions.jsonl")
+n = sum(1 for line in open(path) if json.loads(line).get("event") == "dispatch")
 assert n <= 8, f"{n} despachos, esperaba <= 8"
 print(f"OK {n} despachos")
 PY
@@ -210,14 +233,24 @@ Es la regla dura **voz ≠ precisión** hecha aserción.
 
 ### 3.3 Degradación grácil (AS-4)
 
-Fixture con la combinada a medias (solo bloques 1 y 2):
+Fixture `medias/` con la combinada a medias (solo bloques 1 y 2).
+
+> **No compruebes `next_step == "review"`** (research R11, verificado
+> empíricamente). En produccion `next_step` vale `close` en cuanto hay un bloque
+> sin críticos, porque `closeable` no exige `all_chapters_approved`. El estado de
+> la revisión se lee de `passes_done` y `all_chapters_approved`.
 
 ```bash
-python3 writeonmars/scripts/status.py --json --project-dir "$HALF" \
-  | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["next_step"]=="review"; print("OK")'
+python3 writeonmars/scripts/status.py --json --project-dir "$HALF" | python3 -c '
+import json,sys; d=json.load(sys.stdin)
+assert d["all_chapters_approved"] is False
+assert d["by_chapter"]["1"]["passes_done"] == [1, 2]
+assert d["by_chapter"]["1"]["approved"] is False
+print("OK degradación detectada")'
 ```
 
-Y el ejecutor despacha `review-3` (no se atasca):
+Y el ejecutor despacha `review-3` sin atascarse — vía la rama de normalización
+de `plan_action` (`runner.rs:162`), no vía la rama `"review"`:
 
 ```bash
 cd vivarium && cargo test choose_review_action   # cubre la primera pasada ausente
@@ -256,9 +289,9 @@ python3 writeonmars/scripts/track.py --escalar --project-dir "$P" --json
 ```
 
 ```bash
-python3 - <<'PY'
-import json, pathlib
-m = json.load(open(f"{P}/.writeonmars-manifest.json"))
+P="$P" python3 - <<'PY'
+import json, os
+m = json.load(open(os.path.join(os.environ["P"], ".writeonmars-manifest.json")))
 assert m["track"] == "estandar"
 h = m["track_history"][-1]
 assert h["from"] == "corta" and h["to"] == "estandar"
@@ -299,8 +332,27 @@ Con capítulos 2+ en disco pero temario de 1 fila:
 # → 1, "existen capítulos fuera de pieza única: 2, 3"
 ```
 
-Des-escalado **legal** (proyecto legado sin `track`, temario ≤ 1 fila, sin
-capítulos 2+): exit 0 y entrada en `track_history` con `from: "estandar"`.
+### 4.2b Des-escalado legal: proyecto legado que quiere ser corta
+
+Edge case de la spec ("proyecto legado sin `track` que quiere volverse corta
+antes de empezar"). Manifiesto **sin** el campo `track`, temario de una fila, sin
+capítulos de ordinal ≥ 2:
+
+```bash
+python3 writeonmars/scripts/track.py --desescalar --project-dir "$LEGACY"; echo $?   # → 0
+python3 -c '
+import json,sys
+m = json.load(open(sys.argv[1]))
+assert m["track"] == "corta"
+h = m["track_history"][-1]
+assert h["from"] == "estandar" and h["to"] == "corta"   # la ausencia se resuelve a estandar
+assert h["actor"]
+print("OK des-escalado legal registrado")' "$LEGACY/.writeonmars-manifest.json"
+```
+
+Nótese que `from` vale `"estandar"` aunque el manifiesto no tuviera el campo: la
+ausencia se resuelve vía `findings_lib.project_track` antes de escribir el
+historial.
 
 ### 4.3 Ningún agente escala (AS-3)
 

@@ -87,11 +87,9 @@ formato se verifica igual, en el bloque 5.
 
 ### 2.5 Por qué esto no abre el contrato
 
-`speckit.review-structure.md` **ya emite hoy dos bloques** (`## Pasada 1` y
-`## Pasada 2`) en una sola ejecución: *"cubre las dos dimensiones en una sola
-ejecución, según el `signing_matrix`"*. El esquema pass-output nunca ató un
-bloque a un proceso: ata un bloque a una **dimensión**. La combinada extiende ese
-precedente de dos a cuatro dimensiones.
+El argumento completo está en `research.md` § R7 (el precedente: el comando ya
+emite dos bloques en un run). En corto: el esquema pass-output nunca ató un
+bloque a un proceso, sino a una **dimensión**.
 
 `parse_findings` no conoce el origen del bloque. `_passes_by_chapter` solo mira
 las pasadas 1-4 para `approved`. `plan_global` solo comprueba que exista un
@@ -110,6 +108,12 @@ queda a medias y registra solo los bloques 1 y 2:
 El proyecto converge a ceremonia estándar sin intervención humana y sin perder
 ninguna dimensión. Los comandos sueltos siguen operativos como red de reparación
 (FR-006).
+
+**Cómo se verifica ese estado degradado** (research R11): con
+`all_chapters_approved is False` y `by_chapter["1"].passes_done == [1, 2]`.
+**Nunca** con `next_step == "review"`: en produccion `next_step` ya vale `close`
+en cuanto hay un bloque sin críticos, y el despacho de la pasada que falta llega
+por la rama de normalización de `plan_action` (`runner.rs:162`).
 
 ---
 
@@ -172,7 +176,7 @@ lista de campos garantizados.
 
 ## 5. Delta de `vivarium-core`
 
-### 5.1 `sidecar.rs` — fontanería
+### 5.1 `sidecar.rs` — fontanería, no comportamiento
 
 ```rust
 pub struct Status {
@@ -184,6 +188,10 @@ pub struct Status {
 ```
 
 `#[serde(default)]` mantiene la tolerancia a `status.py` antiguos.
+
+FR-007 declara `plan_global` el **único cambio de comportamiento** admisible en
+el ejecutor. Este campo es lectura de estado, no decisión: sin él, `plan_global`
+no podría consultar la pista. No cuenta como segundo cambio de comportamiento.
 
 ### 5.2 `runner.rs` — el único cambio de comportamiento
 

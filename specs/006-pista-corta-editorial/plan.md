@@ -186,8 +186,13 @@ humano, que `mode_history` no registra. Divergencia documentada en
 |---|---|---|
 | `constitution` | `bootstrap --sector` deja `manifest.sector` no nulo | `status.py:384` (`if not manifest.get("sector")`) |
 | `plan` | el brief firmado materializa 1 fila de temario ⇒ `chapters_expected == 1` | `status.py:389` (`if expected == 0`) |
-| `review-2`, `review-3`, `review-5` | la combinada registra sus bloques; el ejecutor busca la primera pasada ausente | `runner.rs:265` y `runner.rs:282` |
+| `review-3` | la combinada registra el bloque 3; el ejecutor busca la primera pasada ausente y encuentra la 4 | `runner.rs:265` |
+| `review-5` | la combinada registra el bloque 5; `plan_global` no lo despacha si ya existe | `runner.rs:282` |
 | `intro` | **único cambio real**: `plan_global` salta el bloque `README.md` si `track == corta` | `runner.rs:291` |
+
+`review-2` no aparece en la tabla porque **tampoco se despacha en ceremonia
+estándar**: `speckit.review-structure` ya emite hoy los bloques 1 y 2 en un solo
+run, así que `choose_review_action` nunca lo encuentra ausente.
 
 Nada de esto toca `_next_step`, `_build_by_chapter`, `choose_review_action` ni
 `effect_satisfied`.
@@ -251,6 +256,15 @@ Consecuencia en el ejecutor, sin tocarlo: tras `review-1`, `choose_review_action
 encuentra las pasadas 1, 2 y 3 hechas y despacha `review-4` (precisión) al rol
 **Documentalista** — otro modelo. `voz ≠ precisión` sobrevive. Y `plan_global`
 encuentra el bloque 5 ya presente y no despacha `review-5`.
+
+**Por qué vía llega ese despacho** (research R11, verificado empíricamente): en
+produccion `next_step` vale `close` —no `review`— en cuanto `findings.md` tiene
+un bloque y no hay críticos, porque `closeable` no exige `all_chapters_approved`.
+Quien despacha `review-4` es la **rama de normalización** de `plan_action`
+(`runner.rs:162`: `next_step == "close" && !all_chapters_approved`), que existe
+precisamente para eso desde la feature 004. El resultado no cambia; la ruta, sí.
+Ninguna aserción de esta feature debe comprobar `next_step == "review"` sobre un
+proyecto con pasadas parcialmente registradas.
 
 Los comandos sueltos (`review-voice`, `review-global`, `review-precision`) quedan
 como **red de reparación** (FR-006): si la combinada se queda a medias, rellenan
@@ -377,10 +391,23 @@ paralelo al 5-7 (frontera dura por archivos).
 
 ## Riesgos y mitigaciones
 
+- **El oráculo de la 005 se rompe al añadir `track`** (research R4): 
+  `test_oraculo_json_estudio` compara el dict completo de `--json` contra
+  `tests/fixtures/005-estudio/expected-status.json`. La clave nueva lo tumba.
+  Mitigación: el oráculo gana `"track": "estandar"` y **nada más** — edición de
+  dato, no de aserción. Es la única excepción admitida a "ninguna aserción
+  existente se edita", y está acotada a una línea con diff publicado en R4. Sin
+  esta excepción, el gate de T004/T025 sería insatisfacible.
 - **Regresión en `estandar`**: mitigado por FR-010 como contrato (ninguna
-  aserción existente se edita), campos JSON solo aditivos y toda verificación
-  nueva condicionada a `track == corta`. `test_status.py` gana un caso de
-  byte-identidad del dashboard.
+  aserción existente se **debilita**), campos JSON solo aditivos y toda
+  verificación nueva condicionada a `track == corta`. `test_status.py` gana un
+  caso de byte-identidad del dashboard contra un fichero-oráculo capturado
+  **antes** de tocar `status.py` (lo genera T003).
+- **`/speckit-implement` aborta en `main`**: `.specify/scripts/bash/check-prerequisites.sh`
+  llama a `check_feature_branch` sin consultar antes `feature_json_matches_feature_dir`,
+  a diferencia de `setup-plan.sh:36` y `setup-tasks.sh:32`. Como este repo fija la
+  feature con `.specify/feature.json` y trabaja en `main`, el script falla. Se
+  alinea con los otros dos (o, como paliativo, `SPECIFY_FEATURE=006-pista-corta-editorial`).
 - **La combinada se queda a medias** (el agente registra 1 y 2, no 3 ni 5): el
   ejecutor despacha `review-3` por su cuenta — `choose_review_action` busca la
   primera pasada ausente. Degradación grácil a ceremonia estándar, sin

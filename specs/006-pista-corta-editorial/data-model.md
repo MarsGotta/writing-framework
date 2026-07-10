@@ -155,9 +155,8 @@ La dimensión 4 (precisión) **no** va en la combinada: viaja en un relevo apart
 con otro rol/modelo, y en `produccion` emite además `claims.md`. Es la regla
 dura **voz ≠ precisión** del Principio V.
 
-**Precedente**: `speckit.review-structure` ya emite hoy dos bloques (1 y 2) en
-una sola ejecución. La combinada extiende ese precedente de dos a cuatro
-dimensiones.
+**Por qué no abre contrato**: research R7 (el precedente de los dos bloques en un
+run). No se repite aquí.
 
 **Indistinguibilidad**: un bloque escrito por la combinada y uno escrito por su
 comando suelto son idénticos byte a byte en estructura. `parse_findings` no
@@ -188,6 +187,16 @@ los sueltos que falten y el proyecto converge igual.
 `warnings` (lista de `string`, ya existente) gana hasta dos entradas advisory en
 pista corta (R5). No hay ningún otro cambio: `next_step`, `next_detail`, `gates`,
 `closeable`, `by_chapter` y `all_chapters_approved` conservan su lógica exacta.
+
+> **El oráculo de la 005 gana esta clave** (R4).
+> `tests/fixtures/005-estudio/expected-status.json` congela el dict completo de
+> `--json`; debe añadir `"track": "estandar"` y nada más. Cualquier otra línea
+> tocada en ese archivo es señal de que algo se torció.
+
+**Ojo con `next_step`** (R11): en produccion vale `close` —no `review`— en cuanto
+`findings.md` tiene un bloque y no hay críticos, porque `closeable` no exige
+`all_chapters_approved`. El estado de la revisión se lee de
+`by_chapter[c].passes_done` y `all_chapters_approved`, nunca de `next_step`.
 
 `print_dashboard()` **no cambia**: la salida humana de un proyecto `estandar` es
 byte-idéntica a la anterior a esta feature (R4).

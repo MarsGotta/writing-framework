@@ -22,8 +22,9 @@ impuesto que deja las piezas cortas fuera del método (se escriben "a mano",
 sin voz calibrada, sin factualidad, sin registro). La evidencia de coste es
 propia: la validación BYOM real (2026-07-08) necesitó 26 despachos para 2
 capítulos; el camino feliz de una pieza única por la ceremonia estándar son
-~13 pasos, de los cuales al menos dos (temario multi-capítulo, README de
-presentación) son vacuos en pieza única.
+**11 despachos** más dos checkpoints humanos (cifra verificada contra el
+código, 2026-07-10), de los cuales al menos dos (temario multi-capítulo,
+README de presentación) son vacuos en pieza única.
 
 BMAD v6 resolvió este mismo problema en su dominio con pistas de ceremonia
 adaptativas a escala (Quick Flow / Method / Enterprise) y escalado que
@@ -56,7 +57,7 @@ fila con ese título y esa promesa. A partir de ahí el ciclo corre como siempre
 redacción con la pirámide de prosa, revisión, export — pero sin paso de
 temario, sin README de presentación y con el export produciendo un PDF digno
 de pieza única. El camino feliz cuesta como máximo 8 despachos donde la
-ceremonia estándar costaría ~13.
+ceremonia estándar costaría 11.
 
 **Why this priority**: es la feature — sin el ciclo corto operativo de punta
 a punta no hay nada que revisar ni escalar. Las otras dos stories dependen de
@@ -79,8 +80,9 @@ Verificable con stubs, sin agentes reales.
    de presentación (intro omitido) y el export produce un PDF de pieza única
    (portada compacta — título, autora, fecha —; sin índice de capítulos).
 3. **Given** el camino feliz completo (0 ciclos de revise), **When** se
-   cuentan los despachos en `decisions.jsonl`, **Then** son ≤ 8 (agentes +
-   sidecar), frente a ~13 de la ceremonia estándar para la misma pieza.
+   cuentan los despachos en `decisions.jsonl` (registros `event ==
+   "dispatch"`), **Then** son ≤ 8 (agentes + sidecar), frente a los 11 de la
+   ceremonia estándar para la misma pieza.
 4. **Given** un proyecto sin campo `track` o con `track: estandar`, **When**
    se consulta el estado en cualquier fase, **Then** la salida es idéntica a
    la actual (retrocompatibilidad total, espejo de FR-011 de la 005).
@@ -204,17 +206,26 @@ invalidar las pasadas ya registradas del 1.
 - **FR-001**: El manifiesto (`.writeonmars-manifest.json`) MUST admitir el
   campo opcional `track` con valores `estandar` | `corta` (ausencia =
   `estandar`; valor desconocido = error claro, espejo de `mode`), más un
-  historial de cambios (`track_history`, espejo de `mode_history`).
+  historial de cambios (`track_history`, espejo de `mode_history` **en la
+  forma** —array append-only, escrito solo por script, nunca a mano— con el
+  campo adicional `actor` que FR-008 exige para la auditoría).
   `manifest-schema.json` sube MINOR. `status.py` MUST exponer `track` en
-  `--json` (espejo de `mode`); ningún otro cambio en la brújula es admisible
-  para esta feature.
+  `--json` (espejo de `mode`). Ningún cambio en la **lógica de estado** de la
+  brújula es admisible: `next_step`, `next_detail`, `gates`, `closeable` y
+  `by_chapter` conservan su cálculo exacto. `status.py` MAY añadir entradas
+  informativas al canal `warnings` ya existente (avisos de incoherencia de
+  pista); esas entradas no bloquean ni alteran el estado.
 - **FR-002**: `bootstrap.py` MUST aceptar `--track` (y variable de entorno
   `WRITEONMARS_TRACK`) con default `estandar`, escribiéndolo en el manifiesto
-  al crear el proyecto. MUST aceptar también `--sector`, que fija el sector
-  del manifiesto y deja las adendas con los defaults de
-  `references/sectores/<sector>.md`: con sector fijado, la brújula no pide el
-  paso `constitution` en el camino corto (ya lo omite con `sector` no nulo) y
-  el comando queda disponible para calibrar adendas a mano.
+  al crear el proyecto. MUST aceptar también `--sector` (y su gemela
+  `WRITEONMARS_SECTOR`), que fija el sector del manifiesto y aplica las
+  adendas del sector **por referencia**: el script declara sector, registro y
+  base aplicada, y remite a `references/sectores/<sector>.md` sin destilar su
+  prosa (un script determinista no emite juicio, Principio VI). Ambas
+  variables de entorno son la vía por la que un ejecutor crea un proyecto
+  corta sin recibir argumentos nuevos. Con sector fijado, la brújula no pide
+  el paso `constitution` en el camino corto (ya lo omite con `sector` no nulo)
+  y el comando queda disponible para calibrar adendas a mano.
 - **FR-003**: En pista corta, el comando de brief (`speckit.specify`) MUST
   capturar los ocho campos descriptivos **más el título y la promesa de la
   pieza** en una sola ronda compacta (checkpoint humano 1 intacto: sin firma
@@ -244,9 +255,14 @@ invalidar las pasadas ya registradas del 1.
   en pista corta como red de reparación (rellenar bloques que la combinada
   dejara incompletos, re-pasar una dimensión suelta).
 - **FR-007**: En pista corta el paso `intro` (README de presentación) MUST
-  omitirse: el ejecutor MUST NOT exigir `README.md` antes del export (cambio
-  acotado a `plan_global` en `vivarium-core`, único cambio admisible en el
-  ejecutor), y `export.py` MUST producir el PDF de pieza única con **portada
+  omitirse **en ambos modos**: el ejecutor MUST NOT exigir `README.md` antes
+  del export, ni despacharlo en produccion ni convertirlo en checkpoint humano
+  en estudio (un checkpoint sobre un artefacto que el método declara
+  inexistente sería un callejón sin salida). El cambio queda acotado a
+  `plan_global` en `vivarium-core`: es el **único cambio de comportamiento**
+  admisible en el ejecutor. Deserializar el campo `track` en `Status`
+  (`sidecar.rs`) es fontanería de lectura, no comportamiento, y por eso queda
+  permitido. `export.py` MUST producir el PDF de pieza única con **portada
   compacta** (título, autora, fecha) en lugar de la portada de libro, **sin
   índice** de capítulos, conservando la sección Fuentes con el estilo
   `.chapter-sources`.
@@ -302,14 +318,22 @@ invalidar las pasadas ya registradas del 1.
 
 - **SC-001**: Una pieza única en `corta`+`produccion` se recorre de punta a
   punta (brief → close) con **≤ 8 despachos** en el camino feliz (0 revise),
-  contados en `decisions.jsonl`, frente a ~13 de la ceremonia estándar para
-  la misma pieza; reproducible como smoke con stubs.
+  contados en `decisions.jsonl` sobre los registros `event == "dispatch"`
+  (los checkpoints humanos no son despachos), frente a los **11** de la
+  ceremonia estándar para la misma pieza. La cifra de la ceremonia estándar
+  está verificada contra el código: la estimación previa de "~13 pasos"
+  contaba además los dos checkpoints humanos y el `setup`. Reproducible como
+  smoke con stubs.
 - **SC-002**: Las cinco dimensiones del Principio V constan en `findings.md`
   (bloques 1-5) también en pista corta, y `claims.md` existe en produccion:
   cero garantías perdidas, verificable por script sobre el fixture.
-- **SC-003**: `status.py` no cambia su lógica de estado (solo expone
-  `track`): los fixtures existentes producen salida byte-idéntica y el
-  fixture corta alcanza `approved`/`closeable` con el parser actual.
+- **SC-003**: `status.py` no cambia su lógica de estado (solo expone `track`).
+  Verificable en tres planos: (a) el **dashboard** (`print_dashboard`) de un
+  fixture `estandar` produce salida byte-idéntica; (b) el dict de `--json`
+  difiere de la referencia **exactamente** en la clave aditiva `track` y en
+  nada más —por lo que el oráculo `tests/fixtures/005-estudio/expected-status.json`
+  gana esa única clave, sin que ninguna aserción se debilite—; (c) el fixture
+  corta alcanza `approved`/`closeable` con el parser actual.
 - **SC-004**: El escalado del fixture corta conserva el 100% del trabajo
   previo (brief, pieza como capítulo 1, findings, claims, pasadas) y queda
   registrado con actor humano; el des-escalado ilegal se rechaza con mensaje
