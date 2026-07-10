@@ -34,15 +34,25 @@ revisión), no elimina garantías (brief firmado, cinco dimensiones, voz ≠
 precisión, escribe-uno-revisa-otro, claims en produccion, dos checkpoints
 humanos, gates deterministas).
 
+## Clarifications
+
+### Session 2026-07-09
+
+- Q: ¿Cómo despacha el ejecutor la pasada combinada (1·2·3·5) en pista corta? → A: El despacho existente de la pasada 1 se vuelve consciente de pista y registra los bloques 1·2·3·5 en un único run; el ejecutor no cambia (ve el bloque 1 y pasa a la 4).
+- Q: ¿Corre `constitution` como despacho en el camino corto? → A: No en el camino feliz: `bootstrap --sector` fija sector y adendas con los defaults del sector; `constitution` solo se despacha si `sector` queda null (o para ajustar a mano).
+- Q: ¿Cómo se ve el PDF de pieza única? → A: Portada compacta (título, autora, fecha), sin índice; la sección Fuentes conserva el estilo `.chapter-sources`.
+- Q: ¿Mecanismo del escalado corta→estandar? → A: Script determinista dedicado (`scripts/track.py`), patrón `dispose.py`: identidad humana de git, validación de legalidad y escritura atómica de `track` + `track_history`.
+- Q: ¿Quién fija título y promesa del temario degenerado? → A: La operadora, dentro del brief compacto: son campos firmables del checkpoint 1 y se materializan tal cual en `plan.md`.
+
 ## User Stories
 
 ### User Story 1 - Declarar la pista y recorrer el ciclo corto (Priority: P1)
 
 Una operadora quiere publicar un artículo técnico con la voz y las garantías
 de la casa. Crea el proyecto declarando pista corta, firma un brief compacto
-(mismos ocho campos, una sola ronda de preguntas) y el sistema materializa en
-ese momento el temario degenerado: una fila con el título y la promesa de la
-pieza. A partir de ahí el ciclo corre como siempre — research con citas,
+(los ocho campos más el título y la promesa de la pieza, en una sola ronda de
+preguntas) y, con la firma, el sistema materializa el temario degenerado: una
+fila con ese título y esa promesa. A partir de ahí el ciclo corre como siempre — research con citas,
 redacción con la pirámide de prosa, revisión, export — pero sin paso de
 temario, sin README de presentación y con el export produciendo un PDF digno
 de pieza única. El camino feliz cuesta como máximo 8 despachos donde la
@@ -67,7 +77,7 @@ Verificable con stubs, sin agentes reales.
 2. **Given** el mismo proyecto con research y pieza redactada y revisada,
    **When** el ejecutor corre las etapas globales, **Then** no exige README
    de presentación (intro omitido) y el export produce un PDF de pieza única
-   (portada desde el brief; sin índice de capítulos o con índice degenerado).
+   (portada compacta — título, autora, fecha —; sin índice de capítulos).
 3. **Given** el camino feliz completo (0 ciclos de revise), **When** se
    cuentan los despachos en `decisions.jsonl`, **Then** son ≤ 8 (agentes +
    sidecar), frente a ~13 de la ceremonia estándar para la misma pieza.
@@ -141,7 +151,7 @@ estándar "por si acaso", matando la feature. Es P3 porque exige US1/US2
 operativas.
 
 **Independent Test**: sobre un fixture corta con pieza + findings + claims,
-un script ejecuta el escalado y verifica que el manifiesto registra
+se ejecuta `scripts/track.py --escalar` y se verifica que el manifiesto registra
 `track: estandar` + historial, que el temario admite N filas manteniendo la
 pieza como capítulo 1, y que `status.py` pide los capítulos 2..N sin
 invalidar las pasadas ya registradas del 1.
@@ -180,10 +190,9 @@ invalidar las pasadas ya registradas del 1.
   BYOM mal configurado: misma exposición que hoy tiene el reparto Mesa/Doc —
   la config BYOM asigna roles distintos y el smoke lo verifica con stubs
   distinguibles; el método lo declara MUST en los comandos.
-- Export con `--no-toc` o índice degenerado: el PDF de pieza única no debe
-  abrir con un índice de una fila que parezca un error de maquetación; la
-  decisión visual concreta (omitir vs compactar) la fija el plan con la hoja
-  de estilo existente.
+- Export de pieza única: portada compacta y sin índice (clarificado
+  2026-07-09); el plan fija solo los detalles de la hoja de estilo de la
+  cabecera compacta (tipografía, márgenes), no la decisión.
 - Proyecto legado (sin `track`) que quiere volverse corta antes de empezar:
   legal mientras el temario tenga ≤ 1 fila y no haya capítulos 2+; misma
   acción humana registrada.
@@ -201,12 +210,17 @@ invalidar las pasadas ya registradas del 1.
   para esta feature.
 - **FR-002**: `bootstrap.py` MUST aceptar `--track` (y variable de entorno
   `WRITEONMARS_TRACK`) con default `estandar`, escribiéndolo en el manifiesto
-  al crear el proyecto.
+  al crear el proyecto. MUST aceptar también `--sector`, que fija el sector
+  del manifiesto y deja las adendas con los defaults de
+  `references/sectores/<sector>.md`: con sector fijado, la brújula no pide el
+  paso `constitution` en el camino corto (ya lo omite con `sector` no nulo) y
+  el comando queda disponible para calibrar adendas a mano.
 - **FR-003**: En pista corta, el comando de brief (`speckit.specify`) MUST
-  capturar los mismos ocho campos descriptivos en una sola ronda compacta
-  (checkpoint humano 1 intacto: sin firma no hay avance) y, al quedar firmado
-  el brief, MUST materializar el **temario degenerado** — una fila con título
-  y promesa derivados del brief — en el artefacto que la brújula ya lee
+  capturar los ocho campos descriptivos **más el título y la promesa de la
+  pieza** en una sola ronda compacta (checkpoint humano 1 intacto: sin firma
+  no hay avance) y, al quedar firmado el brief, MUST materializar el
+  **temario degenerado** — una fila con el título y la promesa firmados, tal
+  cual — en el artefacto que la brújula ya lee
   (`plan.md` § Temario), de modo que `chapters_expected == 1` y el paso
   `plan` desaparezca del ciclo sin modificar `status.py`.
 - **FR-004**: El research en pista corta MUST conservar íntegro el contrato
@@ -217,7 +231,10 @@ invalidar las pasadas ya registradas del 1.
   **pasada combinada** que verifica las dimensiones 1 (estructura), 2
   (utilidad), 3 (naturalidad) y 5 (formato; la coherencia inter-capítulos es
   vacua en pieza única) y las registra como los bloques de pasada estándar
-  existentes (esquema pass-output sin cambios, un bloque por dimensión); (b)
+  existentes (esquema pass-output sin cambios, un bloque por dimensión),
+  **vehiculada por el despacho existente de la pasada 1** (consciente de
+  pista: ese run verifica y registra 1·2·3·5; el ejecutor no cambia — ve el
+  bloque 1 registrado y pasa a la 4); (b)
   **pasada de precisión** (dimensión 4) en relevo aparte, con rol/modelo
   distinto, que en produccion emite `claims.md` (feature 003 íntegra). Las
   reglas duras se preservan: escribe-uno-revisa-otro, voz ≠ precisión,
@@ -229,13 +246,17 @@ invalidar las pasadas ya registradas del 1.
 - **FR-007**: En pista corta el paso `intro` (README de presentación) MUST
   omitirse: el ejecutor MUST NOT exigir `README.md` antes del export (cambio
   acotado a `plan_global` en `vivarium-core`, único cambio admisible en el
-  ejecutor), y `export.py` MUST producir un PDF digno de pieza única (portada
-  desde el brief; índice omitido o degenerado, decisión visual en el plan).
-- **FR-008**: El escalado `corta → estandar` MUST ser una acción humana
-  explícita registrada en el manifiesto (pista nueva, fecha, actor) que
-  conserva todo el trabajo: brief, pieza (pasa a capítulo 1 del temario
+  ejecutor), y `export.py` MUST producir el PDF de pieza única con **portada
+  compacta** (título, autora, fecha) en lugar de la portada de libro, **sin
+  índice** de capítulos, conservando la sección Fuentes con el estilo
+  `.chapter-sources`.
+- **FR-008**: El escalado `corta → estandar` MUST ejecutarse con un script
+  determinista dedicado (`scripts/track.py`, patrón `dispose.py`: identidad
+  humana desde git config con rechazo de identidades de agente, validación de
+  legalidad, escritura atómica) que registra el cambio en el manifiesto
+  (pista nueva, fecha, actor humano) y conserva todo el trabajo: brief, pieza (pasa a capítulo 1 del temario
   ampliado), findings, claims y pasadas registradas. El des-escalado
-  `estandar → corta` MUST rechazarse si el temario tiene más de una fila o
+  `estandar → corta` MUST rechazarlo el mismo script si el temario tiene más de una fila o
   existen capítulos 2+. Ningún agente MUST cambiar `track` (misma política
   que `mode`).
 - **FR-009**: La pista MUST ser ortogonal al modo (matriz 2×2 completa): en
@@ -265,15 +286,15 @@ invalidar las pasadas ya registradas del 1.
   (ceremonia completa actual) o `corta` (pieza única, temario degenerado, dos
   relevos de revisión, sin intro). Ortogonal al modo. Vive en el manifiesto
   con historial de cambios.
-- **Temario degenerado**: la fila única (título + promesa) que el brief
-  firmado materializa en `plan.md`; hace `chapters_expected == 1` sin tocar
+- **Temario degenerado**: la fila única (título + promesa firmados en el
+  brief) que la firma del checkpoint 1 materializa en `plan.md`; hace `chapters_expected == 1` sin tocar
   la brújula y da al export su portada/estructura.
 - **Pasada combinada**: un despacho que verifica y registra las dimensiones
   1·2·3·5 como bloques pass-output estándar. Comodidad de ceremonia, no
   contrato nuevo: sus bloques son indistinguibles de los de pasadas sueltas.
 - **Registro de escalado (`track_history`)**: apéndice del manifiesto con
   cada cambio de pista (de, a, fecha, actor humano), espejo de
-  `mode_history`.
+  `mode_history`. Lo escribe `scripts/track.py`; nunca se edita a mano.
 
 ## Success Criteria
 
@@ -314,14 +335,16 @@ invalidar las pasadas ya registradas del 1.
 - **El reparto de roles BYOM no cambia**: combinada → editora de mesa,
   precisión → documentalista, redacción/revise → redactora. La config
   `.vivarium/config.toml` existente sirve tal cual.
-- **El comando `review` agrupado se vuelve consciente de pista** (en corta
-  ejecuta combinada + precisión); los comandos sueltos permanecen sin
-  cambios. La mecánica exacta de cómo la pasada combinada emite sus bloques
-  (un run, cuatro bloques) la fija el plan.
-- **`speckit.constitution` en pista corta** sigue siendo el primer paso
-  (adendas por sector con defaults), con la captura guiada reducida a una
-  confirmación cuando la operadora acepta los defaults del sector; no se
-  añade paso nuevo ni se elimina el existente.
+- **Los comandos de pasada se vuelven conscientes de pista** (clarificado
+  2026-07-09): el despacho de la pasada 1 (`review-structure`) vehicula la
+  combinada en corta — un run que verifica y registra los bloques 1·2·3·5 —,
+  el agrupado `review` ejecuta combinada + precisión, y los sueltos restantes
+  quedan como red de reparación.
+- **`speckit.constitution` queda opcional en pista corta** (clarificado
+  2026-07-09): `bootstrap --sector` deja las adendas con los defaults del
+  sector al crear el proyecto y la brújula no lo pide (sector no nulo); el
+  comando sigue disponible para calibrar las adendas a mano cuando la pieza
+  lo pida.
 - **Trazabilidad documental** (constitución § Arquitectura): decisión propia
   del proyecto con fundamento externo en el análisis de BMAD v6
   (`docs/comparativa-bmad.md`: pistas Quick Flow / Method / Enterprise,
