@@ -1,0 +1,41 @@
+================================================================
+ Write.OnMars · 001-fact
+================================================================
+ Capítulos: 3/3 del temario
+   01-uno.md, 02-dos.md, 03-tres.md
+----------------------------------------------------------------
+ Pasada            Estado                Firma       Hallazgos
+----------------------------------------------------------------
+ 1 Estructura      passed                autonomous    crit 0 · med 0 · baj 0 · abiertos 0
+ 2 Utilidad        passed                autonomous    crit 0 · med 0 · baj 0 · abiertos 0
+ 3 Naturalidad     passed                autonomous    crit 0 · med 0 · baj 0 · abiertos 0
+ 4 Precisión       passed                autonomous    crit 0 · med 0 · baj 0 · abiertos 0
+ 1 Estructura      passed                autonomous    crit 0 · med 0 · baj 0 · abiertos 0
+ 2 Utilidad        passed                autonomous    crit 0 · med 0 · baj 0 · abiertos 0
+ 3 Naturalidad     passed                autonomous    crit 0 · med 0 · baj 0 · abiertos 0
+ 4 Precisión       passed                autonomous    crit 0 · med 0 · baj 0 · abiertos 0
+ 1 Estructura      passed                autonomous    crit 0 · med 0 · baj 0 · abiertos 0
+ 2 Utilidad        passed                autonomous    crit 0 · med 0 · baj 0 · abiertos 0
+ 3 Naturalidad     passed                autonomous    crit 0 · med 0 · baj 0 · abiertos 0
+ 4 Precisión       passed                autonomous    crit 0 · med 0 · baj 0 · abiertos 0
+----------------------------------------------------------------
+ Capítulos (ciclo por capítulo)
+   cap 1      APPROVED     pasadas 1·2·3·4    revise 0 · avisos 0
+   cap 2      APPROVED     pasadas 1·2·3·4    revise 0 · avisos 0
+   cap 3      APPROVED     pasadas 1·2·3·4    revise 0 · avisos 0
+   Todos los capítulos aprobados: sí
+----------------------------------------------------------------
+ Factualidad (afirmaciones con evidencia plena): 80%
+   cap 1      80%
+   cap 2      80%
+   cap 3      no medido
+   sin claims (no medidos): 3
+----------------------------------------------------------------
+ Gates de cierre
+   [OK] Sin hallazgos críticos abiertos   (críticos abiertos: 0)
+   [OK] Firmas humanas completas
+   [OK] Guía completa   (3/3 capítulos)
+----------------------------------------------------------------
+ CIERRE: PROYECTO CERRABLE  (hallazgos abiertos totales: 0)
+ Siguiente paso: setup — base ref sin preparar: el humano corre tools/new-guide.sh (scaffold del Project)
+================================================================

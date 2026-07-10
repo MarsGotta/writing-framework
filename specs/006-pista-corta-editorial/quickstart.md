@@ -47,21 +47,28 @@ El fixture `estandar` de referencia para las regresiones ya existe:
 **Lo que se afirma**: un proyecto sin `track` (o con `track: estandar`) se
 comporta exactamente igual que antes de la feature.
 
+> **Ojo con la ruta**: el proyecto editorial del fixture 003 vive en
+> `tests/fixtures/003-factualidad/**project**/`, no en la raíz del fixture
+> (`conftest.py:266` lo confirma). Apuntar a la raíz devuelve **exit 2 con
+> stdout vacío**, y un oráculo vacío hace que la prueba de byte-identidad pase
+> sin comprobar nada.
+
 ```bash
 # 1a. Capturar el ORÁCULO DEL DASHBOARD **antes** de tocar status.py (lo hace T003).
-python3 writeonmars/scripts/status.py --project-dir tests/fixtures/003-factualidad \
+python3 writeonmars/scripts/status.py --project-dir tests/fixtures/003-factualidad/project \
   > tests/fixtures/006-corta/expected-dashboard-estandar.txt
+test -s tests/fixtures/006-corta/expected-dashboard-estandar.txt   # NO vacío: el oráculo debe tener bytes
 ```
 
 ```bash
 # 1b. Tras la feature: el dashboard humano es BYTE-IDÉNTICO.
-python3 writeonmars/scripts/status.py --project-dir tests/fixtures/003-factualidad \
+python3 writeonmars/scripts/status.py --project-dir tests/fixtures/003-factualidad/project \
   | diff - tests/fixtures/006-corta/expected-dashboard-estandar.txt   # sin diferencias
 ```
 
 ```bash
 # 1c. --json gana EXACTAMENTE una clave: "track": "estandar". Ninguna otra diferencia.
-python3 writeonmars/scripts/status.py --json --project-dir tests/fixtures/003-factualidad \
+python3 writeonmars/scripts/status.py --json --project-dir tests/fixtures/003-factualidad/project \
   | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["track"]=="estandar", d["track"]; print("OK")'
 ```
 
@@ -80,12 +87,13 @@ ella.
 `tests/unit/test_status_estudio.py::test_oraculo_json_estudio` compara el dict
 completo de `--json` contra `tests/fixtures/005-estudio/expected-status.json`.
 Añadir la clave `track` lo rompe. El **fichero-oráculo** (dato, no aserción) gana
-una línea y nada más:
+una línea y nada más. El fichero está ordenado con `sort_keys=True`, así que la
+clave cae entre `spec` y `warnings`:
 
 ```diff
    "spec": "001-estudio",
-   "mode": "estudio",
 +  "track": "estandar",
+   "warnings": []
 ```
 
 La aserción (`state == oracle`) no se toca ni se relaja. Si te ves editando

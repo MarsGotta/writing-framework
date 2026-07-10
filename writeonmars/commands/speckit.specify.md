@@ -46,3 +46,39 @@ No avances a `speckit.research` mientras sigan sin resolver los campos críticos
 `specs/<###-feature>/spec.md` con los ocho campos descriptivos completos, el campo
 5 reflejando el tono de las adendas, y un bloque de contexto del proyecto
 (audiencia, ejemplo recurrente, tono heredado) para los pasos siguientes.
+
+## Pista corta
+
+Si el manifiesto declara `track: corta` (`.writeonmars-manifest.json`), el brief se
+recoge en una sola ronda y su firma materializa el temario degenerado.
+
+- Captura los **ocho campos descriptivos más el título y la promesa de la pieza** en
+  **una sola tanda** de preguntas. El checkpoint humano 1 sigue intacto: sin firma no
+  hay avance, y no materializas el temario hasta que el brief queda firmado.
+- Al quedar firmado el brief, escribe `specs/<###-feature>/plan.md` con una sección
+  `## Temario` de **una sola fila**:
+
+  ```markdown
+  ## Temario
+
+  | Número | Título | Promesa | Estructura aplicada |
+  |--------|--------|---------|---------------------|
+  | 1 | <título firmado en el brief> | <promesa firmada en el brief> | didactica_v1 |
+  ```
+
+  Copia el título y la promesa **tal cual** de los campos firmados; no los reescribes
+  ni los "mejoras". Con esa fila, `chapters_expected == 1` y el paso `plan` desaparece
+  del ciclo sin tocar `status.py`.
+
+**Resolución del tono.** Cuando `bootstrap --sector` fija las adendas **por
+referencia**, el bloque `### Tono calibrado` de `.specify/memory/constitution.md`
+remite al sector en lugar de escribir el tono palabra por palabra. Si ese bloque
+declara las adendas por referencia, sigue su puntero hasta
+`.specify/presets/writeonmars/references/sectores/<slug>.md` —secciones
+`## Tono por defecto` y `## Persona gramatical y registro`— y refleja ese tono como
+eco en el campo 5. El bloque de adendas nombra la base en forma corta
+(`references/sectores/<slug>.md`); la ruta de arriba es la que resuelve dentro de un
+proyecto con el preset instalado. Mientras `manifest.sector` tenga valor, **no
+sugieras correr `/speckit-constitution`**: el sector ya dejó la capa normativa escrita
+y la pista corta omite ese paso. Es el mismo patrón con el que
+`speckit.review-voice` resuelve su registro desde el default del sector.

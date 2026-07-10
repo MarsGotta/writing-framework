@@ -53,3 +53,12 @@ nuevo, refresca el `README.md` sin pisar ediciones manuales marcadas.
 `README.md` en la raíz del proyecto. `export` lo incluye como apertura ("Acerca de
 esta guía", `id=intro-readme`). Pasa por la pasada de naturalidad como cualquier
 texto de la guía.
+
+## Pista corta
+
+Si el manifiesto declara `track: corta` (`.writeonmars-manifest.json`), este comando
+**no aplica** y se auto-anula. Una pieza única no lleva README de presentación: no hay
+portada de libro que envolver ni capítulos que anunciar en un índice. Detente sin
+escribir `README.md` y explica que `export.py` produce la portada compacta —título,
+autora y fecha— directamente. El paso `intro` queda omitido en ambos modos, también en
+estudio.

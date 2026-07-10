@@ -34,3 +34,11 @@ una cita válida, o si los `CitationRecord` no validan contra el esquema.
 
 `specs/<###-feature>/research.md` con cobertura completa de los conceptos
 obligatorios.
+
+## Pista corta
+
+Si el manifiesto declara `track: corta` (`.writeonmars-manifest.json`), el research es
+exprés: acota su alcance a los **conceptos obligatorios del brief**, sin panorama del
+campo ni estado del arte. El contrato de citación se conserva **íntegro** —una cita
+válida por concepto obligatorio— y sigue bloqueando el avance mientras algún concepto
+quede sin respaldo.

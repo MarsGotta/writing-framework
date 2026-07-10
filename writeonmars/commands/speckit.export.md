@@ -65,3 +65,10 @@ Reporta la ruta del PDF, el título y el número de capítulos.
 Como es determinista, puede dispararse en un hook `after_close` o por Paperclip
 sin intervención. No requiere decisiones del agente salvo que el usuario quiera
 sobrescribir portada o rutas.
+
+## Pista corta
+
+Si el manifiesto declara `track: corta` (`.writeonmars-manifest.json`), la invocación no
+cambia: `export.py` detecta la pista por sí solo. Produce un PDF de pieza única con
+portada compacta —título, autora y fecha—, sin índice de capítulos, conservando la
+sección `## Fuentes` con el estilo `.chapter-sources`.

@@ -70,26 +70,22 @@ def project_mode(manifest: dict | None) -> str:
         fail(str(e))
 
 
+def project_track(manifest: dict | None) -> str:
+    try:
+        return findings_lib.project_track(manifest)
+    except ValueError as e:
+        fail(str(e))
+
+
 def bar(label: str, width: int = 18) -> str:
     return label.ljust(width)
 
 
-def count_temario(spec_dir: Path) -> int:
-    """Cuenta los capítulos declarados en la tabla Temario de plan.md."""
-    plan = spec_dir / "plan.md"
-    if not plan.exists():
-        return 0
-    n, in_temario = 0, False
-    for line in plan.read_text(encoding="utf-8").splitlines():
-        s = line.strip()
-        if s.startswith("## ") and "Temario" in s:
-            in_temario = True
-            continue
-        if in_temario and s.startswith("## ") and "Temario" not in s:
-            break
-        if in_temario and re.match(r"\|\s*\d+\s*\|", s):
-            n += 1
-    return n
+# count_temario y drafted_ordinals viven ahora en findings_lib (R10, feature 006):
+# track.py las comparte para validar el des-escalado. Los alias módulo-locales
+# conservan los nombres previos (incluido el guion bajo histórico) para no romper
+# importadores ni tests que llaman status.count_temario / status._drafted_ordinals.
+count_temario = findings_lib.count_temario
 
 
 INVALID_ACTORS = {"", "—", "pendiente", "tbd", "{id}", "actor"}
@@ -106,15 +102,7 @@ def _norm_cap(cap: str) -> str:
     return (cap or "").strip().strip("[]").strip()
 
 
-def _drafted_ordinals(chapters: list[str]) -> set[int]:
-    """Ordinales con fichero chapters/NN-*.md presente. Mapea ordinal→fichero por
-    el prefijo numérico del nombre (p. ej. '03-intro.md' → 3)."""
-    out: set[int] = set()
-    for name in chapters:
-        m = re.match(r"\s*(\d+)", name)
-        if m:
-            out.add(int(m.group(1)))
-    return out
+_drafted_ordinals = findings_lib.drafted_ordinals
 
 
 def _passes_by_chapter(blocks: list[dict]) -> dict[str, set[int]]:
@@ -468,6 +456,7 @@ def evaluate(project: Path, spec_dir: Path) -> dict:
     blocks = parse_findings(spec_dir / "findings.md") if spec_dir else []
     manifest = load_manifest(project)
     mode = project_mode(manifest)
+    track = project_track(manifest)
     signing = (manifest or {}).get("signing_matrix", {})
     chapters = sorted(
         p.name for p in (project / "chapters").glob("*.md")
@@ -598,6 +587,22 @@ def evaluate(project: Path, spec_dir: Path) -> dict:
         reopened_chapters = sorted(reopened, key=_cap_sort_key)
         warnings.extend(hash_warnings)
 
+    # Avisos advisory de pista corta (R5, contrato §3.2): informan, no bloquean;
+    # no tocan next_step, gates, closeable ni by_chapter. En estandar no se emiten.
+    if track == "corta":
+        if expected > 1:
+            warnings.append(
+                f"track: corta declara pieza única pero el temario tiene {expected} filas: "
+                "corrige el temario o escala (scripts/track.py --escalar)"
+            )
+        fuera = sorted(n for n in drafted_ordinals if n >= 2)
+        if fuera:
+            warnings.append(
+                "track: corta con capítulos fuera de pieza única ("
+                + ", ".join(str(n) for n in fuera)
+                + "): sugiere escalar (scripts/track.py --escalar)"
+            )
+
     by_chapter, all_chapters_approved = _build_by_chapter(
         expected, chapters, blocks, revise_by_chapter, advisory_by_chapter,
         passes_override=passes_override,
@@ -620,6 +625,7 @@ def evaluate(project: Path, spec_dir: Path) -> dict:
     return {
         "spec": spec_dir.name if spec_dir else "(sin spec todavía)",
         "mode": mode,
+        "track": track,
         "chapters": chapters,
         "chapters_written": len(chapters),
         "chapters_expected": expected,

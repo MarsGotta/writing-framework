@@ -1,0 +1,5 @@
+<div class="cover cover-compact">
+  <h1 class="cover-title">{{TITLE}}</h1>
+  <div class="cover-author">{{AUTHOR}}</div>
+  <div class="cover-meta">{{META}}</div>
+</div>

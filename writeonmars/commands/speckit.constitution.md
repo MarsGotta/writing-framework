@@ -126,3 +126,12 @@ estándar. Lo único que detiene el comando es la falta del núcleo (corre
 
 Ya tienes la identidad normativa de la guía. Sigue con el brief:
 `/speckit-specify "tema"` → `/speckit-research` → `/speckit-plan`.
+
+## Pista corta
+
+Si el manifiesto declara `track: corta` (`.writeonmars-manifest.json`), este paso es
+**opcional**. Al crear el proyecto, `bootstrap --sector` ya dejó sector, registro y
+adendas por referencia, y la brújula no pide `constitution` mientras el sector tenga
+valor. El comando sigue disponible para calibrar a mano el tono, los anglicismos y los
+matices cuando la pieza lo pida: si lo corres, reescribe el bloque de adendas como de
+costumbre, sustituyendo la referencia por valores literales.

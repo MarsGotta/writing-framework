@@ -1,0 +1,34 @@
+{
+  "framework_version": "1.0.0",
+  "constitution_version": "1.7.0",
+  "agent_target": "claude-code",
+  "language_primary": "es",
+  "skills": [
+    {
+      "name": "writeonmars",
+      "version": "1.0.0",
+      "source": "bundled"
+    }
+  ],
+  "research_mode": "byom",
+  "signing_matrix": {
+    "pasada_1_estructura": "autonomous",
+    "pasada_2_utilidad": "autonomous",
+    "pasada_3_naturalidad": "autonomous",
+    "pasada_4_precision": "autonomous",
+    "pasada_5_formato": "autonomous"
+  },
+  "human_operators": [
+    {
+      "id": "marcela",
+      "email": "marcela@example.com",
+      "role": "author"
+    }
+  ],
+  "citation_contract_version": "1.0",
+  "project_type": "editorial",
+  "sector": "tecnologia",
+  "registro": "tecnico-divulgativo",
+  "track": "corta",
+  "mode": "estudio"
+}

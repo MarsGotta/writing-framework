@@ -189,12 +189,14 @@ debilita, ni se relaja el conjunto de claves comparadas. La regla de FR-010
 ("ninguna aserción existente se edita") se lee como "ninguna aserción se
 **debilita**"; congelar un contrato con una clave nueva lo refuerza.
 
-Diff exacto y único admisible sobre el oráculo:
+Diff único admisible sobre el oráculo: **una línea, `"track": "estandar"`**. El
+fichero se genera con `sort_keys=True`, así que la clave cae en su posición
+alfabética (entre `spec` y `warnings`), no junto a `mode`:
 
 ```diff
    "spec": "001-estudio",
-   "mode": "estudio",
 +  "track": "estandar",
+   "warnings": []
 ```
 
 Si un implementador se ve editando cualquier otra línea de ese archivo, algo se
@@ -215,7 +217,9 @@ oráculo quedaría igualmente desactualizado el día que el flag se vuelva defau
 1. Temario con más de una fila:
    `"track: corta declara pieza única pero el temario tiene N filas: corrige el temario o escala (scripts/track.py --escalar)"`
 2. Capítulos con ordinal ≥ 2 en `chapters/`:
-   `"track: corta con capítulos fuera de temario (2, 3): sugiere escalar (scripts/track.py --escalar)"`
+   `"track: corta con capítulos fuera de pieza única (2, 3): sugiere escalar (scripts/track.py --escalar)"`
+
+Los textos literales mandan desde `contracts/track-cli.md` § 3.2, no desde aquí.
 
 Ninguna de las dos modifica `next_step`, `next_detail`, `gates`, `closeable`,
 `by_chapter` ni `all_chapters_approved`. Son informativas y no bloquean.

@@ -61,6 +61,51 @@ def project_mode(manifest: dict | None) -> str:
     return mode
 
 
+def project_track(manifest: dict | None) -> str:
+    """Pista del proyecto: ausencia/None = estandar; valor desconocido → ValueError.
+
+    Gemelo exacto de project_mode. Todo consumidor (status.py, export.py,
+    track.py) usa este accesor; ningún script lee manifest['track'] directamente.
+    """
+    if manifest is None:
+        return "estandar"
+    track = manifest.get("track", "estandar")
+    if track is None:
+        return "estandar"
+    if track not in {"estandar", "corta"}:
+        raise ValueError("manifest.track debe ser 'estandar' o 'corta'")
+    return track
+
+
+def count_temario(spec_dir: Path) -> int:
+    """Cuenta los capítulos declarados en la tabla Temario de plan.md."""
+    plan = spec_dir / "plan.md"
+    if not plan.exists():
+        return 0
+    n, in_temario = 0, False
+    for line in plan.read_text(encoding="utf-8").splitlines():
+        s = line.strip()
+        if s.startswith("## ") and "Temario" in s:
+            in_temario = True
+            continue
+        if in_temario and s.startswith("## ") and "Temario" not in s:
+            break
+        if in_temario and re.match(r"\|\s*\d+\s*\|", s):
+            n += 1
+    return n
+
+
+def drafted_ordinals(chapters: list[str]) -> set[int]:
+    """Ordinales con fichero chapters/NN-*.md presente. Mapea ordinal→fichero por
+    el prefijo numérico del nombre (p. ej. '03-intro.md' → 3)."""
+    out: set[int] = set()
+    for name in chapters:
+        m = re.match(r"\s*(\d+)", name)
+        if m:
+            out.add(int(m.group(1)))
+    return out
+
+
 def parse_findings(findings_md: Path) -> list[dict]:
     """Return pass blocks with signature metadata, covered chapters and findings."""
     if not findings_md.exists():

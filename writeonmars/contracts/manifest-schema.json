@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://write-on-mars.dev/contracts/manifest/v1.3.0.json",
-  "$comment": "ÚNICA fuente editable desde 2026-07-04 (contracts/ raíz y specs/001 son punteros). v1.1 (MINOR, feature 003-atribucion-factualidad): adds optional quality_gates. v1.2 (MINOR, 2026-07-04, pirámide de prosa): adds optional sector and registro; sector already era escrito por speckit.constitution pero no estaba declarado (con additionalProperties:false el manifiesto no validaba). v1.2.1 (PATCH, 2026-07-04): sector admite null (bootstrap escribe null hasta que speckit.constitution lo fija; un proyecto recién creado no validaba). v1.3 (MINOR, feature 004-vivarium-core): adds optional mode and mode_history (constitución v1.6.0 § Modos de proyecto; ausencia de mode = produccion).",
-  "title": "Write.OnMars Project Manifest v1.3.0",
+  "$id": "https://write-on-mars.dev/contracts/manifest/v1.4.0.json",
+  "$comment": "ÚNICA fuente editable desde 2026-07-04 (contracts/ raíz y specs/001 son punteros). v1.1 (MINOR, feature 003-atribucion-factualidad): adds optional quality_gates. v1.2 (MINOR, 2026-07-04, pirámide de prosa): adds optional sector and registro; sector already era escrito por speckit.constitution pero no estaba declarado (con additionalProperties:false el manifiesto no validaba). v1.2.1 (PATCH, 2026-07-04): sector admite null (bootstrap escribe null hasta que speckit.constitution lo fija; un proyecto recién creado no validaba). v1.3 (MINOR, feature 004-vivarium-core): adds optional mode and mode_history (constitución v1.6.0 § Modos de proyecto; ausencia de mode = produccion). v1.4 (MINOR, feature 006-pista-corta-editorial): adds optional track and track_history (constitución v1.7.0 § Pistas de ceremonia; ausencia de track = estandar). track_history registra `actor` humano, a diferencia de mode_history: el escalado de pista exige identidad humana auditable (scripts/track.py).",
+  "title": "Write.OnMars Project Manifest v1.4.0",
   "description": "Manifest declared by every editorial project that uses the Write.OnMars harness. Produced by `writeonmars-install` (FR-001..FR-004) and updated when versions, signing matrix or operators change.",
   "type": "object",
   "required": [
@@ -119,6 +119,27 @@
           "from": {"type": "string", "enum": ["produccion", "estudio"]},
           "to": {"type": "string", "enum": ["produccion", "estudio"]},
           "date": {"type": "string", "format": "date-time"}
+        }
+      }
+    },
+    "track": {
+      "type": "string",
+      "enum": ["estandar", "corta"],
+      "description": "Pista de ceremonia del proyecto (constitución v1.7.0 § Pistas de ceremonia). Ausencia = estandar. estandar: ceremonia completa (temario multi-capítulo, 3 pasadas locales + 1 global, intro). corta: pieza única (temario degenerado de una fila, pasada combinada 1·2·3·5 + precisión 4, sin intro). Ortogonal a `mode`."
+    },
+    "track_history": {
+      "type": "array",
+      "description": "Registro append-only de cambios de pista. Lo escribe EXCLUSIVAMENTE scripts/track.py, que exige identidad humana desde git config y rechaza identidades de agente. Nunca se edita a mano.",
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "date", "actor"],
+        "additionalProperties": false,
+        "properties": {
+          "from": {"type": "string", "enum": ["estandar", "corta"]},
+          "to": {"type": "string", "enum": ["estandar", "corta"]},
+          "date": {"type": "string", "format": "date-time"},
+          "actor": {"type": "string", "minLength": 1, "description": "git config user.name del humano que ejecutó el cambio."},
+          "email": {"type": "string", "format": "email"}
         }
       }
     },

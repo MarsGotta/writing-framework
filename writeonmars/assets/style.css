@@ -305,6 +305,30 @@ hr {
   letter-spacing: 0.05em;
 }
 
+/* ===== Compact cover (pista corta: pieza única) ===== */
+/* Hereda .cover (page: cover, page-break-after: always). Sin eyebrow ni
+   subtitle: el título respira más y se centra algo más alto. Solo se añaden
+   estas reglas; la regla de página de portada no se toca (R9). */
+
+.cover-compact {
+  padding: 6cm 3cm;
+}
+
+.cover-author {
+  font-family: "Inter", -apple-system, sans-serif;
+  font-size: 14pt;
+  font-weight: 500;
+  color: #44403c;
+  letter-spacing: 0.02em;
+  margin: 1cm 0 3cm 0;
+}
+
+/* Sin manifiesto ni operadores, {{AUTHOR}} queda vacío: la portada omite la
+   línea de autor en lugar de dejar un hueco (contrato § 4.2). */
+.cover-author:empty {
+  display: none;
+}
+
 /* ===== Pandoc title header — hide (duplicated by cover) ===== */
 
 #title-block-header {

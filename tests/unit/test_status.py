@@ -583,3 +583,38 @@ class TestCli:
         assert res.returncode == 0
         assert "Gates de cierre" in res.stdout
         assert "PROYECTO CERRABLE" in res.stdout
+
+
+# ---------------------------------------------------------------------------
+# Retrocompatibilidad de la pista (feature 006): SC-003, FR-010, R4
+# ---------------------------------------------------------------------------
+class TestRetrocompatPista:
+    def test_dashboard_byte_identico_y_json_solo_gana_track(
+        self, status_mod, repo_root, capsys
+    ):
+        """Un proyecto sin `track` (fixture 003, raíz en /project) se comporta igual
+        que antes de la feature: el dashboard humano es BYTE-IDÉNTICO al oráculo que
+        T003 capturó con el status.py previo, y --json gana EXACTAMENTE la clave
+        aditiva `track == estandar` y ninguna otra (SC-003, quickstart §1, R4)."""
+        proj = repo_root / "tests" / "fixtures" / "003-factualidad" / "project"
+        state = evaluate(status_mod, proj)
+
+        # 1) Dashboard byte-idéntico al oráculo pre-feature.
+        status_mod.print_dashboard(state)
+        rendered = capsys.readouterr().out
+        oracle_txt = (
+            repo_root / "tests" / "fixtures" / "006-corta" / "expected-dashboard-estandar.txt"
+        ).read_text(encoding="utf-8")
+        assert rendered == oracle_txt
+
+        # 2) --json: la única diferencia de contrato es la clave `track`. El conjunto
+        #    de claves coincide con el oráculo congelado de la 005 (que ganó esa misma
+        #    clave y nada más), y en estandar no se emite ninguna entrada advisory.
+        assert state["track"] == "estandar"
+        oracle_005 = json.loads(
+            (repo_root / "tests" / "fixtures" / "005-estudio" / "expected-status.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        assert set(state) == set(oracle_005)
+        assert not any("track: corta" in w for w in state["warnings"])

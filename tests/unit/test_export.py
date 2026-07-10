@@ -12,6 +12,9 @@ from pathlib import Path
 
 import pytest
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+FIXTURE_CORTA = REPO_ROOT / "tests" / "fixtures" / "006-corta" / "produccion"
+
 
 # ---------------------------------------------------------------------------
 # slugify
@@ -274,3 +277,80 @@ class TestFindChrome:
         with pytest.raises(SystemExit):
             export_mod.find_chrome(None)
         assert "WOM_CHROME" in capsys.readouterr().err
+
+
+# ---------------------------------------------------------------------------
+# Pista corta (feature 006): portada compacta y bifurcación del ensamblado.
+# Todo se verifica sin Chrome: funciones puras + HTML intermedio (pandoc mockeado).
+# ---------------------------------------------------------------------------
+def _fake_pandoc(export_mod, monkeypatch, stdout: str) -> None:
+    def fake_run(cmd, **kwargs):
+        class R:
+            pass
+
+        R.stdout = stdout
+        return R()
+
+    monkeypatch.setattr(export_mod.subprocess, "run", fake_run)
+
+
+class TestPistaCorta:
+    def test_build_cover_compact_marcado_y_sin_eyebrow_ni_subtitle(self, export_mod):
+        out = export_mod.build_cover_compact("T", "A", "2026")
+        assert "cover-compact" in out
+        assert "T" in out and "A" in out and "2026" in out
+        assert "cover-eyebrow" not in out
+        assert "cover-subtitle" not in out
+
+    def test_cover_author_prefiere_email_luego_id_y_vacios(self, export_mod):
+        assert export_mod.cover_author(
+            {"human_operators": [{"id": "m", "email": "m@x.com"}]}
+        ) == "m@x.com"
+        assert export_mod.cover_author(
+            {"human_operators": [{"id": "m", "role": "author"}]}
+        ) == "m"
+        assert export_mod.cover_author({"human_operators": []}) == ""
+        assert export_mod.cover_author(None) == ""
+
+    def test_html_corta_no_contiene_toc_page(self, export_mod, monkeypatch):
+        _fake_pandoc(export_mod, monkeypatch, "<h1>Cap</h1>\n<p>x</p>")
+        project = FIXTURE_CORTA
+        manifest = export_mod.findings_lib.load_manifest(project)
+        track = export_mod.findings_lib.project_track(manifest)
+        assert track == "corta"
+        html_out, chapters = export_mod.assemble_html(
+            project,
+            project / "specs" / "001-mi-pieza",
+            project / "chapters",
+            title="La pieza",
+            meta="2026",
+            track=track,
+            author=export_mod.cover_author(manifest),
+        )
+        assert "toc-page" not in html_out
+        assert "cover-compact" in html_out
+        # human_operators[0].email materializa la línea de autor.
+        assert "marcela@example.com" in html_out
+        assert len(chapters) == 1
+
+    def test_html_estandar_conserva_toc_y_eyebrow(
+        self, export_mod, fact_project, monkeypatch
+    ):
+        # Regresión: proyecto sin track (⇒ estandar) mantiene índice y portada larga.
+        _fake_pandoc(export_mod, monkeypatch, "<h1>Cap</h1>\n<h2>Fuentes</h2>\n<p>x</p>")
+        project = fact_project()
+        manifest = export_mod.findings_lib.load_manifest(project)
+        track = export_mod.findings_lib.project_track(manifest)
+        assert track == "estandar"
+        html_out, _chapters = export_mod.assemble_html(
+            project,
+            project / "specs" / "001-fact",
+            project / "chapters",
+            title="Guía de factualidad",
+            eyebrow="Una guía",
+            meta="2026",
+            track=track,
+        )
+        assert "toc-page" in html_out
+        assert "cover-eyebrow" in html_out
+        assert "cover-compact" not in html_out

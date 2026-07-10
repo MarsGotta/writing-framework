@@ -34,3 +34,11 @@ No avances a redacción si hay capítulos sin promesa, títulos vacíos, o conex
 
 `plan.md` con Temario + Descripciones encadenadas. Pasa el Constitution Check
 editorial (los cinco principios) antes de seguir.
+
+## Pista corta
+
+Si el manifiesto declara `track: corta` (`.writeonmars-manifest.json`), este comando no
+se despacha en el camino feliz: la firma del brief en `speckit.specify` ya materializó
+el temario degenerado de una fila. Si se invoca a mano, **MUST preservar la sección
+`## Temario` existente**: no la regeneres ni la sobrescribas. La pieza única ya es el
+capítulo 1 del temario.

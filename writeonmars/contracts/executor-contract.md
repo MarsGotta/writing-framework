@@ -69,7 +69,7 @@ garantizados (nombres exactos; no inventar): `next_step`, `next_detail`,
 `chapters`, `chapters_written`, `chapters_expected`, `passes`,
 `criticals_open`, `open_findings_total`, `revise_pending`,
 `revise_by_chapter`, `advisory_open_bajo`, `sign_violations`, `gates`,
-`closeable`, `has_manifest`, `by_chapter`, `all_chapters_approved`.
+`closeable`, `has_manifest`, `by_chapter`, `all_chapters_approved`, `track`.
 
 `by_chapter`: objeto keyado por ordinal del temario en string (`"1"`..`"N"`,
 más `"global"`), valor `{ "drafted": bool, "passes_done": [int],
@@ -120,3 +120,23 @@ Delta para proyectos con `.writeonmars-manifest.json` declarando
 - Si un ejecutor comitea trabajo de agentes, el autor del commit MUST usar la
   convención `<rol>@agents.writeonmars.invalid` para que
   `scripts/authorship.py` pueda clasificar la procedencia.
+
+## 7. Pista corta
+
+Delta para proyectos con `.writeonmars-manifest.json` declarando `track: corta`.
+
+- `status.py --json` expone `track` (`"estandar"` | `"corta"`, siempre presente).
+  El ejecutor MUST leerlo de ahí, nunca del manifiesto directamente.
+- En etapa global, el paso `intro` **no aplica**: el ejecutor MUST NOT exigir
+  `README.md` antes del export, en ningún modo. Una pieza única no tiene README
+  de presentación; `export.py` produce la portada compacta.
+- El ejecutor MUST NOT cambiar `track` ni ofrecer un comando para hacerlo. El
+  escalado vive en `scripts/track.py` y exige identidad humana (Principio VI).
+- Ningún otro cambio es admisible. En particular: la pasada combinada (un
+  despacho que registra los bloques 1·2·3·5) es transparente para el ejecutor —
+  ve el bloque 1 registrado y continúa por la primera pasada ausente, la 4.
+- Un ejecutor sin este delta ante un proyecto corta se quedará esperando en el
+  paso `intro` (pide un `README.md` que nadie escribirá). Falla ruidosa y
+  recuperable, no corrupción de estado.
+
+Campo garantizado adicional en `status.py --json`: `track`.

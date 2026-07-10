@@ -30,6 +30,12 @@ import sys
 import tempfile
 from pathlib import Path
 
+HERE = Path(__file__).resolve().parent
+if str(HERE) not in sys.path:
+    sys.path.insert(0, str(HERE))
+
+import findings_lib  # noqa: E402
+
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
 CHROME_CANDIDATES = [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
@@ -232,6 +238,30 @@ def build_cover(eyebrow: str, title: str, subtitle: str, meta: str) -> str:
     )
 
 
+def build_cover_compact(title: str, author: str, meta: str) -> str:
+    """Portada compacta de pieza única (pista corta): sin eyebrow ni subtitle.
+    Gemela pura de build_cover; conserva la clase .cover para heredar la @page."""
+    tpl = (ASSETS / "cover-compact.html.template").read_text(encoding="utf-8")
+    return (
+        tpl.replace("{{TITLE}}", html.escape(title))
+        .replace("{{AUTHOR}}", html.escape(author))
+        .replace("{{META}}", html.escape(meta))
+    )
+
+
+def cover_author(manifest: dict | None) -> str:
+    """Autor para la portada compacta desde manifest['human_operators'][0]:
+    su 'email' o, si no lo hay, su 'id'. Cadena vacía si falta el manifiesto o la
+    lista de operadores (la portada compacta muestra entonces la línea vacía)."""
+    if not manifest:
+        return ""
+    ops = manifest.get("human_operators") or []
+    if not ops:
+        return ""
+    first = ops[0] or {}
+    return str(first.get("email") or first.get("id") or "")
+
+
 def toc_entry(num: str, title: str, desc: str, anchor: str) -> str:
     return (
         f'    <a class="toc-entry" href="#{anchor}">\n'
@@ -287,37 +317,28 @@ def slugify(s: str) -> str:
 
 
 # --------------------------------------------------------------------------- #
-def main() -> None:
-    ap = argparse.ArgumentParser(description="Genera el PDF editorial de una guía Write.OnMars.")
-    ap.add_argument("--project-dir", default=".", help="Raíz del proyecto editorial (default: cwd).")
-    ap.add_argument("--spec", default=None, help="Nombre/ruta del spec; default: el de número más alto.")
-    ap.add_argument("--chapters-dir", default=None, help="Carpeta de capítulos (default: <proyecto>/chapters).")
-    ap.add_argument("--title", default=None, help="Título de portada (default: del spec).")
-    ap.add_argument("--subtitle", default="", help="Subtítulo de portada.")
-    ap.add_argument("--eyebrow", default="", help="Texto pequeño superior (eyebrow) en portada e índice.")
-    ap.add_argument("--meta", default=None, help="Meta de portada (default: año actual).")
-    ap.add_argument("--output", default=None, help="Ruta del PDF (default: <proyecto>/<slug-titulo>.pdf).")
-    ap.add_argument("--chrome", default=os.environ.get("WOM_CHROME"), help="Ruta a Chrome/Chromium.")
-    ap.add_argument("--keep-temp", action="store_true", help="No borrar el HTML intermedio.")
-    ap.add_argument("--strict-claims", action="store_true",
-                    help="Falla (exit 1) si la validación de factualidad contra claims.md emite avisos.")
-    args = ap.parse_args()
+# Ensamblado del documento (pura salvo por pandoc: NO lanza Chrome). Extraída de
+# main() para poder verificar el HTML intermedio sin generar un PDF real.
+# --------------------------------------------------------------------------- #
+def assemble_html(
+    project: Path,
+    spec_dir: Path | None,
+    chapters_dir: Path,
+    *,
+    title: str,
+    subtitle: str = "",
+    eyebrow: str = "",
+    meta: str,
+    track: str = "estandar",
+    author: str = "",
+    strict_claims: bool = False,
+) -> tuple[str, list[tuple[int, Path]]]:
+    """Recolecta las piezas y ensambla el HTML final. Devuelve (html, capítulos).
 
-    project = Path(args.project_dir).resolve()
-    if not project.is_dir():
-        fail(f"no existe el directorio {project}")
-    if not (ASSETS / "style.css").exists():
-        fail(f"falta {ASSETS/'style.css'}; ¿copiaste los assets del preset?")
-
-    spec_dir = newest_spec_dir(project, args.spec, required=False)
-    title = args.title or (parse_title(spec_dir / "spec.md", project.name) if spec_dir else project.name)
+    En pista corta usa la portada compacta y NO genera índice (build_toc); en
+    estándar el comportamiento es byte-idéntico al anterior."""
     temario = parse_temario(spec_dir / "plan.md") if spec_dir else {}
-    from datetime import date
 
-    meta = args.meta if args.meta is not None else str(date.today().year)
-    chapters_dir = Path(args.chapters_dir).resolve() if args.chapters_dir else project / "chapters"
-
-    # --- Recolectar piezas ---
     body_parts: list[str] = []
     intro_toc: list[tuple[str, str, str]] = []
     chap_toc: list[tuple[str, str, str, str]] = []
@@ -337,7 +358,7 @@ def main() -> None:
     claim_warnings = validate_claims(spec_dir, chapters)
     for w in claim_warnings:
         print(f"[export] aviso factualidad: {w}", file=sys.stderr)
-    if claim_warnings and args.strict_claims:
+    if claim_warnings and strict_claims:
         fail(f"--strict-claims: {len(claim_warnings)} aviso(s) de factualidad; abortando antes del PDF")
 
     for num, path in chapters:
@@ -360,14 +381,77 @@ def main() -> None:
             ref_toc.append((label, desc, anchor))
 
     # --- Ensamblar HTML ---
-    cover = build_cover(args.eyebrow, title, args.subtitle, meta)
-    toc = build_toc(args.eyebrow or "Una guía", intro_toc, chap_toc, ref_toc)
+    if track == "corta":
+        # Pieza única: portada compacta y sin índice (R9). El primer capítulo abre
+        # página por el page-break-after de .cover; no hace falta .toc-page.
+        middle = build_cover_compact(title, author, meta)
+    else:
+        cover = build_cover(eyebrow, title, subtitle, meta)
+        toc = build_toc(eyebrow or "Una guía", intro_toc, chap_toc, ref_toc)
+        middle = f"{cover}\n{toc}"
+
     style_href = (ASSETS / "style.css").resolve().as_uri()
     final_html = (
         f'<!DOCTYPE html>\n<html lang="es">\n<head>\n<meta charset="utf-8">\n'
         f"<title>{html.escape(title)}</title>\n"
         f'<link rel="stylesheet" href="{style_href}">\n</head>\n<body>\n'
-        f"{cover}\n{toc}\n{''.join(body_parts)}\n</body>\n</html>\n"
+        f"{middle}\n{''.join(body_parts)}\n</body>\n</html>\n"
+    )
+    return final_html, chapters
+
+
+# --------------------------------------------------------------------------- #
+def main() -> None:
+    ap = argparse.ArgumentParser(description="Genera el PDF editorial de una guía Write.OnMars.")
+    ap.add_argument("--project-dir", default=".", help="Raíz del proyecto editorial (default: cwd).")
+    ap.add_argument("--spec", default=None, help="Nombre/ruta del spec; default: el de número más alto.")
+    ap.add_argument("--chapters-dir", default=None, help="Carpeta de capítulos (default: <proyecto>/chapters).")
+    ap.add_argument("--title", default=None, help="Título de portada (default: del spec).")
+    ap.add_argument("--subtitle", default="", help="Subtítulo de portada.")
+    ap.add_argument("--eyebrow", default="", help="Texto pequeño superior (eyebrow) en portada e índice.")
+    ap.add_argument("--meta", default=None, help="Meta de portada (default: año actual).")
+    ap.add_argument("--output", default=None, help="Ruta del PDF (default: <proyecto>/<slug-titulo>.pdf).")
+    ap.add_argument("--chrome", default=os.environ.get("WOM_CHROME"), help="Ruta a Chrome/Chromium.")
+    ap.add_argument("--keep-temp", action="store_true", help="No borrar el HTML intermedio.")
+    ap.add_argument("--strict-claims", action="store_true",
+                    help="Falla (exit 1) si la validación de factualidad contra claims.md emite avisos.")
+    args = ap.parse_args()
+
+    project = Path(args.project_dir).resolve()
+    if not project.is_dir():
+        fail(f"no existe el directorio {project}")
+    if not (ASSETS / "style.css").exists():
+        fail(f"falta {ASSETS/'style.css'}; ¿copiaste los assets del preset?")
+
+    # Detección de pista (R9, contrato § 4.1). Tolerante: manifiesto ausente ⇒
+    # estandar (guía legacy de layout plano). Un manifiesto roto sí es error, pero
+    # se reporta como los demás errores de export, no como un traceback: hasta ahora
+    # export.py ni leía el manifiesto, así que el fallo sería nuevo y feo.
+    try:
+        manifest = findings_lib.load_manifest(project)
+        track = findings_lib.project_track(manifest)
+    except ValueError as exc:
+        fail(str(exc))
+    author = cover_author(manifest)
+
+    spec_dir = newest_spec_dir(project, args.spec, required=False)
+    title = args.title or (parse_title(spec_dir / "spec.md", project.name) if spec_dir else project.name)
+    from datetime import date
+
+    meta = args.meta if args.meta is not None else str(date.today().year)
+    chapters_dir = Path(args.chapters_dir).resolve() if args.chapters_dir else project / "chapters"
+
+    final_html, chapters = assemble_html(
+        project,
+        spec_dir,
+        chapters_dir,
+        title=title,
+        subtitle=args.subtitle,
+        eyebrow=args.eyebrow,
+        meta=meta,
+        track=track,
+        author=author,
+        strict_claims=args.strict_claims,
     )
 
     tmpdir = Path(tempfile.mkdtemp(prefix="wom-export-"))
