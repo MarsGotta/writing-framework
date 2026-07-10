@@ -58,5 +58,5 @@ jobs:
           workspaces: vivarium
       - name: Tests de Vivarium
         run: cargo test --workspace --manifest-path vivarium/Cargo.toml
-      - name: Smoke tests (factualidad + vivarium-e2e + estudio-e2e)
+      - name: Smoke tests (factualidad + vivarium-e2e + estudio-e2e + corta-e2e)
         run: bash tests/smoke/run-all.sh

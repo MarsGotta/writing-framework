@@ -18,6 +18,7 @@ tests=(
     "test-factuality.sh"
     "vivarium-e2e.sh"
     "estudio-e2e.sh"
+    "corta-e2e.sh"
 )
 
 results=()

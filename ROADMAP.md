@@ -334,6 +334,16 @@ sin avisos. Confirma SC-001/SC-004 (0 tipos/estados/routines nuevos de Paperclip
 - **CI**: desde 2026-07-09 los gates corren en GitHub Actions
   (`.github/workflows/ci.yml`): pytest, `cargo test` y smokes con stubs en cada
   push. En local siguen siendo obligatorios antes de commitear (CLAUDE.md).
+  Gotcha: si el `python3` del sistema no trae pytest, el comando de CLAUDE.md
+  falla; usa `uvx --with pytest --with pyyaml --with jsonschema python -m pytest
+  tests/unit -q` (la forma que fija T025 de la spec 006).
+- **`StepResult::BlockedByMode` sin test propio** (`vivarium/crates/vivarium-core/
+  src/runner.rs:125`, exit 11): es defensa en profundidad y resulta inalcanzable
+  por el camino feliz —en modo estudio `status.py` propone el checkpoint `write`
+  (exit 10) antes de que el runner planifique un `Act` que escriba manuscrito—, así
+  que los smokes solo lo comprueban como invariante (cero despachos de
+  `implement`/`revise`/`intro`). Un test unitario en `vivarium-core` que construya
+  el `Act` directamente cerraría el hueco.
 - **`guia-prueba`**: su `findings.md` quedó con numeración mezclada de pruebas
   previas; se limpia al re-correr `review` con el preset corregido.
 - **`install.sh`**: retirado del árbol (2026-07-09; vive en la historia de git). La vía canónica es el preset.

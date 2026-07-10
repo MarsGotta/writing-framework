@@ -378,7 +378,7 @@ movido por el escalado.
 
 ## Phase 7: Polish & e2e
 
-- [ ] T022 Smoke `tests/smoke/corta-e2e.sh` implementando quickstart § 6 (espejo de
+- [X] T022 Smoke `tests/smoke/corta-e2e.sh` implementando quickstart § 6 (espejo de
   `tests/smoke/estudio-e2e.sh`; Bash 3.2; skip exit 99 sin `cargo`) y alta del test
   en el array `tests=(...)` de `tests/smoke/run-all.sh`. Crea el proyecto con
   `WRITEONMARS_TRACK=corta WRITEONMARS_SECTOR=tecnologia vivarium new …` — sin tocar
@@ -413,12 +413,25 @@ movido por el escalado.
   en forma corta, que **no resuelve** desde la raíz de un proyecto con el preset
   instalado (`.specify/presets/writeonmars/references/…`); las pasadas de revisión
   ya usan la forma larga. Deriva preexistente, detectada al implementar T009.
-- [ ] T025 Gate final (SC-006): `uvx --with pytest --with pyyaml --with jsonschema
+- [X] T025 Gate final (SC-006): `uvx --with pytest --with pyyaml --with jsonschema
   python -m pytest tests/unit -q` + `bash tests/smoke/run-all.sh` + `cd vivarium &&
   cargo test --workspace` — los tres en verde, en local y en CI
   (`.github/workflows/ci.yml`), sin pasos manuales no documentados. Verificar que el
   conteo de tests unitarios es **≥ 169** y que `git diff` no muestra ninguna
   aserción preexistente modificada (FR-010).
+  Resultado (2026-07-10): **218 unitarios** verdes (≥ 169 ✓), `run-all.sh` 4/4 PASS
+  (factualidad, vivarium-e2e, estudio-e2e, corta-e2e), `cargo test --workspace` en
+  verde y `git diff -- tests/unit/` vacío (FR-010 ✓).
+  Dos matizaciones sobre los asserts de T022, ambas resueltas en la capa correcta:
+  (a) «el HTML no tenía índice» se prueba en `tests/unit/test_export.py`
+  (`test_html_corta_no_contiene_toc_page` + su regresión estándar), no en el smoke,
+  porque el smoke stubea `export.py` (CI no tiene pandoc ni Chrome); (b) el
+  guardarraíl `exit 11` (`StepResult::BlockedByMode`) es defensa en profundidad e
+  **inalcanzable** por el camino feliz de estudio —`status.py` propone el checkpoint
+  `write` (exit 10) antes de que el runner planifique un `Act` que escriba
+  manuscrito—, así que el smoke lo verifica como invariante observable: cero
+  despachos de `implement`/`revise`/`intro`. Deuda menor anotada: `BlockedByMode`
+  no tiene test unitario propio en `vivarium-core`.
 
 ## Dependencies & Execution Order
 
